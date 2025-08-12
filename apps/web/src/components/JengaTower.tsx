@@ -34,25 +34,18 @@ const BlockComponent: React.FC<BlockProps> = ({
   const meshRef = useRef<THREE.Mesh>(null);
   const isRemoved = block.removed;
 
-  // Determine block color based on LAYER position (not block type) - following Bitcoin Jenga design
+  // Determine block color based on type and state - RESTORING ORIGINAL WORKING SYSTEM
   const getBlockColor = () => {
     if (isRemoved) return '#374151'; // Gray for removed blocks
     
     if (!canPullFromLayer) return '#1f2937'; // Dark gray for restricted layers
     
-    // Layer-based color gradient (like the Bitcoin Jenga design)
-    // Bottom layers = Red/Orange (dangerous), Top layers = Green (safe)
-    if (layer <= 2) return '#ef4444'; // Red for bottom layers (most dangerous)
-    if (layer <= 4) return '#f97316'; // Orange for lower-middle layers
-    if (layer <= 6) return '#eab308'; // Yellow for middle layers
-    if (layer <= 8) return '#84cc16'; // Light green for upper-middle layers
-    if (layer <= 10) return '#22c55e'; // Green for upper layers
-    if (layer <= 12) return '#10b981'; // Teal for top layers (safest)
-    if (layer <= 14) return '#06b6d4'; // Blue for very top layers
-    if (layer <= 16) return '#8b5cf6'; // Purple for highest layers
-    if (layer <= 18) return '#ec4899'; // Pink for ultimate layers
-    
-    return '#6b7280'; // Gray fallback
+    switch (block.type) {
+      case 'safe': return '#10b981'; // Green
+      case 'risky': return '#ef4444'; // Red
+      case 'challenge': return '#f59e0b'; // Yellow
+      default: return '#6b7280'; // Gray
+    }
   };
 
   // Debug: Log block information
@@ -114,7 +107,7 @@ const BlockComponent: React.FC<BlockProps> = ({
         roughness={0.8}
       />
       
-      {/* Block Layer Indicator (instead of type) */}
+      {/* Block Type Indicator - RESTORING ORIGINAL */}
       <Text
         position={[0, 0.4, 0]}
         fontSize={0.12}
@@ -122,7 +115,7 @@ const BlockComponent: React.FC<BlockProps> = ({
         anchorX="center"
         anchorY="middle"
       >
-        {layer <= 2 ? '🔴' : layer <= 4 ? '🟠' : layer <= 6 ? '🟡' : layer <= 8 ? '🟢' : layer <= 10 ? '🟢' : layer <= 12 ? '🔵' : layer <= 14 ? '🔵' : layer <= 16 ? '🟣' : '🟣'}
+        {block.type === 'safe' ? '🟢' : block.type === 'risky' ? '🔴' : '🟡'}
       </Text>
       
       {/* Layer number */}
@@ -268,45 +261,31 @@ const JengaTower: React.FC<JengaTowerProps> = ({
         </div>
       </div>
 
-      {/* Enhanced Layer-Based Color Legend */}
+      {/* Enhanced Block Type Legend - RESTORING ORIGINAL */}
       <div className="absolute top-4 right-4 z-10 bg-black/90 backdrop-blur-sm rounded-lg p-4 border border-gray-600/50">
         <div className="text-center mb-3">
-          <div className="text-gray-300 text-sm font-semibold">Layer Difficulty</div>
+          <div className="text-gray-300 text-sm font-semibold">Block Types</div>
         </div>
         <div className="space-y-3 text-sm">
+          <div className="flex items-center gap-3 p-2 bg-green-500/10 border border-green-400/30 rounded-lg">
+            <div className="w-4 h-4 bg-green-500 rounded"></div>
+            <div>
+              <div className="font-semibold text-green-300">Safe</div>
+              <div className="text-green-200 text-xs">+Points, +Stability</div>
+            </div>
+          </div>
           <div className="flex items-center gap-3 p-2 bg-red-500/10 border border-red-400/30 rounded-lg">
             <div className="w-4 h-4 bg-red-500 rounded"></div>
             <div>
-              <div className="font-semibold text-red-300">Layers 1-2</div>
-              <div className="text-red-200 text-xs">Most Dangerous</div>
-            </div>
-          </div>
-          <div className="flex items-center gap-3 p-2 bg-orange-500/10 border border-orange-400/30 rounded-lg">
-            <div className="w-4 h-4 bg-orange-500 rounded"></div>
-            <div>
-              <div className="font-semibold text-orange-300">Layers 3-4</div>
-              <div className="text-orange-200 text-xs">High Risk</div>
+              <div className="font-semibold text-red-300">Risky</div>
+              <div className="text-red-200 text-xs">+Points, -Stability</div>
             </div>
           </div>
           <div className="flex items-center gap-3 p-2 bg-yellow-500/10 border border-yellow-400/30 rounded-lg">
             <div className="w-4 h-4 bg-yellow-500 rounded"></div>
             <div>
-              <div className="font-semibold text-yellow-300">Layers 5-6</div>
-              <div className="text-yellow-200 text-xs">Medium Risk</div>
-            </div>
-          </div>
-          <div className="flex items-center gap-3 p-2 bg-green-500/10 border border-green-400/30 rounded-lg">
-            <div className="w-4 h-4 bg-green-500 rounded"></div>
-            <div>
-              <div className="font-semibold text-green-300">Layers 7-12</div>
-              <div className="text-green-200 text-xs">Lower Risk</div>
-            </div>
-          </div>
-          <div className="flex items-center gap-3 p-2 bg-blue-500/10 border border-blue-400/30 rounded-lg">
-            <div className="w-4 h-4 bg-blue-500 rounded"></div>
-            <div>
-              <div className="font-semibold text-blue-300">Layers 13-18</div>
-              <div className="text-blue-200 text-xs">Safest</div>
+              <div className="font-semibold text-yellow-300">Challenge</div>
+              <div className="text-yellow-200 text-xs">Quiz Questions</div>
             </div>
           </div>
         </div>
@@ -382,15 +361,13 @@ const JengaTower: React.FC<JengaTowerProps> = ({
         />
       </Canvas>
 
-      {/* Interactive Instructions */}
+      {/* Interactive Instructions - RESTORING ORIGINAL */}
       <div className="absolute bottom-4 right-4 z-10 bg-black/80 backdrop-blur-sm rounded-lg p-3 border border-blue-400/50 max-w-xs">
         <div className="text-center">
           <div className="text-blue-300 text-sm font-semibold mb-2">How to Play</div>
           <div className="text-gray-300 text-xs space-y-1">
             <div>• Click on highlighted blocks to remove</div>
-            <div>• Red/Orange = Dangerous (easy access)</div>
-            <div>• Yellow = Medium risk</div>
-            <div>• Green/Blue = Safe (harder access)</div>
+            <div>• Green blocks = Safe, Red = Risky, Yellow = Quiz</div>
             <div>• Roll dice to change layer access</div>
             <div>• Learn privacy tips from each block</div>
           </div>
