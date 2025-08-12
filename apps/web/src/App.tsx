@@ -1,5 +1,4 @@
 import { Routes, Route } from 'react-router-dom';
-import { motion } from 'framer-motion';
 import HomePage from './pages/HomePage';
 import GamePage from './pages/GamePage';
 import BitsaccoLogo from './components/BitsaccoLogo';

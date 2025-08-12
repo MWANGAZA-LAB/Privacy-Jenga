@@ -14,13 +14,15 @@
     "test:ui": "vitest --ui"
   },
   "dependencies": {
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "react-router-dom": "^6.20.1",
+    "@react-three/drei": "^9.88.13",
+    "@react-three/fiber": "^8.15.11",
     "framer-motion": "^10.16.4",
     "lucide-react": "^0.294.0",
-    "@react-three/fiber": "^8.15.11",
-    "@react-three/drei": "^9.88.13",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-hot-toast": "^2.5.2",
+    "react-query": "^3.39.3",
+    "react-router-dom": "^6.20.1",
     "three": "^0.158.0"
   },
   "devDependencies": {

@@ -1,4 +1,4 @@
-import React, { useRef, useMemo } from 'react';
+import React, { useRef } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { OrbitControls, Text, Box } from '@react-three/drei';
 import { Block as BlockType } from '@/types';
@@ -44,9 +44,9 @@ const Block: React.FC<BlockProps> = ({ block, onClick, isSelected, isClickable, 
     if (isSelected) return '#3b82f6'; // Blue for selected
     if (!isClickable) return '#9ca3af'; // Gray for non-clickable
     
-    // Color by level for visual variety
+    // Color by block ID for visual variety
     const colors = ['#ef4444', '#f59e0b', '#10b981', '#8b5cf6', '#06b6d4'];
-    return colors[block.level % colors.length];
+    return colors[parseInt(block.id) % colors.length];
   };
 
   return (
@@ -81,8 +81,10 @@ const JengaTower: React.FC<JengaTowerProps> = ({
   isInteractive, 
   selectedBlockId 
 }) => {
-  const getBlockPosition = (blockData: BlockType): [number, number, number] => {
-    const { level, position } = blockData;
+  const getBlockPosition = (_blockData: BlockType, index: number): [number, number, number] => {
+    // Simple positioning: blocks in a row, 3 blocks per level
+    const level = Math.floor(index / 3);
+    const position = index % 3;
     const isEvenLevel = level % 2 === 0;
     
     let x = 0;
@@ -98,14 +100,16 @@ const JengaTower: React.FC<JengaTowerProps> = ({
       z = (position - 1) * 3; // -3, 0, 3
     }
     
-    const y = level * 0.9; // Stack height
+    const y = level * 0.9; // Height increases with level
     
     return [x, y, z];
   };
 
-  const visibleBlocks = useMemo(() => {
-    return blocks.filter(block => !block.removed);
-  }, [blocks]);
+  // Filter out removed blocks
+  const visibleBlocks = blocks.filter(block => !block.removed);
+
+  // Calculate camera position based on visible blocks
+  const maxLevel = Math.floor((visibleBlocks.length - 1) / 3);
 
   return (
     <div className="w-full h-96 bg-gradient-to-b from-blue-50 to-blue-100 rounded-xl overflow-hidden">
@@ -140,21 +144,21 @@ const JengaTower: React.FC<JengaTowerProps> = ({
         </mesh>
         
         {/* Render blocks */}
-        {visibleBlocks.map((block) => (
+        {visibleBlocks.map((block, index) => (
           <Block
             key={block.id}
             block={block}
             onClick={onBlockClick}
             isSelected={block.id === selectedBlockId}
             isClickable={isInteractive}
-            position={getBlockPosition(block)}
+            position={getBlockPosition(block, index)}
           />
         ))}
         
         {/* Tower stability indicator */}
         {visibleBlocks.length < blocks.length && (
           <Text
-            position={[0, Math.max(...visibleBlocks.map(b => b.level)) * 0.9 + 3, 0]}
+            position={[0, maxLevel * 0.9 + 3, 0]}
             fontSize={1}
             color="#ef4444"
             anchorX="center"

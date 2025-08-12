@@ -1,14 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { 
-  Copy, 
-  Share2, 
   Settings, 
   LogOut, 
   Play, 
   Timer,
-  Trophy,
   Users
 } from 'lucide-react';
 
@@ -57,8 +54,8 @@ const GamePage: React.FC = () => {
   const [room, setRoom] = useState<Room | null>(null);
   const [currentPlayer, setCurrentPlayer] = useState<Player | null>(null);
   const [selectedContent, setSelectedContent] = useState<Content | null>(null);
-  const [isMyTurn, setIsMyTurn] = useState(true);
-  const [turnTimeLeft, setTurnTimeLeft] = useState(60);
+  const [isMyTurn] = useState(true);
+  const [turnTimeLeft] = useState(60);
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
   const [selectedBlock, setSelectedBlock] = useState<Block | null>(null);
   const [showContentModal, setShowContentModal] = useState(false);

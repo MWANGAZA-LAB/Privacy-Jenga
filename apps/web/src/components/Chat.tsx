@@ -100,12 +100,12 @@ const Chat: React.FC<ChatProps> = ({ messages, onSendMessage, disabled = false, 
                           </div>
                         )}
                         <div className="text-sm">
-                          {msg.message}
+                          {msg.text}
                         </div>
                         <div className={`text-xs mt-1 ${
                           msg.playerId === currentPlayerId ? 'text-primary-200' : 'text-gray-500'
                         }`}>
-                          {formatTime(msg.timestamp)}
+                          {formatTime(new Date(msg.timestamp))}
                         </div>
                       </div>
                     </motion.div>

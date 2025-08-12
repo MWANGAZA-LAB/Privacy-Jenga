@@ -98,9 +98,6 @@ const ContentModal: React.FC<ContentModalProps> = ({
                       <span className={getSeverityBadge(content.severity)}>
                         {content.severity.toUpperCase()}
                       </span>
-                      <span className="text-sm text-gray-500">
-                        {content.category}
-                      </span>
                     </div>
                   </div>
                 </div>
@@ -125,23 +122,6 @@ const ContentModal: React.FC<ContentModalProps> = ({
                 </p>
               </div>
 
-              {/* Tags */}
-              {content.tags.length > 0 && (
-                <div className="mb-6">
-                  <h4 className="text-sm font-medium text-gray-900 mb-2">Tags</h4>
-                  <div className="flex flex-wrap gap-2">
-                    {content.tags.map((tag, index) => (
-                      <span
-                        key={index}
-                        className="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded-md"
-                      >
-                        #{tag}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              )}
-
               {/* Quiz Section */}
               {content.quiz && showQuiz && (
                 <div className="border-t border-gray-200 pt-6">
@@ -155,7 +135,7 @@ const ContentModal: React.FC<ContentModalProps> = ({
                     </p>
                     
                     <div className="space-y-3">
-                      {content.quiz.choices.map((choice, index) => (
+                      {content.quiz.choices.map((choice: string, index: number) => (
                         <motion.label
                           key={index}
                           className={`flex items-center p-3 rounded-lg border cursor-pointer transition-all ${
@@ -250,11 +230,11 @@ const ContentModal: React.FC<ContentModalProps> = ({
                         </span>
                       </div>
                       
-                      {showExplanation && content.quiz.explanation && (
+                      {showExplanation && (
                         <p className={`text-sm ${
                           isCorrectAnswer ? 'text-green-700' : 'text-red-700'
                         }`}>
-                          {content.quiz.explanation}
+                          {isCorrectAnswer ? 'Great job! You understand this privacy concept well.' : 'Keep learning! Privacy is an ongoing journey.'}
                         </p>
                       )}
                     </motion.div>
