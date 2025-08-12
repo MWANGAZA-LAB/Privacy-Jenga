@@ -34,6 +34,23 @@ const BlockComponent: React.FC<BlockProps> = ({
   const meshRef = useRef<THREE.Mesh>(null);
   const isRemoved = block.removed;
 
+  // Determine block color based on type and state
+  const getBlockColor = () => {
+    if (isRemoved) return '#374151'; // Gray for removed blocks
+    
+    if (!canPullFromLayer) return '#1f2937'; // Dark gray for restricted layers
+    
+    switch (block.type) {
+      case 'safe': return '#10b981'; // Green
+      case 'risky': return '#ef4444'; // Red
+      case 'challenge': return '#f59e0b'; // Yellow
+      default: return '#6b7280'; // Gray
+    }
+  };
+
+  // Debug: Log block information
+  console.log(`Block ${block.id}: type=${block.type}, layer=${layer}, position=${position}, color=${getBlockColor()}`);
+
   // Enhanced visual effects
   useFrame((state) => {
     if (meshRef.current && !isRemoved) {
@@ -51,20 +68,6 @@ const BlockComponent: React.FC<BlockProps> = ({
       }
     }
   });
-
-  // Determine block color based on type and state
-  const getBlockColor = () => {
-    if (isRemoved) return '#374151'; // Gray for removed blocks
-    
-    if (!canPullFromLayer) return '#1f2937'; // Dark gray for restricted layers
-    
-    switch (block.type) {
-      case 'safe': return '#10b981'; // Green
-      case 'risky': return '#ef4444'; // Red
-      case 'challenge': return '#f59e0b'; // Yellow
-      default: return '#6b7280'; // Gray
-    }
-  };
 
   // Determine block opacity
   const getBlockOpacity = () => {
@@ -85,6 +88,9 @@ const BlockComponent: React.FC<BlockProps> = ({
     return null;
   }
 
+  const blockColor = getBlockColor();
+  const blockOpacity = getBlockOpacity();
+
   return (
     <mesh
       ref={meshRef}
@@ -94,9 +100,9 @@ const BlockComponent: React.FC<BlockProps> = ({
     >
       <Box args={[1, 0.3, 3]} />
       <meshStandardMaterial 
-        color={getBlockColor()} 
+        color={blockColor}
         transparent 
-        opacity={getBlockOpacity()}
+        opacity={blockOpacity}
         metalness={0.1}
         roughness={0.8}
       />
@@ -169,6 +175,12 @@ const JengaTower: React.FC<JengaTowerProps> = ({
   gameState,
   selectedBlockId 
 }) => {
+  // Debug: Log what blocks are being received
+  console.log('JengaTower - Received blocks:', blocks?.length || 0);
+  if (blocks && blocks.length > 0) {
+    console.log('JengaTower - First few blocks:', blocks.slice(0, 3).map(b => ({ id: b.id, type: b.type, layer: b.layer })));
+  }
+  
   const maxLayer = Math.max(...(blocks?.map(b => b.layer) || [0]));
   
   // Calculate 3D positions for all blocks
@@ -189,10 +201,12 @@ const JengaTower: React.FC<JengaTowerProps> = ({
   // Filter visible blocks and determine which are removable
   const visibleBlocks = useMemo(() => {
     if (!blocks || blocks.length === 0) {
+      console.warn('JengaTower - No blocks provided to component');
       return [];
     }
     
     if (!gameState) {
+      console.warn('JengaTower - No game state provided');
       return [];
     }
     
@@ -215,6 +229,9 @@ const JengaTower: React.FC<JengaTowerProps> = ({
           worldPosition
         };
       });
+    
+    console.log('JengaTower - Visible blocks after filtering:', filtered.length);
+    console.log('JengaTower - First few visible blocks:', filtered.slice(0, 3).map(b => ({ id: b.id, type: b.type, layer: b.layer })));
     
     return filtered;
   }, [blocks, gameState?.canPullFromLayers]);
