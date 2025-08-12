@@ -1,98 +1,136 @@
 import React from 'react';
-import { motion } from 'framer-motion';
-import { Player } from '@/types';
+import { Player, GameState } from '../types';
+import { Crown, Trophy, Star } from 'lucide-react';
 
 interface PlayerListProps {
   players: Player[];
-  currentTurn: string;
+  currentTurn?: string;
   currentPlayerId?: string;
+  gameState: GameState;
 }
 
-const PlayerList: React.FC<PlayerListProps> = ({ players, currentTurn, currentPlayerId }) => {
-  // Sort players by host status (host first)
+const PlayerList: React.FC<PlayerListProps> = ({ 
+  players, 
+  currentTurn, 
+  currentPlayerId,
+  gameState 
+}) => {
+  // Sort players: host first, then by score
   const sortedPlayers = [...players].sort((a, b) => {
     if (a.isHost && !b.isHost) return -1;
     if (!a.isHost && b.isHost) return 1;
-    return 0;
+    return b.score - a.score;
   });
 
   return (
-    <div className="card">
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="text-lg font-semibold text-gray-900">Players</h3>
-        <div className="text-sm text-gray-500">
-          {players.length} player{players.length !== 1 ? 's' : ''}
-        </div>
-      </div>
-
+    <div className="bitsacco-card p-4">
+      <h3 className="text-lg font-semibold text-teal-300 mb-4 flex items-center gap-2">
+        <Star className="w-5 h-5" />
+        Players ({players.length})
+      </h3>
+      
       <div className="space-y-3">
-        {sortedPlayers.map((player, index) => (
-          <motion.div
+        {sortedPlayers.map((player) => (
+          <div
             key={player.nickname}
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: index * 0.1 }}
-            className={`flex items-center gap-3 p-3 rounded-lg border transition-all ${
+            className={`p-3 rounded-lg border transition-all duration-200 ${
               player.nickname === currentTurn
-                ? 'border-blue-500 bg-blue-50'
-                : 'border-gray-200 hover:border-gray-300'
+                ? 'border-teal-400 bg-teal-400/10'
+                : 'border-gray-600 bg-gray-700/50'
+            } ${
+              player.nickname === currentPlayerId
+                ? 'ring-2 ring-teal-400'
+                : ''
             }`}
           >
-            {/* Player Avatar */}
-            <div className="relative">
-              <div className="w-10 h-10 bg-gradient-to-br from-teal-500 to-cyan-600 rounded-full flex items-center justify-center text-white font-semibold text-lg">
-                {player.nickname.charAt(0).toUpperCase()}
-              </div>
-              
-              {/* Host Crown */}
-              {player.isHost && (
-                <div className="absolute -top-1 -right-1 w-5 h-5 bg-yellow-400 rounded-full flex items-center justify-center" title="Host">
-                  👑
-                </div>
-              )}
-              
-              {/* Current Turn Indicator */}
-              {player.nickname === currentTurn && (
-                <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center">
-                  <div className="w-2 h-2 bg-white rounded-full animate-pulse" />
-                </div>
-              )}
-            </div>
-
-            {/* Player Info */}
-            <div className="flex-1 min-w-0">
+            <div className="flex items-center justify-between mb-2">
               <div className="flex items-center gap-2">
-                <span className={`font-medium truncate ${
-                  player.nickname === currentTurn ? 'text-blue-700' : 'text-gray-900'
-                }`}>
-                  {player.nickname}
-                  {player.nickname === currentPlayerId && ' (You)'}
-                </span>
-                
-                {/* Host Badge */}
                 {player.isHost && (
-                  <span className="px-2 py-1 bg-yellow-100 text-yellow-800 text-xs rounded-full font-medium">
-                    Host
+                  <Crown className="w-4 h-4 text-yellow-400" />
+                )}
+                <span className="font-medium text-white">
+                  {player.nickname}
+                </span>
+                {player.nickname === currentTurn && (
+                  <span className="px-2 py-1 bg-teal-500 text-white text-xs rounded-full">
+                    Current Turn
                   </span>
                 )}
               </div>
               
-              {/* Turn Status */}
-              <div className="text-sm text-gray-500">
-                {player.nickname === currentTurn ? 'Current Turn' : 'Waiting'}
+              <div className="text-right">
+                <div className="text-lg font-bold text-teal-400">
+                  {player.score}
+                </div>
+                <div className="text-xs text-gray-400">Score</div>
               </div>
             </div>
-          </motion.div>
+            
+            <div className="grid grid-cols-2 gap-2 text-xs text-gray-300">
+              <div>
+                <span className="text-gray-400">High Score:</span>
+                <span className="ml-1 text-yellow-400">{player.highScore}</span>
+              </div>
+              <div>
+                <span className="text-gray-400">Games:</span>
+                <span className="ml-1">{player.gamesPlayed}</span>
+              </div>
+              <div>
+                <span className="text-gray-400">Blocks:</span>
+                <span className="ml-1">{player.totalBlocksRemoved}</span>
+              </div>
+              <div>
+                <span className="text-gray-400">Correct:</span>
+                <span className="ml-1 text-green-400">{player.correctAnswers}</span>
+              </div>
+            </div>
+            
+            {player.achievements.length > 0 && (
+              <div className="mt-2 pt-2 border-t border-gray-600">
+                <div className="text-xs text-gray-400 mb-1">Achievements:</div>
+                <div className="flex flex-wrap gap-1">
+                  {player.achievements.slice(0, 3).map((achievement) => (
+                    <div
+                      key={achievement.id}
+                      className="flex items-center gap-1 px-2 py-1 bg-yellow-500/20 border border-yellow-400/30 rounded text-xs text-yellow-300"
+                      title={achievement.description}
+                    >
+                      <Trophy className="w-3 h-3" />
+                      {achievement.name}
+                    </div>
+                  ))}
+                  {player.achievements.length > 3 && (
+                    <div className="text-xs text-gray-400">
+                      +{player.achievements.length - 3} more
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
         ))}
       </div>
-
-      {/* Turn Status */}
-      <div className="mt-4 p-3 bg-gray-50 rounded-lg">
-        <div className="text-sm font-medium text-gray-700 mb-1">
-          Current Turn
-        </div>
-        <div className="text-lg font-semibold text-blue-600">
-          {players.find(p => p.nickname === currentTurn)?.nickname || 'Someone'}&apos;s turn
+      
+      {/* Game Stats Summary */}
+      <div className="mt-4 pt-4 border-t border-gray-600">
+        <div className="text-sm text-gray-400 mb-2">Game Progress:</div>
+        <div className="grid grid-cols-2 gap-2 text-xs">
+          <div>
+            <span className="text-gray-400">Tower Height:</span>
+            <span className="ml-1 text-blue-400">{gameState.towerHeight}/18</span>
+          </div>
+          <div>
+            <span className="text-gray-400">Blocks Removed:</span>
+            <span className="ml-1 text-red-400">{gameState.blocksRemoved}/54</span>
+          </div>
+          <div>
+            <span className="text-gray-400">Current Score:</span>
+            <span className="ml-1 text-teal-400">{gameState.currentScore}</span>
+          </div>
+          <div>
+            <span className="text-gray-400">Mode:</span>
+            <span className="ml-1 text-purple-400 capitalize">{gameState.gameMode}</span>
+          </div>
         </div>
       </div>
     </div>

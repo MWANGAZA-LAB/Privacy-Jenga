@@ -1,279 +1,368 @@
 import React, { useState, useEffect } from 'react';
-import { AnimatePresence } from 'framer-motion';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { 
-  Settings, 
-  LogOut, 
+  ArrowLeft, 
+  Dice1, 
   Play, 
-  Timer,
-  Users
+  Trophy,
+  BarChart3,
+  Infinity
 } from 'lucide-react';
-
 import { mockGameService } from '../services/mockGameService';
+import { Block, Content, Player, GameState } from '../types';
 import JengaTower from '../components/JengaTower';
+import Chat from '../components/Chat';
 import ContentModal from '../components/ContentModal';
 import PlayerList from '../components/PlayerList';
-import Chat from '../components/Chat';
-
-interface Player {
-  nickname: string;
-  isHost: boolean;
-}
-
-interface Room {
-  id: string;
-  code: string;
-}
-
-interface Block {
-  id: string;
-  removed: boolean;
-}
-
-interface Content {
-  id: string;
-  title: string;
-  text: string;
-  severity: 'tip' | 'warning' | 'critical';
-  quiz?: {
-    question: string;
-    choices: string[];
-    correctIndex: number;
-  };
-}
-
-interface ChatMessage {
-  id: number;
-  text: string;
-  player: string;
-  timestamp: string;
-}
+import GameStats from '../components/GameStats';
 
 const GamePage: React.FC = () => {
   const navigate = useNavigate();
-  const [room, setRoom] = useState<Room | null>(null);
-  const [currentPlayer, setCurrentPlayer] = useState<Player | null>(null);
-  const [selectedContent, setSelectedContent] = useState<Content | null>(null);
-  const [isMyTurn] = useState(true);
-  const [turnTimeLeft] = useState(60);
-  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
-  const [selectedBlock, setSelectedBlock] = useState<Block | null>(null);
+  const [searchParams] = useSearchParams();
+  const roomCode = searchParams.get('room');
+  
+  const [blocks, setBlocks] = useState<Block[]>([]);
   const [showContentModal, setShowContentModal] = useState(false);
-  const [showSettings, setShowSettings] = useState(false);
+  const [currentContent, setCurrentContent] = useState<Content | null>(null);
+  const [showQuiz, setShowQuiz] = useState(false);
+  const [players, setPlayers] = useState<Player[]>([]);
+  const [gameState, setGameState] = useState<GameState | null>(null);
+  const [diceRolling, setDiceRolling] = useState(false);
+  const [showGameStats, setShowGameStats] = useState(false);
 
-  // Get current room and player from localStorage
   useEffect(() => {
-    const roomId = localStorage.getItem('currentRoomId');
-    const nickname = localStorage.getItem('playerNickname');
-    
-    if (!roomId || !nickname) {
-      navigate('/');
+    initializeGame();
+  }, []);
+
+  const initializeGame = async () => {
+    try {
+      // Initialize game state
+      await mockGameService.startGame();
+      
+      // Get initial data
+      const initialBlocks = mockGameService.getBlocks();
+      const initialMockPlayers = mockGameService.getPlayers();
+      const initialGameState = mockGameService.getGameState();
+      
+      // Convert MockPlayer to Player
+      const initialPlayers: Player[] = initialMockPlayers.map(mockPlayer => ({
+        nickname: mockPlayer.nickname,
+        isHost: mockPlayer.id === '1', // First player is host
+        score: mockPlayer.score,
+        achievements: mockPlayer.achievements,
+        highScore: mockPlayer.highScore,
+        gamesPlayed: mockPlayer.gamesPlayed,
+        totalPoints: mockPlayer.totalPoints,
+        totalBlocksRemoved: mockPlayer.totalBlocksRemoved,
+        correctAnswers: mockPlayer.correctAnswers,
+        incorrectAnswers: mockPlayer.incorrectAnswers
+      }));
+      
+      setBlocks(initialBlocks);
+      setPlayers(initialPlayers);
+      setGameState(initialGameState);
+      
+      // Create mock room if needed
+      if (roomCode) {
+        // Note: We don't need to store the room in state for single player
+        // Room code is used for display purposes only
+      }
+    } catch (error) {
+      console.error('Failed to initialize game:', error);
+    }
+  };
+
+  const handleBlockClick = async (block: Block) => {
+    if (gameState && !gameState.canPullFromLayers.includes(block.layer)) {
+      alert(`You can only pull from layers: ${gameState.canPullFromLayers.join(', ')}`);
       return;
     }
 
-    const currentRoom = mockGameService.getCurrentRoom();
-    if (currentRoom) {
-      setRoom(currentRoom);
-      setCurrentPlayer({ nickname, isHost: true });
-    } else {
-      navigate('/');
+    try {
+      const result = await mockGameService.pickBlock(block.id);
+      if (result) {
+        setCurrentContent(result.content);
+        setShowContentModal(true);
+        setShowQuiz(result.content.quiz ? true : false);
+        
+        // Update game state
+        setGameState(result.gameState);
+        
+        // Update blocks
+        const updatedBlocks = mockGameService.getBlocks();
+        setBlocks(updatedBlocks);
+        
+        // Check if game is over
+        if (result.gameState.towerHeight <= 1) {
+          setTimeout(() => {
+            alert('Game Over! The tower has fallen!');
+            handleNewGame();
+          }, 1000);
+        }
+      }
+    } catch (error) {
+      console.error('Failed to pick block:', error);
+      alert(error instanceof Error ? error.message : 'Failed to pick block');
     }
-  }, [navigate]);
+  };
 
-  // Handle content display when block is removed
-  useEffect(() => {
-    if (selectedContent) {
-      setShowContentModal(true);
+  const handleQuizAnswer = async (selectedAnswer: number) => {
+    if (!currentContent) return;
+    
+    try {
+      // Find the block that corresponds to the current content
+      const block = blocks.find(b => b.content.id === currentContent.id);
+      if (!block) return;
+      
+      const result = await mockGameService.answerQuiz(block.id, selectedAnswer);
+      
+      // Update game state
+      setGameState(result.gameState);
+      
+      // Update players
+      const updatedMockPlayers = mockGameService.getPlayers();
+      const updatedPlayers: Player[] = updatedMockPlayers.map(mockPlayer => ({
+        nickname: mockPlayer.nickname,
+        isHost: mockPlayer.id === '1', // First player is host
+        score: mockPlayer.score,
+        achievements: mockPlayer.achievements,
+        highScore: mockPlayer.highScore,
+        gamesPlayed: mockPlayer.gamesPlayed,
+        totalPoints: mockPlayer.totalPoints,
+        totalBlocksRemoved: mockPlayer.totalBlocksRemoved,
+        correctAnswers: mockPlayer.correctAnswers,
+        incorrectAnswers: mockPlayer.incorrectAnswers
+      }));
+      setPlayers(updatedPlayers);
+      
+      // Close modal
+      setShowContentModal(false);
+      setShowQuiz(false);
+      setCurrentContent(null);
+      
+      // Show result
+      if (result.correct) {
+        alert(`Correct! +${result.points} points`);
+      } else {
+        alert(`Incorrect! ${result.points} points`);
+      }
+      
+    } catch (error) {
+      console.error('Failed to answer quiz:', error);
     }
-  }, [selectedContent]);
+  };
 
-  if (!room || !currentPlayer) {
+  const handleDiceRoll = async () => {
+    if (diceRolling) return;
+    
+    setDiceRolling(true);
+    try {
+      const result = await mockGameService.rollDice();
+      
+      // Update game state
+      const updatedGameState = mockGameService.getGameState();
+      setGameState(updatedGameState);
+      
+      // Show dice result
+      setTimeout(() => {
+        alert(`Dice: ${result.value}\nEffect: ${result.effect}`);
+        setDiceRolling(false);
+      }, 500);
+      
+    } catch (error) {
+      console.error('Failed to roll dice:', error);
+      setDiceRolling(false);
+    }
+  };
+
+  const handleNewGame = () => {
+    mockGameService.resetGame();
+    initializeGame();
+  };
+
+  const handleEndlessMode = () => {
+    mockGameService.startEndlessMode();
+    initializeGame();
+  };
+
+  const handleBackToHome = () => {
+    navigate('/');
+  };
+
+  if (!gameState) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white flex items-center justify-center">
         <div className="text-center">
-          <div className="loading-spinner mx-auto mb-4" />
-          <p className="text-gray-600">Loading game...</p>
+          <div className="w-16 h-16 border-4 border-teal-400 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-teal-300">Loading game...</p>
         </div>
       </div>
     );
   }
 
-  const handleBlockClick = async (block: Block) => {
-    if (!isMyTurn || block.removed) {
-      alert("It's not your turn or block is unavailable");
-      return;
-    }
-
-    setSelectedBlock(block);
-    
-    try {
-      const result = await mockGameService.pickBlock(block.id);
-      if (result && result.content) {
-        setSelectedContent(result.content);
-      }
-    } catch (error) {
-      alert('Failed to pick block');
-    }
-  };
-
-  const handleQuizAnswer = async (selectedIndex: number) => {
-    if (selectedBlock && selectedContent) {
-      try {
-        // Mock quiz answer handling
-        alert(`Quiz answered! You selected option ${selectedIndex + 1}`);
-        setShowContentModal(false);
-        setSelectedContent(null);
-        setSelectedBlock(null);
-      } catch (error) {
-        alert('Failed to submit quiz answer');
-      }
-    }
-  };
-
-  const handleStartGame = async () => {
-    if (!currentPlayer?.isHost) {
-      alert('Only the host can start the game');
-      return;
-    }
-
-    try {
-      // Mock game start
-      alert('Game started!');
-    } catch (error) {
-      alert('Failed to start game');
-    }
-  };
-
-  const leaveRoom = () => {
-    localStorage.removeItem('currentRoomId');
-    localStorage.removeItem('playerNickname');
-    navigate('/');
-  };
-
-  const sendChatMessage = (text: string) => {
-    const newMessage: ChatMessage = {
-      id: Date.now(),
-      text,
-      player: currentPlayer.nickname,
-      timestamp: new Date().toISOString()
-    };
-    setChatMessages(prev => [...prev, newMessage]);
-  };
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-teal-50 via-white to-cyan-50">
-      {/* Game Header */}
-      <header className="bg-gradient-to-r from-teal-600 to-cyan-600 text-white shadow-lg">
-        <div className="container mx-auto px-6 py-4">
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white">
+      {/* Header */}
+      <header className="bg-gradient-to-r from-gray-800 to-gray-900 border-b border-gray-700 shadow-lg">
+        <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <h1 className="text-2xl font-bold">Privacy Jenga</h1>
-              <div className="bg-teal-500 px-3 py-1 rounded-full text-sm">
-                Room: {room?.code || 'DEMO'}
+            <div className="flex items-center space-x-4">
+              <button
+                onClick={handleBackToHome}
+                className="bitsacco-btn bitsacco-btn-outline flex items-center gap-2"
+              >
+                <ArrowLeft className="w-4 h-4" />
+                Back
+              </button>
+              
+              <div className="text-center">
+                <h1 className="text-xl font-bold text-teal-300">Privacy Jenga</h1>
+                <p className="text-sm text-gray-400">Room: {roomCode || 'Local Game'}</p>
               </div>
             </div>
             
             <div className="flex items-center space-x-4">
-              {/* Turn Timer */}
-              <div className="flex items-center space-x-2 bg-teal-500 px-3 py-1 rounded-full">
-                <Timer className="w-4 h-4" />
-                <span className="text-sm font-medium">{turnTimeLeft}s</span>
+              <div className="text-center">
+                <div className="text-sm text-gray-400">Score</div>
+                <div className="text-xl font-bold text-teal-400">{gameState.currentScore}</div>
               </div>
               
-              {/* Player Info */}
-              <div className="flex items-center space-x-2">
-                <Users className="w-4 h-4" />
-                <span className="text-sm">{currentPlayer.nickname}</span>
-              </div>
-              
-              {/* Settings */}
               <button
-                onClick={() => setShowSettings(!showSettings)}
-                className="p-2 hover:bg-teal-500 rounded-lg transition-colors"
+                onClick={() => setShowGameStats(!showGameStats)}
+                className="bitsacco-btn bitsacco-btn-secondary flex items-center gap-2"
               >
-                <Settings className="w-5 h-5" />
+                <BarChart3 className="w-4 h-4" />
+                Stats
               </button>
               
-              {/* Leave Room */}
               <button
-                onClick={leaveRoom}
-                className="p-2 hover:bg-red-500 rounded-lg transition-colors"
+                onClick={handleDiceRoll}
+                disabled={diceRolling}
+                className="bitsacco-btn bitsacco-btn-primary flex items-center gap-2"
               >
-                <LogOut className="w-5 h-5" />
+                {diceRolling ? (
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                ) : (
+                  <Dice1 className="w-4 h-4" />
+                )}
+                Roll Dice
               </button>
             </div>
+          </div>
+          
+          {/* Game Mode and Dice Info */}
+          <div className="flex items-center justify-between mt-4 text-sm">
+            <div className="flex items-center gap-4">
+              <span className="text-gray-400">Mode:</span>
+              <span className="px-3 py-1 bg-teal-600/20 border border-teal-400/30 rounded-full text-teal-300">
+                {gameState.gameMode === 'endless' ? 'Endless Mode' : 'Classic Mode'}
+              </span>
+              
+              <span className="text-gray-400">Tower:</span>
+              <span className="px-3 py-1 bg-blue-600/20 border border-blue-400/30 rounded-full text-blue-300">
+                {gameState.towerHeight}/18 layers
+              </span>
+            </div>
+            
+            {gameState.diceResult > 0 && (
+              <div className="flex items-center gap-2">
+                <span className="text-gray-400">Dice:</span>
+                <span className="px-3 py-1 bg-purple-600/20 border border-purple-400/30 rounded-full text-purple-300">
+                  {gameState.diceResult}
+                </span>
+                <span className="text-gray-400">Available layers: {gameState.canPullFromLayers.join(', ')}</span>
+              </div>
+            )}
           </div>
         </div>
       </header>
 
-      {/* Game Content */}
-      <main className="container mx-auto px-6 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-          {/* Left Sidebar - Player List */}
+      <div className="container mx-auto px-4 py-6">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+          {/* Left Sidebar - Game Stats */}
           <div className="lg:col-span-1">
-            <PlayerList 
-              players={[currentPlayer]}
-              currentTurn={currentPlayer.nickname}
-            />
-          </div>
-          
-          {/* Center - Jenga Tower */}
-          <div className="lg:col-span-2">
-            <div className="text-center mb-6">
-              <h2 className="text-3xl font-bold text-gray-800 mb-2">
-                Privacy Jenga Tower
-              </h2>
-              <p className="text-gray-600">
-                Click on a block to remove it and learn about privacy!
-              </p>
-            </div>
-            
-            <JengaTower 
-              blocks={mockGameService.getBlocks()}
-              onBlockClick={handleBlockClick}
-              isInteractive={isMyTurn}
-              selectedBlockId={selectedBlock?.id}
-            />
-            
-            {/* Start Game Button */}
-            {currentPlayer?.isHost && (
-              <div className="text-center mt-6">
+            <div className="bitsacco-card p-4 mb-6">
+              <h3 className="text-lg font-semibold text-teal-300 mb-4 flex items-center gap-2">
+                <Trophy className="w-5 h-5" />
+                Game Controls
+              </h3>
+              
+              <div className="space-y-3">
                 <button
-                  onClick={handleStartGame}
-                  className="bg-gradient-to-r from-teal-600 to-cyan-600 text-white px-8 py-3 rounded-lg font-semibold hover:from-teal-700 hover:to-cyan-700 transition-all duration-200 flex items-center justify-center mx-auto space-x-2"
+                  onClick={handleNewGame}
+                  className="bitsacco-btn bitsacco-btn-primary w-full flex items-center justify-center gap-2"
                 >
-                  <Play className="w-5 h-5" />
-                  <span>Start Game</span>
+                  <Play className="w-4 h-4" />
+                  New Game
+                </button>
+                
+                <button
+                  onClick={handleEndlessMode}
+                  className="bitsacco-btn bitsacco-btn-secondary w-full flex items-center justify-center gap-2"
+                >
+                  <Infinity className="w-4 h-4" />
+                  Endless Mode
                 </button>
               </div>
+            </div>
+            
+            {/* Game Stats Toggle */}
+            {showGameStats && (
+              <GameStats
+                gameState={gameState}
+                onNewGame={handleNewGame}
+                onEndlessMode={handleEndlessMode}
+              />
             )}
           </div>
-          
-          {/* Right Sidebar - Chat */}
-          <div className="lg:col-span-1">
-            <Chat 
-              messages={chatMessages}
-              onSendMessage={sendChatMessage}
-              currentPlayerId={currentPlayer.nickname}
+
+          {/* Main Game Area */}
+          <div className="lg:col-span-2">
+            <div className="bitsacco-card p-6">
+              <JengaTower
+                blocks={blocks}
+                onBlockClick={handleBlockClick}
+                isInteractive={true}
+                selectedBlockId={currentContent?.id}
+                gameState={gameState}
+              />
+            </div>
+          </div>
+
+          {/* Right Sidebar - Players and Chat */}
+          <div className="lg:col-span-1 space-y-6">
+            {/* Player List */}
+            <PlayerList
+              players={players}
+              currentTurn={gameState.currentPlayer?.nickname}
+              currentPlayerId={gameState.currentPlayer?.nickname}
+              gameState={gameState}
+            />
+            
+            {/* Chat */}
+            <Chat
+              messages={[]}
+              onSendMessage={() => {}}
+              disabled={false}
+              currentPlayerId={gameState.currentPlayer?.nickname}
             />
           </div>
         </div>
-      </main>
+      </div>
 
       {/* Content Modal */}
-      <AnimatePresence>
-        {showContentModal && selectedContent && (
-          <ContentModal
-            content={selectedContent}
-            isOpen={showContentModal}
-            onClose={() => {
-              setShowContentModal(false);
-              setSelectedContent(null);
-            }}
-            onQuizAnswer={handleQuizAnswer}
-          />
-        )}
-      </AnimatePresence>
+      <ContentModal
+        content={currentContent}
+        isOpen={showContentModal}
+        onClose={() => {
+          setShowContentModal(false);
+          setShowQuiz(false);
+          setCurrentContent(null);
+        }}
+        onQuizAnswer={handleQuizAnswer}
+        showQuiz={showQuiz}
+        gameState={gameState}
+      />
     </div>
   );
 };

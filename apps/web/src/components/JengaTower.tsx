@@ -9,6 +9,7 @@ interface JengaTowerProps {
   onBlockClick: (block: BlockType) => void;
   isInteractive: boolean;
   selectedBlockId?: string;
+  gameState: any;
 }
 
 interface BlockProps {
@@ -39,14 +40,46 @@ const Block: React.FC<BlockProps> = ({ block, onClick, isSelected, isClickable, 
     return null; // Don't render removed blocks
   }
 
-  // Color based on severity and state
+  // Color based on block type and state
   const getBlockColor = () => {
     if (isSelected) return '#3b82f6'; // Blue for selected
-    if (!isClickable) return '#9ca3af'; // Gray for non-clickable
     
-    // Color by block ID for visual variety
-    const colors = ['#ef4444', '#f59e0b', '#10b981', '#8b5cf6', '#06b6d4'];
-    return colors[parseInt(block.id) % colors.length];
+    switch (block.type) {
+      case 'safe':
+        return '#10b981'; // Green for safe blocks
+      case 'risky':
+        return '#ef4444'; // Red for risky blocks
+      case 'challenge':
+        return '#f59e0b'; // Yellow for challenge blocks
+      default:
+        return '#6b7280'; // Gray fallback
+    }
+  };
+
+  // Visual feedback for block type
+  const getBlockMaterial = () => {
+    const baseColor = getBlockColor();
+    
+    if (isSelected) {
+      return (
+        <meshBasicMaterial 
+          color="#3b82f6" 
+          wireframe={true}
+          transparent={true}
+          opacity={0.5} 
+        />
+      );
+    }
+
+    return (
+      <meshStandardMaterial 
+        color={baseColor}
+        transparent={true}
+        opacity={isClickable ? 1 : 0.5}
+        roughness={0.3}
+        metalness={0.1}
+      />
+    );
   };
 
   return (
@@ -56,20 +89,14 @@ const Block: React.FC<BlockProps> = ({ block, onClick, isSelected, isClickable, 
       args={[2.8, 0.8, 0.8]} // Jenga block proportions
       onClick={handleClick}
     >
-      <meshStandardMaterial 
-        color={getBlockColor()}
-        transparent={true}
-        opacity={isClickable ? 1 : 0.5}
-        roughness={0.3}
-        metalness={0.1}
-      />
-      {isSelected && (
-        <meshBasicMaterial 
-          color="#3b82f6" 
-          wireframe={true}
-          transparent={true}
-          opacity={0.5} 
-        />
+      {getBlockMaterial()}
+      
+      {/* Block type indicator */}
+      {!isSelected && (
+        <mesh position={[0, 0.5, 0]}>
+          <boxGeometry args={[0.2, 0.1, 0.2]} />
+          <meshBasicMaterial color={getBlockColor()} />
+        </mesh>
       )}
     </Box>
   );
@@ -79,28 +106,29 @@ const JengaTower: React.FC<JengaTowerProps> = ({
   blocks, 
   onBlockClick, 
   isInteractive, 
-  selectedBlockId 
+  selectedBlockId,
+  gameState,
 }) => {
   const getBlockPosition = (_blockData: BlockType, index: number): [number, number, number] => {
-    // Simple positioning: blocks in a row, 3 blocks per level
-    const level = Math.floor(index / 3);
-    const position = index % 3;
-    const isEvenLevel = level % 2 === 0;
+    // Calculate position based on 18 layers × 3 blocks per layer
+    const layer = Math.floor(index / 3) + 1;
+    const position = (index % 3) + 1;
+    const isEvenLayer = layer % 2 === 0;
     
     let x = 0;
     let z = 0;
     
-    if (isEvenLevel) {
-      // Even levels: blocks along X-axis
-      x = (position - 1) * 3; // -3, 0, 3
+    if (isEvenLayer) {
+      // Even layers: blocks along X-axis
+      x = (position - 2) * 3; // -3, 0, 3
       z = 0;
     } else {
-      // Odd levels: blocks along Z-axis (rotated 90 degrees)
+      // Odd layers: blocks along Z-axis (rotated 90 degrees)
       x = 0;
-      z = (position - 1) * 3; // -3, 0, 3
+      z = (position - 2) * 3; // -3, 0, 3
     }
     
-    const y = level * 0.9; // Height increases with level
+    const y = (layer - 1) * 0.9; // Height increases with layer
     
     return [x, y, z];
   };
@@ -109,7 +137,7 @@ const JengaTower: React.FC<JengaTowerProps> = ({
   const visibleBlocks = blocks.filter(block => !block.removed);
 
   // Calculate camera position based on visible blocks
-  const maxLevel = Math.floor((visibleBlocks.length - 1) / 3);
+  const maxLayer = Math.max(...visibleBlocks.map(b => b.layer));
 
   return (
     <div className="w-full h-96 bg-gradient-to-b from-blue-50 to-blue-100 rounded-xl overflow-hidden">
@@ -158,13 +186,26 @@ const JengaTower: React.FC<JengaTowerProps> = ({
         {/* Tower stability indicator */}
         {visibleBlocks.length < blocks.length && (
           <Text
-            position={[0, maxLevel * 0.9 + 3, 0]}
+            position={[0, maxLayer * 0.9 + 3, 0]}
             fontSize={1}
             color="#ef4444"
             anchorX="center"
             anchorY="middle"
           >
             Tower Unstable!
+          </Text>
+        )}
+        
+        {/* Layer information */}
+        {gameState && gameState.diceResult > 0 && (
+          <Text
+            position={[0, -2, 0]}
+            fontSize={0.8}
+            color="#3b82f6"
+            anchorX="center"
+            anchorY="middle"
+          >
+            Available Layers: {gameState.canPullFromLayers.join(', ')}
           </Text>
         )}
         
@@ -185,6 +226,9 @@ const JengaTower: React.FC<JengaTowerProps> = ({
         <div className="text-sm font-medium text-gray-700">
           Blocks Remaining: {visibleBlocks.length}/{blocks.length}
         </div>
+        <div className="text-xs text-gray-500 mt-1">
+          Layers: {maxLayer}/18
+        </div>
         {isInteractive && (
           <div className="text-xs text-gray-500 mt-1">
             Click a block to remove it
@@ -192,17 +236,25 @@ const JengaTower: React.FC<JengaTowerProps> = ({
         )}
       </div>
       
-      {/* Legend */}
+      {/* Block Type Legend */}
       <div className="absolute bottom-4 right-4 bg-white/90 backdrop-blur-sm rounded-lg p-3 shadow-lg">
-        <div className="text-xs font-medium text-gray-700 mb-2">Block Colors</div>
+        <div className="text-xs font-medium text-gray-700 mb-2">Block Types</div>
         <div className="space-y-1">
+          <div className="flex items-center gap-2">
+            <div className="w-3 h-3 bg-green-500 rounded"></div>
+            <span className="text-xs">Safe (Green)</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="w-3 h-3 bg-red-500 rounded"></div>
+            <span className="text-xs">Risky (Red)</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="w-3 h-3 bg-yellow-500 rounded"></div>
+            <span className="text-xs">Challenge (Yellow)</span>
+          </div>
           <div className="flex items-center gap-2">
             <div className="w-3 h-3 bg-blue-500 rounded"></div>
             <span className="text-xs">Selected</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="w-3 h-3 bg-gray-400 rounded"></div>
-            <span className="text-xs">Unavailable</span>
           </div>
         </div>
       </div>

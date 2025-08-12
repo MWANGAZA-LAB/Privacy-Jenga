@@ -10,6 +10,7 @@ function App() {
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/game" element={<GamePage />} />
+        <Route path="/test" element={<div className="p-8 text-center"><h1 className="text-2xl font-bold text-red-600">Routing Test - This should work!</h1></div>} />
       </Routes>
 
       {/* Footer */}
