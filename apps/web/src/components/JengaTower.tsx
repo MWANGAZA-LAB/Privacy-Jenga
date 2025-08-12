@@ -1,260 +1,350 @@
-import React, { useRef } from 'react';
+import React, { useMemo, useRef } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
-import { OrbitControls, Text, Box } from '@react-three/drei';
-import { Block as BlockType } from '@/types';
-import * as THREE from 'three';
+import { Text, Box, OrbitControls } from '@react-three/drei';
+import { Block, GameState } from '../types';
 
 interface JengaTowerProps {
-  blocks: BlockType[];
-  onBlockClick: (block: BlockType) => void;
-  isInteractive: boolean;
+  blocks: Block[];
+  onBlockClick: (block: Block) => void;
+  gameState: GameState;
   selectedBlockId?: string;
-  gameState: any;
 }
 
 interface BlockProps {
-  block: BlockType;
-  onClick: (block: BlockType) => void;
+  block: Block;
+  onClick: () => void;
   isSelected: boolean;
-  isClickable: boolean;
-  position: [number, number, number];
+  isRemovable: boolean;
+  canPullFromLayer: boolean;
+  layer: number;
+  position: number;
+  worldPosition: [number, number, number];
 }
 
-const Block: React.FC<BlockProps> = ({ block, onClick, isSelected, isClickable, position }) => {
+const BlockComponent: React.FC<BlockProps> = ({ 
+  block, 
+  onClick, 
+  isSelected, 
+  isRemovable, 
+  canPullFromLayer,
+  layer,
+  position,
+  worldPosition
+}) => {
   const meshRef = useRef<THREE.Mesh>(null);
-  
+  const isRemoved = block.removed;
+
+  // Enhanced visual effects
   useFrame((state) => {
-    if (meshRef.current && isSelected) {
-      meshRef.current.rotation.y = Math.sin(state.clock.elapsedTime * 2) * 0.1;
+    if (meshRef.current && !isRemoved) {
+      // Subtle floating animation for accessible blocks
+      if (isRemovable && canPullFromLayer) {
+        meshRef.current.position.y = worldPosition[1] + Math.sin(state.clock.elapsedTime * 2) * 0.02;
+      }
+      
+      // Warning pulse for risky blocks
+      if (block.type === 'risky' && canPullFromLayer && meshRef.current.material) {
+        const material = meshRef.current.material as THREE.Material;
+        if ('opacity' in material) {
+          material.opacity = 0.8 + Math.sin(state.clock.elapsedTime * 3) * 0.2;
+        }
+      }
     }
   });
 
-  const handleClick = (e: any) => {
-    e.stopPropagation();
-    if (isClickable && !block.removed) {
-      onClick(block);
-    }
-  };
-
-  if (block.removed) {
-    return null; // Don't render removed blocks
-  }
-
-  // Color based on block type and state
+  // Determine block color based on type and state
   const getBlockColor = () => {
-    if (isSelected) return '#3b82f6'; // Blue for selected
+    if (isRemoved) return '#374151'; // Gray for removed blocks
+    
+    if (!canPullFromLayer) return '#1f2937'; // Dark gray for restricted layers
     
     switch (block.type) {
-      case 'safe':
-        return '#10b981'; // Green for safe blocks
-      case 'risky':
-        return '#ef4444'; // Red for risky blocks
-      case 'challenge':
-        return '#f59e0b'; // Yellow for challenge blocks
-      default:
-        return '#6b7280'; // Gray fallback
+      case 'safe': return '#10b981'; // Green
+      case 'risky': return '#ef4444'; // Red
+      case 'challenge': return '#f59e0b'; // Yellow
+      default: return '#6b7280'; // Gray
     }
   };
 
-  // Visual feedback for block type
-  const getBlockMaterial = () => {
-    const baseColor = getBlockColor();
-    
-    if (isSelected) {
-      return (
-        <meshBasicMaterial 
-          color="#3b82f6" 
-          wireframe={true}
-          transparent={true}
-          opacity={0.5} 
-        />
-      );
-    }
-
-    return (
-      <meshStandardMaterial 
-        color={baseColor}
-        transparent={true}
-        opacity={isClickable ? 1 : 0.5}
-        roughness={0.3}
-        metalness={0.1}
-      />
-    );
+  // Determine block opacity
+  const getBlockOpacity = () => {
+    if (isRemoved) return 0.3;
+    if (!canPullFromLayer) return 0.5;
+    if (isSelected) return 1;
+    return 0.9;
   };
+
+  // Determine block scale for visual feedback
+  const getBlockScale = () => {
+    if (isSelected) return 1.1;
+    if (isRemovable && canPullFromLayer) return 1.05;
+    return 1;
+  };
+
+  if (isRemoved) {
+    return null;
+  }
 
   return (
-    <Box
+    <mesh
       ref={meshRef}
-      position={position}
-      args={[2.8, 0.8, 0.8]} // Jenga block proportions
-      onClick={handleClick}
+      position={worldPosition}
+      onClick={onClick}
+      scale={getBlockScale()}
     >
-      {getBlockMaterial()}
+      <Box args={[1, 0.3, 3]} />
+      <meshStandardMaterial 
+        color={getBlockColor()} 
+        transparent 
+        opacity={getBlockOpacity()}
+        metalness={0.1}
+        roughness={0.8}
+      />
       
-      {/* Block type indicator */}
-      {!isSelected && (
-        <mesh position={[0, 0.5, 0]}>
-          <boxGeometry args={[0.2, 0.1, 0.2]} />
-          <meshBasicMaterial color={getBlockColor()} />
+      {/* Block Type Indicator */}
+      <Text
+        position={[0, 0.4, 0]}
+        fontSize={0.12}
+        color={canPullFromLayer ? '#ffffff' : '#6b7280'}
+        anchorX="center"
+        anchorY="middle"
+        font="/fonts/Inter-Bold.woff"
+      >
+        {block.type === 'safe' ? '🟢' : block.type === 'risky' ? '🔴' : '🟡'}
+      </Text>
+      
+      {/* Layer indicator */}
+      <Text
+        position={[0, 0.2, 0]}
+        fontSize={0.15}
+        color={canPullFromLayer ? '#ffffff' : '#6b7280'}
+        anchorX="center"
+        anchorY="middle"
+        font="/fonts/Inter-Bold.woff"
+      >
+        {layer}
+      </Text>
+      
+      {/* Position indicator */}
+      <Text
+        position={[0, -0.2, 0]}
+        fontSize={0.12}
+        color={canPullFromLayer ? '#e5e7eb' : '#6b7280'}
+        anchorX="center"
+        anchorY="middle"
+        font="/fonts/Inter-Regular.woff"
+      >
+        {position + 1}
+      </Text>
+
+      {/* Selection highlight */}
+      {isSelected && (
+        <mesh position={[0, 0, 0]}>
+          <Box args={[1.1, 0.35, 3.1]} />
+          <meshBasicMaterial 
+            color="#06b6d4" 
+            wireframe={true}
+            transparent
+            opacity={0.8}
+          />
         </mesh>
       )}
-    </Box>
+
+      {/* Removable indicator */}
+      {isRemovable && canPullFromLayer && (
+        <mesh position={[0, 0, 0]}>
+          <Box args={[1.05, 0.32, 3.05]} />
+          <meshBasicMaterial 
+            color="#ffffff" 
+            wireframe={true}
+            transparent
+            opacity={0.3}
+          />
+        </mesh>
+      )}
+    </mesh>
   );
 };
 
 const JengaTower: React.FC<JengaTowerProps> = ({ 
   blocks, 
   onBlockClick, 
-  isInteractive, 
-  selectedBlockId,
   gameState,
+  selectedBlockId 
 }) => {
-  const getBlockPosition = (_blockData: BlockType, index: number): [number, number, number] => {
-    // Calculate position based on 18 layers × 3 blocks per layer
-    const layer = Math.floor(index / 3) + 1;
-    const position = (index % 3) + 1;
-    const isEvenLayer = layer % 2 === 0;
+  const maxLayer = Math.max(...blocks.map(b => b.layer));
+  
+  // Calculate 3D positions for all blocks
+  const getBlockWorldPosition = (layer: number, position: number): [number, number, number] => {
+    const layerHeight = 0.4; // Height between layers
+    const blockSpacing = 1.2; // Spacing between blocks in same layer
     
-    let x = 0;
-    let z = 0;
+    // Calculate position within layer (0, 1, or 2)
+    const x = (position - 1) * blockSpacing;
+    const y = (maxLayer - layer) * layerHeight;
     
-    if (isEvenLayer) {
-      // Even layers: blocks along X-axis
-      x = (position - 2) * 3; // -3, 0, 3
-      z = 0;
-    } else {
-      // Odd layers: blocks along Z-axis (rotated 90 degrees)
-      x = 0;
-      z = (position - 2) * 3; // -3, 0, 3
-    }
-    
-    const y = (layer - 1) * 0.9; // Height increases with layer
+    // Alternate orientation every layer
+    const z = layer % 2 === 0 ? 0 : 1.5;
     
     return [x, y, z];
   };
 
-  // Filter out removed blocks
-  const visibleBlocks = blocks.filter(block => !block.removed);
+  // Filter visible blocks and determine which are removable
+  const visibleBlocks = useMemo(() => {
+    return blocks
+      .filter(block => !block.removed)
+      .map(block => {
+        // Handle both number and array types for canPullFromLayers
+        const maxAllowedLayer = Array.isArray(gameState.canPullFromLayers) 
+          ? Math.max(...gameState.canPullFromLayers)
+          : gameState.canPullFromLayers;
+        
+        const isRemovable = block.layer <= maxAllowedLayer;
+        const canPullFromLayer = block.layer <= maxAllowedLayer;
+        const worldPosition = getBlockWorldPosition(block.layer, block.position);
+        
+        return {
+          ...block,
+          isRemovable,
+          canPullFromLayer,
+          worldPosition
+        };
+      });
+  }, [blocks, gameState.canPullFromLayers]);
 
-  // Calculate camera position based on visible blocks
-  const maxLayer = Math.max(...visibleBlocks.map(b => b.layer));
+  // Get the maximum allowed layer for display
+  const maxAllowedLayer = Array.isArray(gameState.canPullFromLayers) 
+    ? Math.max(...gameState.canPullFromLayers)
+    : gameState.canPullFromLayers;
 
   return (
-    <div className="w-full h-96 bg-gradient-to-b from-blue-50 to-blue-100 rounded-xl overflow-hidden">
+    <div className="jenga-tower-container relative w-full h-full">
+      {/* Layer Restriction Overlay */}
+      <div className="absolute top-4 left-4 z-10 bg-black/80 backdrop-blur-sm rounded-lg p-3 border border-teal-400/50">
+        <div className="text-center">
+          <div className="text-teal-300 text-sm font-semibold mb-1">Available Layers</div>
+          <div className="text-white text-lg font-bold">
+            {maxAllowedLayer === 1 && "1-3 (Safe Zone)"}
+            {maxAllowedLayer === 2 && "1-6 (Steady)"}
+            {maxAllowedLayer === 3 && "1-9 (Risky)"}
+            {maxAllowedLayer === 4 && "1-12 (Danger)"}
+            {maxAllowedLayer === 5 && "1-15 (Extreme)"}
+            {maxAllowedLayer === 6 && "All Layers (Ultimate)"}
+          </div>
+          <div className="text-teal-200 text-xs mt-1">
+            Roll dice to change access
+          </div>
+        </div>
+      </div>
+
+      {/* Enhanced Block Type Legend */}
+      <div className="absolute top-4 right-4 z-10 bg-black/90 backdrop-blur-sm rounded-lg p-4 border border-gray-600/50">
+        <div className="text-center mb-3">
+          <div className="text-gray-300 text-sm font-semibold">Block Types</div>
+        </div>
+        <div className="space-y-3 text-sm">
+          <div className="flex items-center gap-3 p-2 bg-green-500/10 border border-green-400/30 rounded-lg">
+            <div className="w-4 h-4 bg-green-500 rounded"></div>
+            <div>
+              <div className="font-semibold text-green-300">Safe</div>
+              <div className="text-green-200 text-xs">+Points, +Stability</div>
+            </div>
+          </div>
+          <div className="flex items-center gap-3 p-2 bg-red-500/10 border border-red-400/30 rounded-lg">
+            <div className="w-4 h-4 bg-red-500 rounded"></div>
+            <div>
+              <div className="font-semibold text-red-300">Risky</div>
+              <div className="text-red-200 text-xs">+Points, -Stability</div>
+            </div>
+          </div>
+          <div className="flex items-center gap-3 p-2 bg-yellow-500/10 border border-yellow-400/30 rounded-lg">
+            <div className="w-4 h-4 bg-yellow-500 rounded"></div>
+            <div>
+              <div className="font-semibold text-yellow-300">Challenge</div>
+              <div className="text-yellow-200 text-xs">Quiz Questions</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Tower Stability Indicator */}
+      <div className="absolute bottom-4 left-4 z-10 bg-black/80 backdrop-blur-sm rounded-lg p-3 border border-gray-600/50">
+        <div className="text-center">
+          <div className="text-gray-300 text-sm font-semibold mb-1">Tower Stability</div>
+          <div className="w-24 h-2 bg-gray-700 rounded-full overflow-hidden">
+            <div 
+              className={`h-full transition-all duration-500 ${
+                gameState.towerHeight > 15 ? 'bg-green-500' :
+                gameState.towerHeight > 10 ? 'bg-yellow-500' :
+                gameState.towerHeight > 5 ? 'bg-orange-500' : 'bg-red-500'
+              }`}
+              style={{ width: `${(gameState.towerHeight / maxLayer) * 100}%` }}
+            />
+          </div>
+          <div className="text-white text-sm font-bold mt-1">
+            {gameState.towerHeight}/{maxLayer} layers
+          </div>
+        </div>
+      </div>
+
+      {/* 3D Canvas */}
       <Canvas
-        camera={{ 
-          position: [10, 10, 10], 
-          fov: 50,
-          near: 0.1,
-          far: 1000
-        }}
-        shadows
+        camera={{ position: [8, 8, 8], fov: 50 }}
+        className="w-full h-full"
       >
-        {/* Lighting */}
-        <ambientLight intensity={0.4} />
-        <directionalLight 
-          position={[10, 10, 5]} 
-          intensity={1}
-          castShadow={true}
-          shadow-mapSize-width={2048}
-          shadow-mapSize-height={2048}
-        />
-        <pointLight position={[-10, -10, -10]} intensity={0.3} />
+        <ambientLight intensity={0.6} />
+        <directionalLight position={[10, 10, 5]} intensity={1} />
+        <pointLight position={[-10, -10, -10]} intensity={0.5} />
         
-        {/* Ground plane */}
-        <mesh 
-          rotation={[-Math.PI / 2, 0, 0]} 
-          position={[0, -1, 0]}
-          receiveShadow={true}
-        >
+        {/* Ground plane for reference */}
+        <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.1, 0]}>
           <planeGeometry args={[20, 20]} />
-          <meshStandardMaterial color="#f3f4f6" />
+          <meshBasicMaterial color="#374151" transparent opacity={0.3} />
         </mesh>
         
         {/* Render blocks */}
-        {visibleBlocks.map((block, index) => (
-          <Block
-            key={block.id}
-            block={block}
-            onClick={onBlockClick}
-            isSelected={block.id === selectedBlockId}
-            isClickable={isInteractive}
-            position={getBlockPosition(block, index)}
-          />
+        {visibleBlocks.map((block) => {
+          return (
+            <BlockComponent
+              key={block.id}
+              block={block}
+              onClick={() => onBlockClick(block)}
+              isSelected={selectedBlockId === block.id}
+              isRemovable={block.isRemovable}
+              canPullFromLayer={block.canPullFromLayer}
+              layer={block.layer}
+              position={block.position}
+              worldPosition={block.worldPosition}
+            />
+          );
+        })}
+        
+        {/* Layer separation lines */}
+        {Array.from({ length: maxLayer + 1 }, (_, i) => (
+          <mesh key={`layer-${i}`} position={[0, (maxLayer - i) * 0.4, 0]}>
+            <planeGeometry args={[10, 0.01]} />
+            <meshBasicMaterial color="#374151" transparent opacity={0.3} />
+          </mesh>
         ))}
         
-        {/* Tower stability indicator */}
-        {visibleBlocks.length < blocks.length && (
-          <Text
-            position={[0, maxLayer * 0.9 + 3, 0]}
-            fontSize={1}
-            color="#ef4444"
-            anchorX="center"
-            anchorY="middle"
-          >
-            Tower Unstable!
-          </Text>
-        )}
-        
-        {/* Layer information */}
-        {gameState && gameState.diceResult > 0 && (
-          <Text
-            position={[0, -2, 0]}
-            fontSize={0.8}
-            color="#3b82f6"
-            anchorX="center"
-            anchorY="middle"
-          >
-            Available Layers: {gameState.canPullFromLayers.join(', ')}
-          </Text>
-        )}
-        
-        {/* Controls */}
-        <OrbitControls
-          enablePan={false}
+        <OrbitControls 
+          enablePan={true}
           enableZoom={true}
           enableRotate={true}
-          minDistance={8}
-          maxDistance={25}
-          minPolarAngle={0}
-          maxPolarAngle={Math.PI / 2}
+          minDistance={5}
+          maxDistance={20}
         />
       </Canvas>
-      
-      {/* UI Overlay */}
-      <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm rounded-lg p-3 shadow-lg">
-        <div className="text-sm font-medium text-gray-700">
-          Blocks Remaining: {visibleBlocks.length}/{blocks.length}
-        </div>
-        <div className="text-xs text-gray-500 mt-1">
-          Layers: {maxLayer}/18
-        </div>
-        {isInteractive && (
-          <div className="text-xs text-gray-500 mt-1">
-            Click a block to remove it
-          </div>
-        )}
-      </div>
-      
-      {/* Block Type Legend */}
-      <div className="absolute bottom-4 right-4 bg-white/90 backdrop-blur-sm rounded-lg p-3 shadow-lg">
-        <div className="text-xs font-medium text-gray-700 mb-2">Block Types</div>
-        <div className="space-y-1">
-          <div className="flex items-center gap-2">
-            <div className="w-3 h-3 bg-green-500 rounded"></div>
-            <span className="text-xs">Safe (Green)</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="w-3 h-3 bg-red-500 rounded"></div>
-            <span className="text-xs">Risky (Red)</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="w-3 h-3 bg-yellow-500 rounded"></div>
-            <span className="text-xs">Challenge (Yellow)</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="w-3 h-3 bg-blue-500 rounded"></div>
-            <span className="text-xs">Selected</span>
+
+      {/* Interactive Instructions */}
+      <div className="absolute bottom-4 right-4 z-10 bg-black/80 backdrop-blur-sm rounded-lg p-3 border border-blue-400/50 max-w-xs">
+        <div className="text-center">
+          <div className="text-blue-300 text-sm font-semibold mb-2">How to Play</div>
+          <div className="text-gray-300 text-xs space-y-1">
+            <div>• Click on highlighted blocks to remove</div>
+            <div>• Green blocks = Safe, Red = Risky, Yellow = Quiz</div>
+            <div>• Roll dice to change layer access</div>
+            <div>• Learn privacy tips from each block</div>
           </div>
         </div>
       </div>

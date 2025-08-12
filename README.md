@@ -1,179 +1,222 @@
-# 🎮 Privacy Jenga
+# 🎯 Privacy Jenga - Interactive Privacy Education Game
 
-**Multiplayer educational privacy game with Jenga-style mechanics powered by Bitsacco**
+> **Learn online privacy and security through an engaging tower-building experience!**
 
-[![GitHub Pages](https://img.shields.io/badge/GitHub%20Pages-Live-blue?style=flat-square)](https://mwanga-lab.github.io/Privacy-Jenga/)
-[![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.3.3-blue.svg)](https://www.typescriptlang.org/)
-[![React](https://img.shields.io/badge/React-18.2.0-blue.svg)](https://reactjs.org/)
+[![Build Status](https://github.com/yourusername/privacy-jenga/actions/workflows/static.yml/badge.svg)](https://github.com/yourusername/privacy-jenga/actions/workflows/static.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-## 🚀 **Quick Start**
+## 🌟 **What is Privacy Jenga?**
 
-### **Frontend-Only Version (Current)**
-The game is now **frontend-only** and works completely offline! No backend server required.
+Privacy Jenga is an **interactive educational game** that teaches online privacy and security concepts through the classic tower-building mechanics of Jenga. Each block contains valuable knowledge about protecting yourself online, making learning both fun and memorable.
 
+## ✨ **Key Features**
+
+### 🎮 **Gameplay Mechanics**
+- **54-Block Tower System** - Complete Jenga experience with 18 layers
+- **Dice-Based Access Control** - Roll to determine which layers you can access
+- **Three Block Types:**
+  - 🟢 **Safe Blocks** - Good privacy practices (+points, +stability)
+  - 🔴 **Risky Blocks** - Bad practices (+points, -stability)  
+  - 🟡 **Challenge Blocks** - Quiz questions (correct = bonus, wrong = penalty)
+
+### 🎲 **Dice Mechanics**
+- **Layer 1-3**: Safe Zone (Green) - Perfect for beginners
+- **Layer 1-6**: Steady (Blue) - Balanced risk/reward
+- **Layer 1-9**: Risky (Yellow) - Increased challenge
+- **Layer 1-12**: Danger Zone (Orange) - High risk, high reward
+- **Layer 1-15**: Extreme (Red) - Expert level challenges
+- **All Layers**: Ultimate Challenge (Purple) - Maximum difficulty
+
+### 📚 **Educational Content**
+- **Progressive Learning** - Start with basics, advance to complex topics
+- **Real-World Examples** - Practical privacy scenarios and solutions
+- **Interactive Quizzes** - Test your knowledge with immediate feedback
+- **Achievement System** - Unlock badges for learning milestones
+
+### 🎯 **Game Modes**
+- **Classic Mode** - Traditional gameplay until tower collapse
+- **Endless Mode** - Continuous play with tower resets and high score tracking
+
+## 🚀 **Getting Started**
+
+### **Prerequisites**
+- Node.js 18+ 
+- npm or yarn
+
+### **Installation**
 ```bash
 # Clone the repository
-git clone https://github.com/MWANGAZA-LAB/Privacy-Jenga.git
-cd Privacy-Jenga
+git clone https://github.com/yourusername/privacy-jenga.git
+cd privacy-jenga
 
 # Install dependencies
-cd apps/web
 npm install
 
-# Start the game
+# Start development server
 npm run dev
 ```
 
-**Open your browser**: http://localhost:5173
-
-### **Features Available Now**
-- ✅ **Complete Jenga Game**: All mechanics working
-- ✅ **Privacy Education**: Educational content in each block
-- ✅ **Single Player Mode**: Full game experience
-- ✅ **Local Storage**: Game progress saved in browser
-- ✅ **Responsive Design**: Works on mobile and desktop
-- ✅ **Bitsacco Branding**: Teal horse logo and theme
-
-## 🏗️ **Architecture Overview**
-
-### **Current Implementation (Frontend-Only)**
-```
-Client (Browser/Mobile)
-├── React + Vite + Tailwind CSS
-├── Game UI: React Three Fiber (3D) + Canvas (2D)
-├── Mock Game Service (in-memory state)
-├── Local Storage for persistence
-└── Responsive design for all devices
-```
-
-### **Future Scalability Features (Coming Soon)**
-```
-🔄 Real-time Multiplayer
-├── Socket.IO client for real-time communication
-├── Optional Lightning wallet integration
-└── Multiplayer rooms and turn management
-
-🔄 Backend Services
-├── Node.js + TypeScript + Express
-├── Socket.IO server with Redis adapter
-├── PostgreSQL for persistent data
-└── Redis for ephemeral room state
-
-🔄 Infrastructure
-├── Docker containers
-├── Managed PostgreSQL (AWS RDS/Supabase)
-├── Managed Redis (AWS ElastiCache)
-└── Monitoring and analytics
-```
-
-## 🎯 **Game Features**
-
-### **Core Gameplay**
-- **Jenga Tower**: 3D interactive tower with realistic physics
-- **Privacy Blocks**: Each block contains educational privacy content
-- **Turn-Based**: Strategic block removal with educational rewards
-- **Scoring System**: Points for correct privacy knowledge
-- **Local Progress**: Save your learning journey in the browser
-
-### **Educational Content**
-- **Security Tips**: Two-factor authentication, password security
-- **Privacy Best Practices**: Social media settings, data sharing
-- **Network Safety**: Public WiFi security, VPN usage
-- **Digital Hygiene**: Regular updates, backup strategies
-
-## 🚧 **Development Roadmap**
-
-### **Phase 1: Frontend MVP (✅ Complete)**
-- [x] Core Jenga game mechanics
-- [x] Privacy education content
-- [x] Single-player experience
-- [x] Responsive design
-- [x] Local storage persistence
-
-### **Phase 2: Multiplayer Features (Coming Soon)**
-- [ ] Real-time multiplayer rooms
-- [ ] Turn management system
-- [ ] Chat functionality
-- [ ] Player leaderboards
-- [ ] Room creation and joining
-
-### **Phase 3: Advanced Features (Coming Soon)**
-- [ ] Backend API services
-- [ ] User authentication
-- [ ] Progress tracking
-- [ ] Analytics and insights
-- [ ] Admin panel for content management
-
-## 🛠️ **Tech Stack**
-
-### **Frontend (Current)**
-- **Framework**: React 18 + TypeScript
-- **Build Tool**: Vite
-- **Styling**: Tailwind CSS
-- **3D Graphics**: React Three Fiber + Three.js
-- **State Management**: React Hooks + Local Storage
-- **Mock Services**: In-memory game state
-
-### **Future Backend (Coming Soon)**
-- **Runtime**: Node.js + TypeScript
-- **Framework**: Express.js
-- **Real-time**: Socket.IO + Redis adapter
-- **Database**: PostgreSQL
-- **Caching**: Redis
-- **Deployment**: Docker + Kubernetes
-
-## 📱 **Access URLs**
-
-### **Local Development**
-- **Web Client**: http://localhost:5173
-- **Game**: Fully functional frontend-only version
-
-### **Production (GitHub Pages)**
-- **Live Game**: https://mwanga-lab.github.io/Privacy-Jenga/
-- **Repository**: https://github.com/MWANGAZA-LAB/Privacy-Jenga
-
-## 🔧 **Development Commands**
-
+### **Build for Production**
 ```bash
-# Frontend development
-cd apps/web
+npm run build
+```
+
+## 🎮 **How to Play**
+
+### **1. Start Your Journey**
+- Click "Start Playing Now" to begin
+- First-time users get an automatic tutorial
+- Access help anytime via the Help button
+
+### **2. Roll the Dice**
+- Click "Roll Dice" to determine layer access
+- Each roll shows which layers you can pull from
+- Plan your strategy based on available access
+
+### **3. Remove Blocks**
+- Click on highlighted blocks within allowed layers
+- Read the privacy lesson on each block
+- Answer quiz questions for bonus points
+
+### **4. Build Your Score**
+- Safe blocks earn points and stabilize the tower
+- Risky blocks earn points but destabilize
+- Challenge blocks offer bonus points for correct answers
+- Higher layers = more points (risk vs. reward)
+
+### **5. Monitor Stability**
+- Watch the tower stability indicator
+- Green = Stable, Yellow = Warning, Red = Danger
+- Game ends when tower becomes unstable
+
+## 🏗️ **Architecture & Technology**
+
+### **Frontend Stack**
+- **React 18** - Modern React with hooks and functional components
+- **TypeScript** - Type-safe development experience
+- **Vite** - Fast build tool and development server
+- **Tailwind CSS** - Utility-first CSS framework
+- **Framer Motion** - Smooth animations and transitions
+- **Three.js + React Three Fiber** - 3D graphics and tower visualization
+
+### **Key Components**
+- **`GameTutorial`** - Interactive 6-step tutorial system
+- **`GameHelp`** - Comprehensive 4-tab help system
+- **`JengaTower`** - Enhanced 3D tower with visual feedback
+- **`GamePage`** - Main game interface with integrated features
+- **`HomePage`** - Landing page with feature showcase
+
+### **State Management**
+- **React Hooks** - Local component state management
+- **Mock Services** - In-memory game logic for frontend-only development
+- **Local Storage** - Game progress and achievement persistence
+
+## 🎨 **UI/UX Features**
+
+### **BITSACCO Dark Theme**
+- **Professional dark color scheme** throughout the application
+- **Consistent visual language** with teal accents
+- **Accessibility-focused** design with high contrast
+
+### **Visual Enhancements**
+- **Clear layer restrictions** with visual overlays
+- **Block type legend** for easy identification
+- **Tower stability indicator** with color-coded progress
+- **Interactive instructions** panel
+- **Enhanced 3D rendering** with better spacing
+
+### **Responsive Design**
+- **Mobile-first approach** for touch interactions
+- **Responsive grid layouts** for all screen sizes
+- **Touch-friendly controls** and navigation
+
+## 📱 **User Experience Features**
+
+### **First-Time User Experience**
+- **Automatic tutorial** for new players
+- **Welcome overlay** explaining game concepts
+- **Progressive disclosure** of game mechanics
+
+### **Help System**
+- **Contextual help** accessible during gameplay
+- **Comprehensive rules** and strategy guides
+- **Visual examples** and step-by-step instructions
+
+### **Accessibility**
+- **Keyboard navigation** support
+- **Screen reader** friendly content
+- **High contrast** color schemes
+- **Clear visual cues** for all interactions
+
+## 🔧 **Development**
+
+### **Project Structure**
+```
+apps/web/
+├── src/
+│   ├── components/          # Reusable UI components
+│   │   ├── GameTutorial.tsx # Interactive tutorial system
+│   │   ├── GameHelp.tsx     # Comprehensive help system
+│   │   ├── JengaTower.tsx   # 3D tower visualization
+│   │   ├── GameStats.tsx    # Game statistics display
+│   │   └── ...
+│   ├── pages/               # Page components
+│   ├── services/            # Game logic and mock services
+│   ├── types/               # TypeScript type definitions
+│   └── styles/              # Global styles and CSS
+├── public/                  # Static assets
+└── package.json            # Dependencies and scripts
+```
+
+### **Available Scripts**
+```bash
 npm run dev          # Start development server
 npm run build        # Build for production
 npm run preview      # Preview production build
 npm run lint         # Run ESLint
-
-# Future backend commands (when implemented)
-cd services/api
-npm run dev          # Start API server
-npm run build        # Build API
-npm run test         # Run tests
+npm run type-check   # Run TypeScript compiler
 ```
 
-## 🌟 **Why Frontend-Only First?**
+## 🧪 **Testing & Quality**
 
-### **Advantages of Current Approach**
-1. **Instant Deployment**: Works immediately on GitHub Pages
-2. **No Server Costs**: Free hosting and scaling
-3. **Faster Development**: Focus on game mechanics and UX
-4. **Easier Testing**: All features testable locally
-5. **Mobile Ready**: Works offline on all devices
+### **Code Quality**
+- **TypeScript** for type safety
+- **ESLint** for code consistency
+- **Prettier** for code formatting
+- **Strict mode** enabled
 
-### **Future Benefits**
-- **Progressive Enhancement**: Add features incrementally
-- **User Feedback**: Gather input before building backend
-- **Performance**: Optimize frontend before scaling
-- **Cost Control**: Only add infrastructure when needed
+### **Build Process**
+- **Vite** for fast development and optimized builds
+- **Tree shaking** for minimal bundle size
+- **Code splitting** for optimal performance
+- **GitHub Actions** for automated deployment
+
+## 🚀 **Deployment**
+
+### **GitHub Pages**
+- **Automatic deployment** via GitHub Actions
+- **Subdirectory routing** support (`/Privacy-Jenga/`)
+- **Optimized builds** for production
+
+### **Environment Variables**
+```bash
+# Development
+VITE_APP_TITLE=Privacy Jenga (Dev)
+
+# Production  
+VITE_APP_TITLE=Privacy Jenga
+```
 
 ## 🤝 **Contributing**
 
-We welcome contributions! The project is designed for easy frontend development:
+We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details.
 
-1. **Fork** the repository
-2. **Create** a feature branch
-3. **Develop** using the mock service
-4. **Test** locally without backend
-5. **Submit** a pull request
+### **Development Setup**
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Add tests if applicable
+5. Submit a pull request
 
 ## 📄 **License**
 
@@ -181,13 +224,18 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 🙏 **Acknowledgments**
 
-- **Bitsacco**: For the educational mission and branding
-- **MWANGAZA-LAB**: Development team and vision
-- **Privacy Community**: For educational content inspiration
-- **Open Source**: Built with amazing open-source tools
+- **Privacy Education Community** - For inspiration and feedback
+- **Open Source Contributors** - For the amazing tools and libraries
+- **Game Development Community** - For educational game design insights
+
+## 📞 **Support & Contact**
+
+- **Issues**: [GitHub Issues](https://github.com/yourusername/privacy-jenga/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/yourusername/privacy-jenga/discussions)
+- **Email**: privacy-jenga@example.com
 
 ---
 
-**🎮 Ready to play?** [Start the game now!](https://mwanga-lab.github.io/Privacy-Jenga/)
+**🎯 Ready to master online privacy? [Start playing now!](https://yourusername.github.io/privacy-jenga/)**
 
-**🔮 Want to contribute?** Check out our [roadmap](#development-roadmap) and help build the future of privacy education!
+*Built with ❤️ for privacy education • Powered by React & Three.js*
