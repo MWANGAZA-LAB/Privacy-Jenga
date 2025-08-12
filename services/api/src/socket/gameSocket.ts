@@ -11,7 +11,7 @@ import {
   Room,
   Player,
   Block
-} from '@privacy-jenga/types';
+} from '../types';
 
 export function setupSocketHandlers(io: Server, socket: Socket) {
   
@@ -54,9 +54,11 @@ export function setupSocketHandlers(io: Server, socket: Socket) {
       socket.data.playerId = result.playerId;
       
       // Notify room of new player
-      io.to(data.roomId).emit('player_joined', {
-        player: result.roomState.players.find(p => p.id === result.playerId)
-      });
+      if (result.roomState) {
+        io.to(data.roomId).emit('player_joined', {
+          player: result.roomState.players.find(p => p.id === result.playerId)
+        });
+      }
       
       // Send current room state to joining player
       socket.emit('room_state', { room: result.roomState });
@@ -118,7 +120,10 @@ export function setupSocketHandlers(io: Server, socket: Socket) {
       }
       
       // Get content for the block
-      const content = await contentService.getContentById(result.block.contentId);
+      let content = null;
+      if (result.block) {
+        content = await contentService.getContentById(result.block.contentId);
+      }
       
       // Notify all players in room
       io.to(roomId).emit('block_removed', {

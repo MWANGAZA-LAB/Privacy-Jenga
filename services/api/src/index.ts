@@ -59,7 +59,7 @@ app.use(cors({
   origin: process.env.CORS_ORIGIN || "http://localhost:5173",
   credentials: true
 }));
-app.use(compression());
+app.use(compression() as unknown as express.RequestHandler);
 app.use(morgan('combined'));
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
@@ -72,7 +72,7 @@ const limiter = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
 });
-app.use('/api', limiter);
+app.use('/api', limiter as unknown as express.RequestHandler);
 
 // Setup API routes
 setupRoutes(app);

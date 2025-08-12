@@ -65,6 +65,30 @@ export interface Quiz {
   points: number;
 }
 
+// Socket Event Data Types
+export interface CreateRoomData {
+  settings: RoomSettings;
+}
+
+export interface JoinRoomData {
+  roomId: string;
+  nickname: string;
+  avatar: string;
+}
+
+export interface PickBlockData {
+  blockId: string;
+}
+
+export interface AnswerQuizData {
+  blockId: string;
+  answer: number;
+}
+
+export interface ChatMessageData {
+  text: string;
+}
+
 // Admin Types
 export interface AdminUser {
   id: string;
