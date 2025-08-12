@@ -108,7 +108,6 @@ const BlockComponent: React.FC<BlockProps> = ({
         color={canPullFromLayer ? '#ffffff' : '#6b7280'}
         anchorX="center"
         anchorY="middle"
-        font="/fonts/Inter-Bold.woff"
       >
         {block.type === 'safe' ? '🟢' : block.type === 'risky' ? '🔴' : '🟡'}
       </Text>
@@ -120,7 +119,6 @@ const BlockComponent: React.FC<BlockProps> = ({
         color={canPullFromLayer ? '#ffffff' : '#6b7280'}
         anchorX="center"
         anchorY="middle"
-        font="/fonts/Inter-Bold.woff"
       >
         {layer}
       </Text>
@@ -132,7 +130,6 @@ const BlockComponent: React.FC<BlockProps> = ({
         color={canPullFromLayer ? '#e5e7eb' : '#6b7280'}
         anchorX="center"
         anchorY="middle"
-        font="/fonts/Inter-Regular.woff"
       >
         {position + 1}
       </Text>
@@ -172,7 +169,14 @@ const JengaTower: React.FC<JengaTowerProps> = ({
   gameState,
   selectedBlockId 
 }) => {
-  const maxLayer = Math.max(...blocks.map(b => b.layer));
+  console.log('JengaTower - Component rendered with props:', {
+    blocksCount: blocks?.length || 0,
+    gameState: !!gameState,
+    selectedBlockId
+  });
+  
+  const maxLayer = Math.max(...(blocks?.map(b => b.layer) || [0]));
+  console.log('JengaTower - Max layer calculated:', maxLayer);
   
   // Calculate 3D positions for all blocks
   const getBlockWorldPosition = (layer: number, position: number): [number, number, number] => {
@@ -191,8 +195,17 @@ const JengaTower: React.FC<JengaTowerProps> = ({
 
   // Filter visible blocks and determine which are removable
   const visibleBlocks = useMemo(() => {
-    console.log('JengaTower - Total blocks received:', blocks.length);
-    console.log('JengaTower - Game state:', gameState);
+    console.log('JengaTower - Filtering visible blocks from total:', blocks?.length || 0);
+    
+    if (!blocks || blocks.length === 0) {
+      console.warn('JengaTower - No blocks provided to component');
+      return [];
+    }
+    
+    if (!gameState) {
+      console.warn('JengaTower - No game state provided');
+      return [];
+    }
     
     const filtered = blocks
       .filter(block => !block.removed)
@@ -215,10 +228,10 @@ const JengaTower: React.FC<JengaTowerProps> = ({
       });
     
     console.log('JengaTower - Visible blocks after filtering:', filtered.length);
-    console.log('JengaTower - First few blocks:', filtered.slice(0, 3));
+    console.log('JengaTower - First few visible blocks:', filtered.slice(0, 3));
     
     return filtered;
-  }, [blocks, gameState.canPullFromLayers]);
+  }, [blocks, gameState?.canPullFromLayers]);
 
   // Get the maximum allowed layer for display
   const maxAllowedLayer = Array.isArray(gameState.canPullFromLayers) 
@@ -318,7 +331,6 @@ const JengaTower: React.FC<JengaTowerProps> = ({
             color="#6b7280"
             anchorX="center"
             anchorY="middle"
-            font="/fonts/Inter-Bold.woff"
           >
             No blocks to display.
           </Text>
