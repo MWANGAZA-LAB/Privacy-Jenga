@@ -169,14 +169,7 @@ const JengaTower: React.FC<JengaTowerProps> = ({
   gameState,
   selectedBlockId 
 }) => {
-  console.log('JengaTower - Component rendered with props:', {
-    blocksCount: blocks?.length || 0,
-    gameState: !!gameState,
-    selectedBlockId
-  });
-  
   const maxLayer = Math.max(...(blocks?.map(b => b.layer) || [0]));
-  console.log('JengaTower - Max layer calculated:', maxLayer);
   
   // Calculate 3D positions for all blocks
   const getBlockWorldPosition = (layer: number, position: number): [number, number, number] => {
@@ -195,15 +188,11 @@ const JengaTower: React.FC<JengaTowerProps> = ({
 
   // Filter visible blocks and determine which are removable
   const visibleBlocks = useMemo(() => {
-    console.log('JengaTower - Filtering visible blocks from total:', blocks?.length || 0);
-    
     if (!blocks || blocks.length === 0) {
-      console.warn('JengaTower - No blocks provided to component');
       return [];
     }
     
     if (!gameState) {
-      console.warn('JengaTower - No game state provided');
       return [];
     }
     
@@ -226,9 +215,6 @@ const JengaTower: React.FC<JengaTowerProps> = ({
           worldPosition
         };
       });
-    
-    console.log('JengaTower - Visible blocks after filtering:', filtered.length);
-    console.log('JengaTower - First few visible blocks:', filtered.slice(0, 3));
     
     return filtered;
   }, [blocks, gameState?.canPullFromLayers]);
@@ -275,7 +261,7 @@ const JengaTower: React.FC<JengaTowerProps> = ({
             <div className="w-4 h-4 bg-red-500 rounded"></div>
             <div>
               <div className="font-semibold text-red-300">Risky</div>
-              <div className="text-red-200 text-xs">+Points, -Stability</div>
+              <div className="text-green-200 text-xs">+Points, -Stability</div>
             </div>
           </div>
           <div className="flex items-center gap-3 p-2 bg-yellow-500/10 border border-yellow-400/30 rounded-lg">
@@ -308,10 +294,11 @@ const JengaTower: React.FC<JengaTowerProps> = ({
         </div>
       </div>
 
-      {/* 3D Canvas */}
+      {/* 3D Canvas - Full size and properly configured */}
       <Canvas
         camera={{ position: [8, 8, 8], fov: 50 }}
         className="w-full h-full"
+        style={{ minHeight: '600px' }}
       >
         <ambientLight intensity={0.6} />
         <directionalLight position={[10, 10, 5]} intensity={1} />
@@ -324,33 +311,21 @@ const JengaTower: React.FC<JengaTowerProps> = ({
         </mesh>
         
         {/* Render blocks */}
-        {visibleBlocks.length === 0 ? (
-          <Text
-            position={[0, 0, 0]}
-            fontSize={0.2}
-            color="#6b7280"
-            anchorX="center"
-            anchorY="middle"
-          >
-            No blocks to display.
-          </Text>
-        ) : (
-          visibleBlocks.map((block) => {
-            return (
-              <BlockComponent
-                key={block.id}
-                block={block}
-                onClick={() => onBlockClick(block)}
-                isSelected={selectedBlockId === block.id}
-                isRemovable={block.isRemovable}
-                canPullFromLayer={block.canPullFromLayer}
-                layer={block.layer}
-                position={block.position}
-                worldPosition={block.worldPosition}
-              />
-            );
-          })
-        )}
+        {visibleBlocks.map((block) => {
+          return (
+            <BlockComponent
+              key={block.id}
+              block={block}
+              onClick={() => onBlockClick(block)}
+              isSelected={selectedBlockId === block.id}
+              isRemovable={block.isRemovable}
+              canPullFromLayer={block.canPullFromLayer}
+              layer={block.layer}
+              position={block.position}
+              worldPosition={block.worldPosition}
+            />
+          );
+        })}
         
         {/* Layer separation lines */}
         {Array.from({ length: maxLayer + 1 }, (_, i) => (

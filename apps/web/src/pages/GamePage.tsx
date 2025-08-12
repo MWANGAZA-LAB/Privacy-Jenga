@@ -27,21 +27,9 @@ const GamePage: React.FC = () => {
   // Initialize game
   useEffect(() => {
     const initializeGame = async () => {
-      console.log('GamePage - Starting game initialization...');
-      
-      // Test the mock service first
-      console.log('GamePage - Testing mock service...');
-      const serviceTest = mockGameService.testService();
-      console.log('GamePage - Service test result:', serviceTest);
-      
       try {
-        console.log('GamePage - Creating room...');
         await mockGameService.createRoom();
-        console.log('GamePage - Room created successfully');
-        
-        console.log('GamePage - Getting players...');
         const mockPlayers = mockGameService.getPlayers();
-        console.log('GamePage - Players retrieved:', mockPlayers.length);
         
         // Convert MockPlayer[] to Player[]
         const convertedPlayers: Player[] = mockPlayers.map(mockPlayer => ({
@@ -58,31 +46,21 @@ const GamePage: React.FC = () => {
         }));
 
         setPlayers(convertedPlayers);
-        console.log('GamePage - Players converted and set:', convertedPlayers.length);
         
-        console.log('GamePage - Starting game...');
         const gameStarted = await mockGameService.startGame();
-        console.log('GamePage - Game start result:', gameStarted);
-        
         if (gameStarted) {
-          console.log('GamePage - Getting game state...');
           const newGameState = mockGameService.getGameState();
-          console.log('GamePage - Game state retrieved:', newGameState);
           setGameState(newGameState);
         }
         
         // Check if this is the first time playing
         const hasPlayedBefore = localStorage.getItem('privacy-jenga-has-played');
-        console.log('GamePage - Has played before:', hasPlayedBefore);
         if (!hasPlayedBefore) {
-          console.log('GamePage - First time player, showing tutorial');
           setShowTutorial(true);
           localStorage.setItem('privacy-jenga-has-played', 'true');
         }
-        
-        console.log('GamePage - Game initialization complete');
       } catch (error) {
-        console.error('GamePage - Failed to initialize game:', error);
+        console.error('Failed to initialize game:', error);
       }
     };
 

@@ -24,22 +24,12 @@ class MockGameService {
   private specialActions: SpecialAction[] = [];
 
   constructor() {
-    console.log('MockGameService - Constructor called, initializing...');
-    try {
-      this.initializeMockData();
-      this.initializeAchievements();
-      this.initializeSpecialActions();
-      console.log('MockGameService - Initialization complete');
-      console.log('MockGameService - Total blocks created:', this.blocks.length);
-      console.log('MockGameService - Total players created:', this.players.length);
-    } catch (error) {
-      console.error('MockGameService - Error in constructor:', error);
-    }
+    this.initializeMockData();
+    this.initializeAchievements();
+    this.initializeSpecialActions();
   }
 
   private initializeMockData() {
-    console.log('MockGameService - initializeMockData called');
-    
     // Create mock rooms
     this.rooms = [
       {
@@ -51,7 +41,6 @@ class MockGameService {
         blocks: []
       }
     ];
-    console.log('MockGameService - Rooms created:', this.rooms.length);
 
     // Create single player for single-player mode
     this.players = [
@@ -70,72 +59,39 @@ class MockGameService {
         incorrectAnswers: 0
       }
     ];
-    console.log('MockGameService - Players created:', this.players.length);
 
     // Create enhanced blocks with complete 54-block system
-    console.log('MockGameService - Starting block creation...');
     this.blocks = this.createComplete54BlockSystem();
-    console.log('MockGameService - Block creation complete, total blocks:', this.blocks.length);
   }
 
   private createComplete54BlockSystem(): Block[] {
-    console.log('MockGameService - Creating 54-block system...');
     const blocks: Block[] = [];
     let blockId = 1;
 
-    try {
-      // Create exactly 54 blocks (18 layers × 3 blocks per layer)
-      for (let layer = 1; layer <= 18; layer++) {
-        for (let position = 1; position <= 3; position++) {
-          try {
-            // Determine block type based on layer and position for balanced distribution
-            const blockType = this.getBlockTypeForPosition(layer, position);
-            console.log(`MockGameService - Creating block ${blockId}: layer=${layer}, position=${position}, type=${blockType}`);
-            
-            const content = this.getContentForBlock(blockId, blockType, layer);
-            
-            const block: Block = {
-              id: blockId.toString(),
-              content,
-              removed: false,
-              type: blockType,
-              difficulty: layer,
-              layer,
-              position,
-              stability: this.calculateStability(layer, blockType),
-              category: content.category
-            };
-            
-            blocks.push(block);
-            blockId++;
-          } catch (error) {
-            console.error(`MockGameService - Error creating block ${blockId} at layer ${layer}, position ${position}:`, error);
-            // Create a fallback block to prevent the system from breaking
-            const fallbackBlock: Block = {
-              id: blockId.toString(),
-              content: this.getFallbackContent(blockId),
-              removed: false,
-              type: 'safe',
-              difficulty: layer,
-              layer,
-              position,
-              stability: 1.0,
-              category: 'general'
-            };
-            blocks.push(fallbackBlock);
-            blockId++;
-          }
-        }
+    // Create exactly 54 blocks (18 layers × 3 blocks per layer)
+    for (let layer = 1; layer <= 18; layer++) {
+      for (let position = 1; position <= 3; position++) {
+        // Determine block type based on layer and position for balanced distribution
+        const blockType = this.getBlockTypeForPosition(layer, position);
+        const content = this.getContentForBlock(blockId, blockType, layer);
+        
+        blocks.push({
+          id: blockId.toString(),
+          content,
+          removed: false,
+          type: blockType,
+          difficulty: layer,
+          layer,
+          position,
+          stability: this.calculateStability(layer, blockType),
+          category: content.category
+        });
+        
+        blockId++;
       }
-      
-      console.log(`MockGameService - Successfully created ${blocks.length} blocks`);
-      console.log('MockGameService - Sample blocks:', blocks.slice(0, 3));
-      return blocks;
-    } catch (error) {
-      console.error('MockGameService - Critical error in block creation:', error);
-      // Return minimal fallback blocks to prevent complete failure
-      return this.createFallbackBlocks();
     }
+
+    return blocks;
   }
 
   private getBlockTypeForPosition(layer: number, position: number): 'safe' | 'risky' | 'challenge' {
@@ -185,75 +141,18 @@ class MockGameService {
   }
 
   private getContentForBlock(id: number, type: string, layer: number): Content {
-    try {
-      const contentLibrary = this.getCompleteContentLibrary();
-      const category = this.getCategoryForLayer(layer);
-      
-      console.log(`MockGameService - Getting content for block ${id}: type=${type}, layer=${layer}, category=${category}`);
-      console.log(`MockGameService - Available categories:`, Object.keys(contentLibrary));
-      
-      if (!contentLibrary[category as keyof typeof contentLibrary]) {
-        console.error(`MockGameService - Category '${category}' not found in content library`);
-        return this.getFallbackContent(id);
-      }
-      
-      const categoryContent = contentLibrary[category as keyof typeof contentLibrary];
-      if (!Array.isArray(categoryContent) || categoryContent.length === 0) {
-        console.error(`MockGameService - Category '${category}' has no content`);
-        return this.getFallbackContent(id);
-      }
-      
-      const randomIndex = Math.floor(Math.random() * categoryContent.length);
-      const content = categoryContent[randomIndex];
-      
-      console.log(`MockGameService - Selected content for block ${id}:`, content.title);
-      
-      return {
-        ...content,
-        id: id.toString(),
-        points: this.calculatePoints(type, layer),
-        category: category as 'password' | 'social-media' | 'wifi' | 'data-sharing' | 'encryption' | 'general' | 'phishing' | 'backup',
-        fact: content.fact,
-        impact: content.impact
-      };
-    } catch (error) {
-      console.error(`MockGameService - Error getting content for block ${id}:`, error);
-      return this.getFallbackContent(id);
-    }
-  }
-
-  private getFallbackContent(id: number): Content {
+    const contentLibrary = this.getCompleteContentLibrary();
+    const category = this.getCategoryForLayer(layer);
+    const content = contentLibrary[category as keyof typeof contentLibrary][Math.floor(Math.random() * contentLibrary[category as keyof typeof contentLibrary].length)];
+    
     return {
+      ...content,
       id: id.toString(),
-      title: 'Privacy Tip',
-      text: 'Stay safe online by using strong passwords and being careful with personal information.',
-      severity: 'tip',
-      fact: 'Basic privacy practices can prevent most common online threats.',
-      impact: 'positive',
-      points: 10,
-      category: 'general'
+      points: this.calculatePoints(type, layer),
+      category: category as 'password' | 'social-media' | 'wifi' | 'data-sharing' | 'encryption' | 'general' | 'phishing' | 'backup',
+      fact: content.fact,
+      impact: content.impact
     };
-  }
-
-  private createFallbackBlocks(): Block[] {
-    console.log('MockGameService - Creating fallback blocks due to error');
-    const blocks: Block[] = [];
-    
-    for (let i = 1; i <= 54; i++) {
-      blocks.push({
-        id: i.toString(),
-        content: this.getFallbackContent(i),
-        removed: false,
-        type: 'safe',
-        difficulty: Math.ceil(i / 3),
-        layer: Math.ceil(i / 3),
-        position: ((i - 1) % 3) + 1,
-        stability: 1.0,
-        category: 'general'
-      });
-    }
-    
-    return blocks;
   }
 
   private getCategoryForLayer(layer: number): string {
@@ -1054,24 +953,12 @@ class MockGameService {
     return { success: true, gameState: this.gameState };
   }
 
-  // Test method to verify service is working
-  testService(): { blocks: number; players: number; gameState: boolean } {
-    console.log('MockGameService - testService called');
-    return {
-      blocks: this.blocks.length,
-      players: this.players.length,
-      gameState: !!this.gameState
-    };
+  getBlocks(): Block[] {
+    return this.blocks;
   }
 
   getCurrentRoom(): MockRoom | null {
     return this.currentRoom;
-  }
-
-  getBlocks(): Block[] {
-    console.log('MockGameService - getBlocks called, returning', this.blocks.length, 'blocks');
-    console.log('MockGameService - First few blocks:', this.blocks.slice(0, 3));
-    return this.blocks;
   }
 
   getPlayers(): MockPlayer[] {
