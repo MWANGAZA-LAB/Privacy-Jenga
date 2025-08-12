@@ -1,40 +1,21 @@
 {
   "name": "privacy-jenga",
   "version": "1.0.0",
-  "description": "Multiplayer educational privacy game with Jenga-style mechanics",
+  "description": "Frontend-only educational privacy game with Jenga-style mechanics",
   "private": true,
-  "workspaces": [
-    "apps/*",
-    "services/*",
-    "packages/*"
-  ],
   "scripts": {
-    "dev": "concurrently \"npm run dev:api\" \"npm run dev:web\"",
-    "dev:api": "cd services/api && npm run dev",
-    "dev:web": "cd apps/web && npm run dev",
-    "dev:admin": "cd apps/admin && npm run dev",
-    "build": "npm run build:api && npm run build:web",
-    "build:api": "cd services/api && npm run build",
-    "build:web": "cd apps/web && npm run build",
-    "start": "cd services/api && npm start",
-    "install:all": "npm install && npm run install:workspaces",
-    "install:workspaces": "npm run install:api && npm run install:web && npm run install:admin",
-    "install:api": "cd services/api && npm install",
-    "install:web": "cd apps/web && npm install",
-    "install:admin": "cd apps/admin && npm install",
-    "lint": "npm run lint:api && npm run lint:web",
-    "lint:api": "cd services/api && npm run lint",
-    "lint:web": "cd apps/web && npm run lint",
-    "test": "npm run test:api && npm run test:web",
-    "test:api": "cd services/api && npm test",
-    "test:web": "cd apps/web && npm test",
-    "deploy": "bash scripts/deploy.sh"
+    "dev": "cd apps/web && npm run dev",
+    "build": "cd apps/web && npm run build",
+    "preview": "cd apps/web && npm run preview",
+    "lint": "cd apps/web && npm run lint",
+    "test": "cd apps/web && npm run test",
+    "install:all": "npm install && cd apps/web && npm install",
+    "clean": "cd apps/web && npm run build && rm -rf dist"
   },
-  "keywords": ["privacy", "education", "multiplayer", "game", "jenga", "bitcoin", "bitsacco"],
+  "keywords": ["privacy", "education", "game", "jenga", "bitsacco", "frontend-only"],
   "author": "MWANGAZA-LAB",
   "license": "MIT",
   "devDependencies": {
-    "concurrently": "^8.2.2",
     "typescript": "^5.3.3"
   }
 }

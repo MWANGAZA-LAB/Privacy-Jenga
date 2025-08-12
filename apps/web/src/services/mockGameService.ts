@@ -3,7 +3,7 @@ export interface MockRoom {
   id: string;
   code: string;
   players: string[];
-  status: 'waiting' | 'playing' | 'finished';
+  status: string;
   currentTurn: number;
 }
 
@@ -16,7 +16,17 @@ export interface MockPlayer {
 
 export interface MockBlock {
   id: string;
-  content: string;
+  content: {
+    id: string;
+    title: string;
+    text: string;
+    severity: 'tip' | 'warning' | 'critical';
+    quiz?: {
+      question: string;
+      choices: string[];
+      correctIndex: number;
+    };
+  };
   removed: boolean;
   removedBy?: string;
 }
@@ -59,11 +69,56 @@ class MockGameService {
 
     // Create mock blocks with privacy content
     this.blocks = [
-      { id: '1', content: 'Two-Factor Authentication: Always enable 2FA for your accounts', removed: false },
-      { id: '2', content: 'Password Security: Use strong, unique passwords for each account', removed: false },
-      { id: '3', content: 'Public WiFi: Never access sensitive information on public networks', removed: false },
-      { id: '4', content: 'Social Media Privacy: Review and adjust your privacy settings regularly', removed: false },
-      { id: '5', content: 'Data Sharing: Be cautious about what personal information you share online', removed: false }
+      { 
+        id: '1', 
+        content: {
+          id: '1',
+          title: 'Two-Factor Authentication',
+          text: 'Always enable 2FA for your accounts to add an extra layer of security.',
+          severity: 'critical'
+        }, 
+        removed: false 
+      },
+      { 
+        id: '2', 
+        content: {
+          id: '2',
+          title: 'Password Security',
+          text: 'Use strong, unique passwords for each account and consider a password manager.',
+          severity: 'warning'
+        }, 
+        removed: false 
+      },
+      { 
+        id: '3', 
+        content: {
+          id: '3',
+          title: 'Public WiFi Safety',
+          text: 'Never access sensitive information on public networks without a VPN.',
+          severity: 'warning'
+        }, 
+        removed: false 
+      },
+      { 
+        id: '4', 
+        content: {
+          id: '4',
+          title: 'Social Media Privacy',
+          text: 'Review and adjust your privacy settings regularly to control who sees your content.',
+          severity: 'tip'
+        }, 
+        removed: false 
+      },
+      { 
+        id: '5', 
+        content: {
+          id: '5',
+          title: 'Data Sharing Awareness',
+          text: 'Be cautious about what personal information you share online.',
+          severity: 'tip'
+        }, 
+        removed: false 
+      }
     ];
   }
 
@@ -99,12 +154,12 @@ class MockGameService {
     return false;
   }
 
-  async pickBlock(blockId: string): Promise<MockBlock | null> {
+  async pickBlock(blockId: string): Promise<{ content: MockBlock['content'] } | null> {
     const block = this.blocks.find(b => b.id === blockId && !b.removed);
     if (block) {
       block.removed = true;
       block.removedBy = 'currentPlayer';
-      return block;
+      return { content: block.content };
     }
     return null;
   }

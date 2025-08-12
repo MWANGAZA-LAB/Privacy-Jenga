@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import toast from 'react-hot-toast';
 import { 
   Copy, 
   Share2, 
@@ -13,41 +12,76 @@ import {
   Users
 } from 'lucide-react';
 
-import { useSocket } from '@/hooks/useSocket';
-import JengaTower from '@/components/JengaTower';
-import ContentModal from '@/components/ContentModal';
-import PlayerList from '@/components/PlayerList';
-import Chat from '@/components/Chat';
-import { Block } from '@/types';
+import { mockGameService } from '../services/mockGameService';
+import JengaTower from '../components/JengaTower';
+import ContentModal from '../components/ContentModal';
+import PlayerList from '../components/PlayerList';
+import Chat from '../components/Chat';
+
+interface Player {
+  nickname: string;
+  isHost: boolean;
+}
+
+interface Room {
+  id: string;
+  code: string;
+}
+
+interface Block {
+  id: string;
+  removed: boolean;
+}
+
+interface Content {
+  id: string;
+  title: string;
+  text: string;
+  severity: 'tip' | 'warning' | 'critical';
+  quiz?: {
+    question: string;
+    choices: string[];
+    correctIndex: number;
+  };
+}
+
+interface ChatMessage {
+  id: number;
+  text: string;
+  player: string;
+  timestamp: string;
+}
 
 const GamePage: React.FC = () => {
   const navigate = useNavigate();
-  const {
-    room,
-    currentPlayer,
-    chatMessages,
-    selectedContent,
-    isMyTurn,
-    turnTimeLeft,
-    leaveRoom,
-    startGame,
-    pickBlock,
-    answerQuiz,
-    sendChatMessage,
-    setSelectedContent,
-    connected
-  } = useSocket();
-
+  const [room, setRoom] = useState<Room | null>(null);
+  const [currentPlayer, setCurrentPlayer] = useState<Player | null>(null);
+  const [selectedContent, setSelectedContent] = useState<Content | null>(null);
+  const [isMyTurn, setIsMyTurn] = useState(true);
+  const [turnTimeLeft, setTurnTimeLeft] = useState(60);
+  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
   const [selectedBlock, setSelectedBlock] = useState<Block | null>(null);
   const [showContentModal, setShowContentModal] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
 
-  // Redirect if not in a room
+  // Get current room and player from localStorage
   useEffect(() => {
-    if (!room && connected) {
+    const roomId = localStorage.getItem('currentRoomId');
+    const nickname = localStorage.getItem('playerNickname');
+    
+    if (!roomId || !nickname) {
+      navigate('/');
+      return;
+    }
+
+    const currentRoom = mockGameService.getCurrentRoom();
+    if (currentRoom) {
+      setRoom(currentRoom);
+      setCurrentPlayer({ nickname, isHost: true });
+    } else {
       navigate('/');
     }
-  }, [room, connected, navigate]);
+  }, [navigate]);
 
   // Handle content display when block is removed
   useEffect(() => {
@@ -69,353 +103,178 @@ const GamePage: React.FC = () => {
 
   const handleBlockClick = async (block: Block) => {
     if (!isMyTurn || block.removed) {
-      toast.error("It's not your turn or block is unavailable");
+      alert("It's not your turn or block is unavailable");
       return;
     }
 
     setSelectedBlock(block);
     
     try {
-      await pickBlock(block.id);
+      const result = await mockGameService.pickBlock(block.id);
+      if (result && result.content) {
+        setSelectedContent(result.content);
+      }
     } catch (error) {
-      toast.error('Failed to pick block');
+      alert('Failed to pick block');
     }
   };
 
   const handleQuizAnswer = async (selectedIndex: number) => {
     if (selectedBlock && selectedContent) {
       try {
-        await answerQuiz(selectedBlock.id, selectedIndex);
+        // Mock quiz answer handling
+        alert(`Quiz answered! You selected option ${selectedIndex + 1}`);
+        setShowContentModal(false);
+        setSelectedContent(null);
+        setSelectedBlock(null);
       } catch (error) {
-        toast.error('Failed to submit quiz answer');
+        alert('Failed to submit quiz answer');
       }
     }
   };
 
   const handleStartGame = async () => {
     if (!currentPlayer?.isHost) {
-      toast.error('Only the host can start the game');
+      alert('Only the host can start the game');
       return;
     }
 
     try {
-      await startGame();
+      // Mock game start
+      alert('Game started!');
     } catch (error) {
-      toast.error('Failed to start game');
+      alert('Failed to start game');
     }
   };
 
-  const handleLeaveRoom = () => {
-    leaveRoom();
+  const leaveRoom = () => {
+    localStorage.removeItem('currentRoomId');
+    localStorage.removeItem('playerNickname');
     navigate('/');
   };
 
-  const copyRoomCode = () => {
-    navigator.clipboard.writeText(room.code);
-    toast.success('Room code copied!');
-  };
-
-  const shareRoom = () => {
-    if (navigator.share) {
-      navigator.share({
-        title: 'Join my Privacy Jenga game!',
-        text: `Room code: ${room.code}`,
-        url: window.location.href
-      });
-    } else {
-      copyRoomCode();
-    }
-  };
-
-  const formatTime = (seconds: number) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins}:${secs.toString().padStart(2, '0')}`;
-  };
-
-  const gameStats = {
-    blocksRemoved: room.blocks.filter(b => b.removed).length,
-    totalBlocks: room.blocks.length,
-    topPlayer: room.players.reduce((top, player) => 
-      player.points > top.points ? player : top, room.players[0]
-    )
+  const sendChatMessage = (text: string) => {
+    const newMessage: ChatMessage = {
+      id: Date.now(),
+      text,
+      player: currentPlayer.nickname,
+      timestamp: new Date().toISOString()
+    };
+    setChatMessages(prev => [...prev, newMessage]);
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-40">
-        <div className="max-w-7xl mx-auto px-4 py-4">
+    <div className="min-h-screen bg-gradient-to-br from-teal-50 via-white to-cyan-50">
+      {/* Game Header */}
+      <header className="bg-gradient-to-r from-teal-600 to-cyan-600 text-white shadow-lg">
+        <div className="container mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
-            {/* Room Info */}
-            <div className="flex items-center gap-4">
-              <h1 className="text-2xl font-bold text-gray-900">
-                Privacy Jenga
-              </h1>
-              <div className="flex items-center gap-2">
-                <span className="text-sm text-gray-500">Room:</span>
-                <code className="bg-gray-100 px-2 py-1 rounded font-mono text-sm font-semibold">
-                  {room.code}
-                </code>
-                <button
-                  onClick={copyRoomCode}
-                  className="p-1 hover:bg-gray-100 rounded"
-                  title="Copy room code"
-                >
-                  <Copy className="w-4 h-4 text-gray-500" />
-                </button>
-                <button
-                  onClick={shareRoom}
-                  className="p-1 hover:bg-gray-100 rounded"
-                  title="Share room"
-                >
-                  <Share2 className="w-4 h-4 text-gray-500" />
-                </button>
+            <div className="flex items-center space-x-3">
+              <h1 className="text-2xl font-bold">Privacy Jenga</h1>
+              <div className="bg-teal-500 px-3 py-1 rounded-full text-sm">
+                Room: {room?.code || 'DEMO'}
               </div>
             </div>
-
-            {/* Game Status */}
-            <div className="flex items-center gap-4">
-              {room.gameState === 'playing' && (
-                <div className="flex items-center gap-2">
-                  <Timer className="w-4 h-4 text-gray-500" />
-                  <span className="text-sm font-medium text-gray-700">
-                    {formatTime(turnTimeLeft)}
-                  </span>
-                </div>
-              )}
+            
+            <div className="flex items-center space-x-4">
+              {/* Turn Timer */}
+              <div className="flex items-center space-x-2 bg-teal-500 px-3 py-1 rounded-full">
+                <Timer className="w-4 h-4" />
+                <span className="text-sm font-medium">{turnTimeLeft}s</span>
+              </div>
               
-              <div className="flex items-center gap-2">
-                <Users className="w-4 h-4 text-gray-500" />
-                <span className="text-sm text-gray-600">
-                  {room.players.length}/{room.settings.maxPlayers}
-                </span>
+              {/* Player Info */}
+              <div className="flex items-center space-x-2">
+                <Users className="w-4 h-4" />
+                <span className="text-sm">{currentPlayer.nickname}</span>
               </div>
-
-              {/* Actions */}
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={() => setShowSettings(true)}
-                  className="p-2 hover:bg-gray-100 rounded-lg"
-                  title="Settings"
-                >
-                  <Settings className="w-4 h-4 text-gray-500" />
-                </button>
-                <button
-                  onClick={handleLeaveRoom}
-                  className="btn-secondary text-sm"
-                >
-                  <LogOut className="w-4 h-4 mr-1" />
-                  Leave
-                </button>
-              </div>
+              
+              {/* Settings */}
+              <button
+                onClick={() => setShowSettings(!showSettings)}
+                className="p-2 hover:bg-teal-500 rounded-lg transition-colors"
+              >
+                <Settings className="w-5 h-5" />
+              </button>
+              
+              {/* Leave Room */}
+              <button
+                onClick={leaveRoom}
+                className="p-2 hover:bg-red-500 rounded-lg transition-colors"
+              >
+                <LogOut className="w-5 h-5" />
+              </button>
             </div>
           </div>
         </div>
       </header>
 
-      {/* Main Game Area */}
-      <main className="max-w-7xl mx-auto px-4 py-6">
-        <div className="grid lg:grid-cols-4 gap-6">
-          {/* Game Board */}
-          <div className="lg:col-span-3 space-y-6">
-            {/* Game Status Banner */}
-            <div className="card">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h2 className="text-lg font-semibold text-gray-900 mb-1">
-                    {room.gameState === 'lobby' && 'Waiting for players...'}
-                    {room.gameState === 'playing' && (
-                      isMyTurn ? "It's your turn!" : `${room.players.find(p => p.id === room.currentTurn)?.nickname}&apos;s turn`
-                    )}
-                    {room.gameState === 'finished' && 'Game finished!'}
-                  </h2>
-                  <div className="flex items-center gap-4 text-sm text-gray-600">
-                    <span>Blocks: {gameStats.blocksRemoved}/{gameStats.totalBlocks}</span>
-                    <span>Leader: {gameStats.topPlayer.nickname} ({gameStats.topPlayer.points} pts)</span>
-                  </div>
-                </div>
-
-                {/* Game Actions */}
-                <div className="flex items-center gap-2">
-                  {room.gameState === 'lobby' && currentPlayer.isHost && (
-                    <button
-                      onClick={handleStartGame}
-                      disabled={room.players.length < 2}
-                      className="btn-success"
-                    >
-                      <Play className="w-4 h-4 mr-2" />
-                      Start Game
-                    </button>
-                  )}
-                  
-                  {room.gameState === 'finished' && (
-                    <div className="flex items-center gap-2 text-green-600">
-                      <Trophy className="w-5 h-5" />
-                      <span className="font-medium">
-                        {room.winner === currentPlayer.id ? 'You won!' : 'Game over'}
-                      </span>
-                    </div>
-                  )}
-                </div>
-              </div>
+      {/* Game Content */}
+      <main className="container mx-auto px-6 py-8">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+          {/* Left Sidebar - Player List */}
+          <div className="lg:col-span-1">
+            <PlayerList 
+              players={[currentPlayer]}
+              currentTurn={currentPlayer.nickname}
+            />
+          </div>
+          
+          {/* Center - Jenga Tower */}
+          <div className="lg:col-span-2">
+            <div className="text-center mb-6">
+              <h2 className="text-3xl font-bold text-gray-800 mb-2">
+                Privacy Jenga Tower
+              </h2>
+              <p className="text-gray-600">
+                Click on a block to remove it and learn about privacy!
+              </p>
             </div>
-
-            {/* Turn Timer */}
-            {room.gameState === 'playing' && isMyTurn && (
-              <motion.div
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                className="card bg-primary-50 border-primary-200"
-              >
-                <div className="flex items-center justify-center gap-3">
-                  <Timer className="w-5 h-5 text-primary-600" />
-                  <span className="text-lg font-semibold text-primary-900">
-                    Your turn - {formatTime(turnTimeLeft)} remaining
-                  </span>
-                </div>
-                <div className="mt-3 bg-primary-200 rounded-full h-2 overflow-hidden">
-                  <motion.div
-                    className="h-full bg-primary-600"
-                    initial={{ width: '100%' }}
-                    animate={{ width: `${(turnTimeLeft / room.settings.turnTimeoutSeconds) * 100}%` }}
-                    transition={{ duration: 1, ease: 'linear' }}
-                  />
-                </div>
-              </motion.div>
-            )}
-
-            {/* Jenga Tower */}
-            <div className="card p-0 overflow-hidden">
-              <JengaTower
-                blocks={room.blocks}
-                onBlockClick={handleBlockClick}
-                isInteractive={room.gameState === 'playing' && isMyTurn}
-                selectedBlockId={selectedBlock?.id}
-              />
-            </div>
-
-            {/* Game Instructions */}
-            {room.gameState === 'lobby' && (
-              <div className="card bg-blue-50 border-blue-200">
-                <h3 className="text-lg font-semibold text-blue-900 mb-2">
-                  How to Play
-                </h3>
-                <ul className="text-blue-800 space-y-1 text-sm">
-                  <li>• Take turns removing blocks from the tower</li>
-                  <li>• Each block contains a privacy lesson and quiz</li>
-                  <li>• Answer quizzes correctly to earn points</li>
-                  <li>• Don&apos;t let the tower collapse!</li>
-                  <li>• Learn privacy best practices while having fun</li>
-                </ul>
+            
+            <JengaTower 
+              blocks={mockGameService.getBlocks()}
+              onBlockClick={handleBlockClick}
+              isInteractive={isMyTurn}
+              selectedBlockId={selectedBlock?.id}
+            />
+            
+            {/* Start Game Button */}
+            {currentPlayer?.isHost && (
+              <div className="text-center mt-6">
+                <button
+                  onClick={handleStartGame}
+                  className="bg-gradient-to-r from-teal-600 to-cyan-600 text-white px-8 py-3 rounded-lg font-semibold hover:from-teal-700 hover:to-cyan-700 transition-all duration-200 flex items-center justify-center mx-auto space-x-2"
+                >
+                  <Play className="w-5 h-5" />
+                  <span>Start Game</span>
+                </button>
               </div>
             )}
           </div>
-
-          {/* Sidebar */}
-          <div className="space-y-6">
-            {/* Player List */}
-            <PlayerList
-              players={room.players}
-              currentTurn={room.currentTurn}
-              currentPlayerId={currentPlayer.id}
+          
+          {/* Right Sidebar - Chat */}
+          <div className="lg:col-span-1">
+            <Chat 
+              messages={chatMessages}
+              onSendMessage={sendChatMessage}
+              currentPlayerId={currentPlayer.nickname}
             />
-
-            {/* Chat */}
-            {room.settings.allowChat && (
-              <Chat
-                messages={chatMessages}
-                onSendMessage={sendChatMessage}
-                disabled={room.gameState !== 'playing'}
-                currentPlayerId={currentPlayer.id}
-              />
-            )}
-
-            {/* Game Stats */}
-            <div className="card">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                Game Stats
-              </h3>
-              <div className="space-y-3">
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Blocks Removed</span>
-                  <span className="font-medium">{gameStats.blocksRemoved}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Total Blocks</span>
-                  <span className="font-medium">{gameStats.totalBlocks}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Progress</span>
-                  <span className="font-medium">
-                    {Math.round((gameStats.blocksRemoved / gameStats.totalBlocks) * 100)}%
-                  </span>
-                </div>
-              </div>
-            </div>
           </div>
         </div>
       </main>
 
       {/* Content Modal */}
-      <ContentModal
-        content={selectedContent}
-        isOpen={showContentModal}
-        onClose={() => {
-          setShowContentModal(false);
-          setSelectedContent(null);
-          setSelectedBlock(null);
-        }}
-        onQuizAnswer={handleQuizAnswer}
-        showQuiz={true}
-      />
-
-      {/* Settings Modal */}
       <AnimatePresence>
-        {showSettings && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="absolute inset-0 bg-black/50"
-              onClick={() => setShowSettings(false)}
-            />
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.9 }}
-              className="relative bg-white rounded-xl p-6 w-full max-w-md"
-            >
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                Room Settings
-              </h3>
-              <div className="space-y-3 text-sm">
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Max Players</span>
-                  <span>{room.settings.maxPlayers}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Turn Timeout</span>
-                  <span>{room.settings.turnTimeoutSeconds}s</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Chat Enabled</span>
-                  <span>{room.settings.allowChat ? 'Yes' : 'No'}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Difficulty</span>
-                  <span className="capitalize">{room.settings.difficulty}</span>
-                </div>
-              </div>
-              <button
-                onClick={() => setShowSettings(false)}
-                className="btn-primary w-full mt-6"
-              >
-                Close
-              </button>
-            </motion.div>
-          </div>
+        {showContentModal && selectedContent && (
+          <ContentModal
+            content={selectedContent}
+            isOpen={showContentModal}
+            onClose={() => {
+              setShowContentModal(false);
+              setSelectedContent(null);
+            }}
+            onQuizAnswer={handleQuizAnswer}
+          />
         )}
       </AnimatePresence>
     </div>
