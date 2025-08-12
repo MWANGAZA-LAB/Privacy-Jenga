@@ -21,22 +21,34 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: "18"
           cache: 'npm'
           cache-dependency-path: 'apps/web/package-lock.json'
+          
       - name: Setup Pages
         uses: actions/configure-pages@v4
+        
       - name: Install dependencies
         run: |
           cd apps/web
           npm ci
+          
       - name: Build with Vite
         run: |
           cd apps/web
           npm run build
+          
+      - name: List build output
+        run: |
+          cd apps/web
+          ls -la dist/
+          echo "=== index.html content ==="
+          cat dist/index.html
+          
       - name: Setup artifact context
         uses: actions/upload-pages-artifact@v3
         with:
