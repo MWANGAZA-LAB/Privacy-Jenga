@@ -198,8 +198,32 @@ const GamePage: React.FC = () => {
 
   // Handle tutorial start
   const handleStartTutorial = () => {
-    // Tutorial logic can be implemented here
     console.log('Starting interactive tutorial...');
+  };
+
+  const handleStartGame = () => {
+    console.log('Starting game...');
+    // Ensure the game is properly initialized and ready to play
+    if (gameState) {
+      // Game is already initialized, just close tutorial
+      setShowTutorial(false);
+    } else {
+      // Game not initialized, try to initialize again
+      const initializeGame = async () => {
+        try {
+          await mockGameService.createRoom();
+          const gameStarted = await mockGameService.startGame();
+          if (gameStarted) {
+            const newGameState = mockGameService.getGameState();
+            setGameState(newGameState);
+            setShowTutorial(false);
+          }
+        } catch (error) {
+          console.error('Failed to initialize game:', error);
+        }
+      };
+      initializeGame();
+    }
   };
 
   if (!gameState) {
@@ -375,6 +399,7 @@ const GamePage: React.FC = () => {
         isOpen={showTutorial}
         onClose={() => setShowTutorial(false)}
         onStartTutorial={handleStartTutorial}
+        onStartGame={handleStartGame}
       />
 
       {/* Help Modal */}

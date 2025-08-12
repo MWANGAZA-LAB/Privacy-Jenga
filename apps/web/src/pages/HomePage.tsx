@@ -308,6 +308,7 @@ const HomePage: React.FC = () => {
         isOpen={showTutorial}
         onClose={() => setShowTutorial(false)}
         onStartTutorial={handleStartTutorial}
+        onStartGame={handleStartGame}
       />
     </div>
   );

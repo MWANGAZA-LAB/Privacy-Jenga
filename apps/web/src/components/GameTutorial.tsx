@@ -6,9 +6,10 @@ interface GameTutorialProps {
   isOpen: boolean;
   onClose: () => void;
   onStartTutorial: () => void;
+  onStartGame: () => void; // Add this new callback
 }
 
-const GameTutorial: React.FC<GameTutorialProps> = ({ isOpen, onClose, onStartTutorial }) => {
+const GameTutorial: React.FC<GameTutorialProps> = ({ isOpen, onClose, onStartTutorial, onStartGame }) => {
   const [currentStep, setCurrentStep] = useState(0);
   const [showInteractiveTutorial, setShowInteractiveTutorial] = useState(false);
 
@@ -65,6 +66,12 @@ const GameTutorial: React.FC<GameTutorialProps> = ({ isOpen, onClose, onStartTut
     onClose();
   };
 
+  const handleStartGame = () => {
+    setShowInteractiveTutorial(false);
+    onStartGame(); // Call the new callback to start the game
+    onClose();
+  };
+
   if (showInteractiveTutorial) {
     return (
       <motion.div
@@ -93,7 +100,7 @@ const GameTutorial: React.FC<GameTutorialProps> = ({ isOpen, onClose, onStartTut
               Start Interactive Tutorial
             </button>
             <button
-              onClick={onClose}
+              onClick={handleStartGame}
               className="bitsacco-btn bitsacco-btn-secondary"
             >
               Start Playing

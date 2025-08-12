@@ -191,7 +191,10 @@ const JengaTower: React.FC<JengaTowerProps> = ({
 
   // Filter visible blocks and determine which are removable
   const visibleBlocks = useMemo(() => {
-    return blocks
+    console.log('JengaTower - Total blocks received:', blocks.length);
+    console.log('JengaTower - Game state:', gameState);
+    
+    const filtered = blocks
       .filter(block => !block.removed)
       .map(block => {
         // Handle both number and array types for canPullFromLayers
@@ -210,6 +213,11 @@ const JengaTower: React.FC<JengaTowerProps> = ({
           worldPosition
         };
       });
+    
+    console.log('JengaTower - Visible blocks after filtering:', filtered.length);
+    console.log('JengaTower - First few blocks:', filtered.slice(0, 3));
+    
+    return filtered;
   }, [blocks, gameState.canPullFromLayers]);
 
   // Get the maximum allowed layer for display
@@ -303,21 +311,34 @@ const JengaTower: React.FC<JengaTowerProps> = ({
         </mesh>
         
         {/* Render blocks */}
-        {visibleBlocks.map((block) => {
-          return (
-            <BlockComponent
-              key={block.id}
-              block={block}
-              onClick={() => onBlockClick(block)}
-              isSelected={selectedBlockId === block.id}
-              isRemovable={block.isRemovable}
-              canPullFromLayer={block.canPullFromLayer}
-              layer={block.layer}
-              position={block.position}
-              worldPosition={block.worldPosition}
-            />
-          );
-        })}
+        {visibleBlocks.length === 0 ? (
+          <Text
+            position={[0, 0, 0]}
+            fontSize={0.2}
+            color="#6b7280"
+            anchorX="center"
+            anchorY="middle"
+            font="/fonts/Inter-Bold.woff"
+          >
+            No blocks to display.
+          </Text>
+        ) : (
+          visibleBlocks.map((block) => {
+            return (
+              <BlockComponent
+                key={block.id}
+                block={block}
+                onClick={() => onBlockClick(block)}
+                isSelected={selectedBlockId === block.id}
+                isRemovable={block.isRemovable}
+                canPullFromLayer={block.canPullFromLayer}
+                layer={block.layer}
+                position={block.position}
+                worldPosition={block.worldPosition}
+              />
+            );
+          })
+        )}
         
         {/* Layer separation lines */}
         {Array.from({ length: maxLayer + 1 }, (_, i) => (

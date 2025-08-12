@@ -35,55 +35,19 @@ class MockGameService {
       {
         id: '1',
         code: 'ABC123',
-        players: ['Player1', 'Player2'],
-        status: 'waiting',
-        currentTurn: 0,
-        blocks: []
-      },
-      {
-        id: '2',
-        code: 'XYZ789',
-        players: ['Player3'],
+        players: ['Player1'],
         status: 'waiting',
         currentTurn: 0,
         blocks: []
       }
     ];
 
-    // Create mock players with enhanced stats
+    // Create single player for single-player mode
     this.players = [
       { 
         id: '1', 
         nickname: 'Player1', 
         avatar: '🎮', 
-        points: 0,
-        score: 0,
-        achievements: [],
-        highScore: 0,
-        gamesPlayed: 0,
-        totalPoints: 0,
-        totalBlocksRemoved: 0,
-        correctAnswers: 0,
-        incorrectAnswers: 0
-      },
-      { 
-        id: '2', 
-        nickname: 'Player2', 
-        avatar: '🚀', 
-        points: 0,
-        score: 0,
-        achievements: [],
-        highScore: 0,
-        gamesPlayed: 0,
-        totalPoints: 0,
-        totalBlocksRemoved: 0,
-        correctAnswers: 0,
-        incorrectAnswers: 0
-      },
-      { 
-        id: '3', 
-        nickname: 'Player3', 
-        avatar: '🌟', 
         points: 0,
         score: 0,
         achievements: [],
@@ -667,16 +631,23 @@ class MockGameService {
   }
 
   async startGame(): Promise<boolean> {
+    console.log('MockGameService - startGame called, currentRoom:', this.currentRoom);
     if (this.currentRoom) {
       this.currentRoom.status = 'playing';
       this.initializeGameState();
+      console.log('MockGameService - Game started, gameState:', this.gameState);
       return true;
     }
+    console.log('MockGameService - No current room, cannot start game');
     return false;
   }
 
   private initializeGameState() {
+    console.log('MockGameService - initializeGameState called');
     const currentPlayer = this.players[0]; // For single player
+    console.log('MockGameService - Current player:', currentPlayer);
+    console.log('MockGameService - Total blocks available:', this.blocks.length);
+    
     this.gameState = {
       currentPlayer: {
         nickname: currentPlayer.nickname,
@@ -703,6 +674,8 @@ class MockGameService {
       layerStats: this.calculateLayerStats(),
       blockTypeStats: this.calculateBlockTypeStats()
     };
+    
+    console.log('MockGameService - Game state initialized:', this.gameState);
   }
 
   private calculateLayerStats(): LayerStats[] {
@@ -985,6 +958,8 @@ class MockGameService {
   }
 
   getBlocks(): Block[] {
+    console.log('MockGameService - getBlocks called, returning', this.blocks.length, 'blocks');
+    console.log('MockGameService - First few blocks:', this.blocks.slice(0, 3));
     return this.blocks;
   }
 
