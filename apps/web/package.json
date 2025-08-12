@@ -3,9 +3,11 @@
   "version": "1.0.0",
   "description": "Privacy Jenga Web Application",
   "type": "module",
+  "homepage": "https://mwanga-lab.github.io/Privacy-Jenga",
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
+    "build:pages": "tsc && vite build --mode production",
     "preview": "vite preview",
     "lint": "eslint src --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "test": "vitest",
