@@ -1,331 +1,179 @@
-# 🎯 **Privacy Jenga - Complete Implementation**
+# 🎮 Privacy Jenga
 
-> **Multiplayer educational privacy game with Jenga-style mechanics powered by Bitsacco**
+**Multiplayer educational privacy game with Jenga-style mechanics powered by Bitsacco**
+
+[![GitHub Pages](https://img.shields.io/badge/GitHub%20Pages-Live-blue?style=flat-square)](https://mwanga-lab.github.io/Privacy-Jenga/)
+[![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.3.3-blue.svg)](https://www.typescriptlang.org/)
+[![React](https://img.shields.io/badge/React-18.2.0-blue.svg)](https://reactjs.org/)
+
+## 🚀 **Quick Start**
+
+### **Frontend-Only Version (Current)**
+The game is now **frontend-only** and works completely offline! No backend server required.
+
+```bash
+# Clone the repository
+git clone https://github.com/MWANGAZA-LAB/Privacy-Jenga.git
+cd Privacy-Jenga
+
+# Install dependencies
+cd apps/web
+npm install
+
+# Start the game
+npm run dev
+```
+
+**Open your browser**: http://localhost:5173
+
+### **Features Available Now**
+- ✅ **Complete Jenga Game**: All mechanics working
+- ✅ **Privacy Education**: Educational content in each block
+- ✅ **Single Player Mode**: Full game experience
+- ✅ **Local Storage**: Game progress saved in browser
+- ✅ **Responsive Design**: Works on mobile and desktop
+- ✅ **Bitsacco Branding**: Teal horse logo and theme
 
 ## 🏗️ **Architecture Overview**
 
+### **Current Implementation (Frontend-Only)**
 ```
 Client (Browser/Mobile)
 ├── React + Vite + Tailwind CSS
 ├── Game UI: React Three Fiber (3D) + Canvas (2D)
+├── Mock Game Service (in-memory state)
+├── Local Storage for persistence
+└── Responsive design for all devices
+```
+
+### **Future Scalability Features (Coming Soon)**
+```
+🔄 Real-time Multiplayer
 ├── Socket.IO client for real-time communication
-└── Optional Lightning wallet integration
+├── Optional Lightning wallet integration
+└── Multiplayer rooms and turn management
 
-⬇️ HTTPS / WSS
-
-Edge & CDN
-├── Vercel/Netlify for static assets
-├── Cloudflare CDN for global distribution
-└── Redis for session management
-
-Backend (API + Real-time)
+🔄 Backend Services
 ├── Node.js + TypeScript + Express
 ├── Socket.IO server with Redis adapter
 ├── PostgreSQL for persistent data
-├── Redis for ephemeral room state
-└── Admin service + Headless CMS
+└── Redis for ephemeral room state
 
-Infrastructure
+🔄 Infrastructure
 ├── Docker containers
 ├── Managed PostgreSQL (AWS RDS/Supabase)
 ├── Managed Redis (AWS ElastiCache)
-├── Monitoring: Sentry + Prometheus/Grafana
-└── Analytics: PostHog self-hosted
+└── Monitoring and analytics
 ```
 
-## 🚀 **Quick Start**
-
-### **Prerequisites**
-- Node.js 18+ 
-- Docker & Docker Compose
-- PostgreSQL 15+
-- Redis 7+
-
-### **1. Clone & Setup**
-```bash
-git clone <repository-url>
-cd privacy-jenga
-npm install
-npm run install:all
-```
-
-### **2. Environment Configuration**
-```bash
-cp env.example .env
-# Edit .env with your configuration
-```
-
-### **3. Start Development Environment**
-```bash
-# Option 1: Use PowerShell script (Windows)
-.\start-dev.ps1
-
-# Option 2: Manual start
-npm run dev:api    # Terminal 1
-npm run dev:web    # Terminal 2
-npm run dev:admin  # Terminal 3
-```
-
-### **4. Access Services**
-- 🌐 **Web App**: http://localhost:5173
-- 📡 **API**: http://localhost:3001
-- ⚙️ **Admin**: http://localhost:3002
-- 📊 **Grafana**: http://localhost:3000
-
-## 🏗️ **Project Structure**
-
-```
-privacy-jenga/
-├── apps/
-│   ├── web/                    # Frontend React app
-│   └── admin/                  # Admin panel + CMS
-├── services/
-│   ├── api/                    # Backend API + Socket.IO
-│   └── worker/                 # Background tasks
-├── packages/
-│   ├── ui/                     # Shared React components
-│   └── types/                  # Shared TypeScript types
-├── infra/
-│   ├── docker/                 # Docker configurations
-│   ├── k8s/                    # Kubernetes manifests
-│   └── terraform/              # Infrastructure as Code
-└── scripts/                    # Deployment & utility scripts
-```
-
-## 🔌 **API Endpoints**
-
-### **REST API (HTTPS)**
-```
-POST /api/v1/rooms              # Create room
-POST /api/v1/rooms/:id/join     # Join room
-GET  /api/v1/rooms/:id/state    # Get room state
-POST /api/v1/rooms/:id/start    # Start game
-GET  /api/v1/content            # Get content packs
-POST /api/v1/admin/content      # Create/edit content
-```
-
-### **Socket.IO Events (WSS)**
-```
-Client → Server:
-├── create_room {settings}
-├── join_room {roomId, nickname}
-├── start_game {}
-├── pick_block {blockId}
-├── answer_quiz {blockId, answer}
-└── chat_message {text}
-
-Server → Clients:
-├── room_created {roomId, code}
-├── player_joined {player}
-├── game_started {turnOrder}
-├── block_removed {blockId, content}
-├── quiz_result {blockId, playerId, correct}
-└── turn_changed {nextPlayerId}
-```
-
-## 🗄️ **Data Model**
-
-### **Core Tables**
-```sql
--- Rooms
-rooms (id, code, settings, status, created_at, expires_at)
-
--- Players  
-players (id, room_id, nickname, avatar, session_id, points)
-
--- Blocks
-blocks (id, content_id, pos_index, removed, removed_by, removed_at)
-
--- Content
-contents (id, title, text, severity, quiz, tags, locale)
-
--- Events
-events (id, room_id, player_id, type, meta, created_at)
-```
-
-### **Redis Schema**
-```
-room:{id} → Room state (players[], blocks[], currentTurn)
-pubsub:rooms → Cross-instance room synchronization
-```
-
-## 🔒 **Security & Privacy Features**
-
-### **Security Checklist** ✅
-- [x] HTTPS/WSS only
-- [x] Input validation & sanitization
-- [x] Rate limiting (API + Chat)
-- [x] CORS configuration
-- [x] Helmet security headers
-- [x] SQL injection prevention
-- [x] XSS protection
-- [x] CSRF protection
-
-### **Privacy Features** ✅
-- [x] Minimal PII collection (nickname only)
-- [x] Ephemeral room data (24h expiry)
-- [x] Anonymized analytics
-- [x] No IP→identity mapping
-- [x] GDPR compliance ready
-- [x] Data minimization
-- [x] User consent flows
-
-## 🚀 **Deployment**
-
-### **Docker Deployment**
-```bash
-# Full deployment
-bash scripts/deploy.sh
-
-# Individual commands
-bash scripts/deploy.sh build    # Build images
-bash scripts/deploy.sh push     # Push to registry  
-bash scripts/deploy.sh up       # Start services
-bash scripts/deploy.sh down     # Stop services
-bash scripts/deploy.sh health   # Health check
-```
-
-### **Production Checklist**
-- [ ] Set secure environment variables
-- [ ] Configure SSL/TLS certificates
-- [ ] Set up monitoring & alerting
-- [ ] Configure backup strategies
-- [ ] Set up CI/CD pipeline
-- [ ] Load testing validation
-- [ ] Security audit completion
-
-## 🎮 **Game Features**
+## 🎯 **Game Features**
 
 ### **Core Gameplay**
-- **Multiplayer Rooms**: 2-6 players
-- **Turn-based**: Deterministic block removal
-- **Educational Content**: Privacy lessons per block
-- **Quiz System**: Points & explanations
-- **Real-time Chat**: Room-based communication
-- **Scoring**: Leaderboards & achievements
+- **Jenga Tower**: 3D interactive tower with realistic physics
+- **Privacy Blocks**: Each block contains educational privacy content
+- **Turn-Based**: Strategic block removal with educational rewards
+- **Scoring System**: Points for correct privacy knowledge
+- **Local Progress**: Save your learning journey in the browser
 
-### **Content System**
-- **Block Categories**: Tips, Warnings, Critical
-- **Localization**: English + Swahili support
-- **Admin CMS**: Content management interface
-- **Content Packs**: Curated educational themes
+### **Educational Content**
+- **Security Tips**: Two-factor authentication, password security
+- **Privacy Best Practices**: Social media settings, data sharing
+- **Network Safety**: Public WiFi security, VPN usage
+- **Digital Hygiene**: Regular updates, backup strategies
 
-### **Bitsacco Integration**
-- **Branding**: Teal horse logo throughout
-- **Theme Colors**: Teal/cyan color scheme
-- **External Links**: Direct to bitsacco.com
-- **Reward System**: Optional Lightning integration
+## 🚧 **Development Roadmap**
 
-## 📊 **Monitoring & Analytics**
+### **Phase 1: Frontend MVP (✅ Complete)**
+- [x] Core Jenga game mechanics
+- [x] Privacy education content
+- [x] Single-player experience
+- [x] Responsive design
+- [x] Local storage persistence
 
-### **Infrastructure Monitoring**
-- **Prometheus**: Metrics collection
-- **Grafana**: Dashboards & visualization
-- **Health Checks**: Service availability
-- **Performance Metrics**: Response times, throughput
+### **Phase 2: Multiplayer Features (Coming Soon)**
+- [ ] Real-time multiplayer rooms
+- [ ] Turn management system
+- [ ] Chat functionality
+- [ ] Player leaderboards
+- [ ] Room creation and joining
 
-### **Game Analytics**
-- **Player Engagement**: Session duration, retention
-- **Content Performance**: Block completion rates
-- **Quiz Analytics**: Success rates, difficulty analysis
-- **Privacy Metrics**: Learning outcomes tracking
+### **Phase 3: Advanced Features (Coming Soon)**
+- [ ] Backend API services
+- [ ] User authentication
+- [ ] Progress tracking
+- [ ] Analytics and insights
+- [ ] Admin panel for content management
 
-## 🧪 **Testing**
+## 🛠️ **Tech Stack**
 
-### **Test Coverage**
-```bash
-# Run all tests
-npm test
+### **Frontend (Current)**
+- **Framework**: React 18 + TypeScript
+- **Build Tool**: Vite
+- **Styling**: Tailwind CSS
+- **3D Graphics**: React Three Fiber + Three.js
+- **State Management**: React Hooks + Local Storage
+- **Mock Services**: In-memory game state
 
-# Individual test suites
-npm run test:api     # Backend tests
-npm run test:web     # Frontend tests
-npm run test:e2e     # End-to-end tests
-```
+### **Future Backend (Coming Soon)**
+- **Runtime**: Node.js + TypeScript
+- **Framework**: Express.js
+- **Real-time**: Socket.IO + Redis adapter
+- **Database**: PostgreSQL
+- **Caching**: Redis
+- **Deployment**: Docker + Kubernetes
 
-### **Testing Strategy**
-- **Unit Tests**: Jest + Testing Library
-- **Integration Tests**: API endpoints + Socket events
-- **E2E Tests**: Cypress for user flows
-- **Load Testing**: k6 for performance validation
+## 📱 **Access URLs**
+
+### **Local Development**
+- **Web Client**: http://localhost:5173
+- **Game**: Fully functional frontend-only version
+
+### **Production (GitHub Pages)**
+- **Live Game**: https://mwanga-lab.github.io/Privacy-Jenga/
+- **Repository**: https://github.com/MWANGAZA-LAB/Privacy-Jenga
 
 ## 🔧 **Development Commands**
 
-### **Available Scripts**
 ```bash
-# Development
-npm run dev              # Start all services
-npm run dev:api          # Start API only
-npm run dev:web          # Start web app only
-npm run dev:admin        # Start admin panel only
+# Frontend development
+cd apps/web
+npm run dev          # Start development server
+npm run build        # Build for production
+npm run preview      # Preview production build
+npm run lint         # Run ESLint
 
-# Building
-npm run build            # Build all packages
-npm run build:api        # Build API
-npm run build:web        # Build web app
-
-# Quality
-npm run lint             # Lint all code
-npm run test             # Run all tests
-npm run type-check       # TypeScript validation
+# Future backend commands (when implemented)
+cd services/api
+npm run dev          # Start API server
+npm run build        # Build API
+npm run test         # Run tests
 ```
 
-## 🌍 **Environment Variables**
+## 🌟 **Why Frontend-Only First?**
 
-### **Required Variables**
-```bash
-# Database
-DATABASE_URL=postgresql://user:pass@host:port/db
-POSTGRES_PASSWORD=secure_password
+### **Advantages of Current Approach**
+1. **Instant Deployment**: Works immediately on GitHub Pages
+2. **No Server Costs**: Free hosting and scaling
+3. **Faster Development**: Focus on game mechanics and UX
+4. **Easier Testing**: All features testable locally
+5. **Mobile Ready**: Works offline on all devices
 
-# Redis
-REDIS_URL=redis://:password@host:port
-REDIS_PASSWORD=redis_password
-
-# Security
-JWT_SECRET=your_jwt_secret_here
-```
-
-### **Optional Variables**
-```bash
-# External Services
-LNBITS_URL=https://lnbits.com
-LNBITS_API_KEY=your_api_key
-
-# Monitoring
-SENTRY_DSN=your_sentry_dsn
-PROMETHEUS_ENABLED=true
-```
-
-## 📈 **Performance & Scaling**
-
-### **Scaling Strategy**
-- **Horizontal Scaling**: Multiple API instances
-- **Redis Adapter**: Socket.IO cross-instance sync
-- **Load Balancing**: Nginx reverse proxy
-- **CDN**: Static asset distribution
-- **Database**: Connection pooling + read replicas
-
-### **Performance Targets**
-- **API Response**: < 100ms (95th percentile)
-- **Socket Latency**: < 50ms
-- **Game State Sync**: < 100ms
-- **Concurrent Users**: 1000+ per instance
+### **Future Benefits**
+- **Progressive Enhancement**: Add features incrementally
+- **User Feedback**: Gather input before building backend
+- **Performance**: Optimize frontend before scaling
+- **Cost Control**: Only add infrastructure when needed
 
 ## 🤝 **Contributing**
 
-### **Development Workflow**
-1. Fork the repository
-2. Create feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit changes (`git commit -m 'Add amazing feature'`)
-4. Push to branch (`git push origin feature/amazing-feature`)
-5. Open Pull Request
+We welcome contributions! The project is designed for easy frontend development:
 
-### **Code Standards**
-- **TypeScript**: Strict mode enabled
-- **ESLint**: Airbnb + custom rules
-- **Prettier**: Consistent formatting
-- **Conventional Commits**: Standard commit messages
+1. **Fork** the repository
+2. **Create** a feature branch
+3. **Develop** using the mock service
+4. **Test** locally without backend
+5. **Submit** a pull request
 
 ## 📄 **License**
 
@@ -334,24 +182,12 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## 🙏 **Acknowledgments**
 
 - **Bitsacco**: For the educational mission and branding
-- **MWANGAZA-LAB**: Development team
-- **Open Source Community**: For the amazing tools and libraries
+- **MWANGAZA-LAB**: Development team and vision
+- **Privacy Community**: For educational content inspiration
+- **Open Source**: Built with amazing open-source tools
 
 ---
 
-## 🚀 **Ready to Deploy?**
+**🎮 Ready to play?** [Start the game now!](https://mwanga-lab.github.io/Privacy-Jenga/)
 
-The Privacy Jenga system is now fully implemented and ready for deployment! 
-
-**Next Steps:**
-1. Configure your environment variables
-2. Run the deployment script
-3. Access your services
-4. Start playing and learning!
-
-**Need Help?**
-- Check the [Issues](../../issues) page
-- Review the [Wiki](../../wiki) for detailed guides
-- Contact the development team
-
-**Happy Gaming & Learning! 🎮✨**
+**🔮 Want to contribute?** Check out our [roadmap](#development-roadmap) and help build the future of privacy education!

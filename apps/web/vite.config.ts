@@ -13,18 +13,7 @@ export default defineConfig({
   },
   server: {
     port: 5173,
-    host: true,
-    proxy: {
-      '/api': {
-        target: 'http://localhost:3001',
-        changeOrigin: true,
-      },
-      '/socket.io': {
-        target: 'http://localhost:3001',
-        changeOrigin: true,
-        ws: true,
-      },
-    },
+    host: true
   },
   build: {
     outDir: 'dist',
@@ -34,7 +23,6 @@ export default defineConfig({
         manualChunks: {
           vendor: ['react', 'react-dom'],
           three: ['three', '@react-three/fiber', '@react-three/drei'],
-          socket: ['socket.io-client'],
         },
       },
     },
