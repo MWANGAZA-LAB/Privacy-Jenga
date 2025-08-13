@@ -81,7 +81,7 @@ export interface GameState {
   blocksRemoved: number;
   totalBlocks: number;
   currentScore: number;
-  gameMode: 'classic' | 'endless' | 'challenge';
+  gameMode: 'classic' | 'endless' | 'challenge' | 'learning';
   difficulty: number;
   diceResult: number;
   canPullFromLayers: number[];

@@ -1193,7 +1193,7 @@ class MockGameService {
   }
 
   // Enhanced mode switching with proper state management
-  async switchGameMode(mode: 'classic' | 'endless'): Promise<void> {
+  async switchGameMode(mode: 'classic' | 'endless' | 'learning'): Promise<void> {
     if (!this.gameState) {
       throw new Error('No active game to switch modes');
     }
@@ -1224,12 +1224,12 @@ class MockGameService {
     }
   }
 
-  // Enhanced endless mode support
+  // Enhanced unified learning mode support
   async startEndlessMode(): Promise<void> {
     this.initializeGameState();
     if (this.gameState) {
-      this.gameState.gameMode = 'endless';
-      console.log('Endless mode started - tower will reset when unstable');
+      this.gameState.gameMode = 'learning';
+      console.log('Unified learning mode started - tower will reset for continuous learning');
     }
   }
 
@@ -1280,7 +1280,7 @@ class MockGameService {
       this.initializeGameState();
       if (this.gameState) {
         this.gameState.currentScore = currentScore;
-        this.gameState.gameMode = 'endless'; // This method is for endless mode
+        this.gameState.gameMode = 'learning'; // This method is for unified learning mode
       }
     }
   }
@@ -1330,6 +1330,17 @@ class MockGameService {
           'Perfect for focused, strategic gameplay'
         ]
       };
+    } else if (this.gameState.gameMode === 'learning') {
+      return {
+        mode: 'Learning',
+        description: 'Unified learning experience - tower resets for continuous education',
+        rules: [
+          'Tower automatically resets when it becomes unstable',
+          'Score accumulates across multiple tower resets',
+          'Focus on mastering all 54 privacy concepts',
+          'Perfect for continuous learning and skill development'
+        ]
+      };
     } else {
       return {
         mode: 'Endless',
@@ -1351,6 +1362,9 @@ class MockGameService {
     if (this.gameState.gameMode === 'classic') {
       // In classic mode, check if tower is still stable
       return this.calculateTowerStability() > 20 && this.gameState.towerHeight > 3;
+    } else if (this.gameState.gameMode === 'learning') {
+      // In learning mode, game can always continue (tower resets)
+      return true;
     } else {
       // In endless mode, game can always continue
       return true;

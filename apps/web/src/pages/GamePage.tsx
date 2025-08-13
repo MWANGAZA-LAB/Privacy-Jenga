@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { ArrowLeft, BarChart3, Infinity, HelpCircle, BookOpen, Dice1, ChevronDown, ChevronUp, Settings, Brain } from 'lucide-react';
+import { ArrowLeft, BarChart3, HelpCircle, BookOpen, Dice1, ChevronDown, ChevronUp, Settings, Brain } from 'lucide-react';
 import { mockGameService } from '../services/mockGameService';
 import { Block, Content, Player, GameState } from '../types';
 import JengaTower from '../components/JengaTower';
@@ -385,31 +385,19 @@ const GamePage: React.FC = () => {
               
               {showGameControls && (
                 <div className="p-4 space-y-4">
-                  {/* Game Mode */}
-                  <div className={`text-center p-3 rounded-lg border ${
-                    gameState.gameMode === 'endless' 
-                      ? 'bg-purple-500/10 border-purple-400/30' 
-                      : 'bg-blue-500/10 border-blue-400/30'
-                  }`}>
-                    <div className={`text-lg font-semibold mb-1 ${
-                      gameState.gameMode === 'endless' ? 'text-purple-300' : 'text-blue-300'
-                    }`}>
-                      Game Mode
+                  {/* Learning Experience */}
+                  <div className="text-center p-3 rounded-lg border bg-teal-500/10 border-teal-400/30">
+                    <div className="text-lg font-semibold mb-1 text-teal-300">
+                      Learning Experience
                     </div>
                     <div className="text-white text-2xl font-bold">
-                      {gameState.gameMode === 'endless' ? (
-                        <span className="flex items-center justify-center gap-2 text-purple-400">
-                          <Infinity className="w-6 h-6" />
-                          Endless
-                        </span>
-                      ) : (
-                        <span className="text-blue-400">Classic</span>
-                      )}
+                      <span className="flex items-center justify-center gap-2 text-teal-400">
+                        <Brain className="w-6 h-6" />
+                        Continuous
+                      </span>
                     </div>
                     <div className="text-gray-300 text-sm mt-2">
-                      {gameState.gameMode === 'endless' 
-                        ? 'Tower resets after collapse' 
-                        : 'Game ends when tower falls'}
+                      Tower resets for uninterrupted learning
                     </div>
                   </div>
 

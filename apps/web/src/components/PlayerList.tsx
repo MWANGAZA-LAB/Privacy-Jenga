@@ -129,7 +129,7 @@ const PlayerList: React.FC<PlayerListProps> = ({
           </div>
           <div>
             <span className="text-gray-400">Mode:</span>
-            <span className="ml-1 text-purple-400 capitalize">{gameState.gameMode}</span>
+            <span className="ml-1 text-teal-400">Learning</span>
           </div>
         </div>
       </div>
