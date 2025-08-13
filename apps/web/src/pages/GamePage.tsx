@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { Brain, ChevronUp, ChevronDown, Dice1, Trophy, BookOpen, HelpCircle, BarChart3, ArrowLeft } from 'lucide-react';
+import { Brain, ChevronUp, ChevronDown, Dice1, Trophy, BookOpen, HelpCircle, BarChart3, ArrowLeft, Gamepad2 } from 'lucide-react';
 import JengaTower from '../components/JengaTower';
 import ContentModal from '../components/ContentModal';
 import GameHelp from '../components/GameHelp';
@@ -62,14 +62,51 @@ const GamePage: React.FC = () => {
 
   // Fix: Memoize handleBlockClick with stable dependencies
   const handleBlockClick = useCallback(async (block: Block) => {
-    if (!gameState || !isInteractive) return;
+    if (!gameState || !isInteractive) {
+      console.log('Block click blocked:', {
+        hasGameState: !!gameState,
+        isInteractive,
+        blockId: block.id,
+        blockType: block.type,
+        blockLayer: block.layer
+      });
+      return;
+    }
 
     try {
-      console.log('Clicking block:', block.id, 'Layer:', block.layer);
+      console.log('🎯 Block clicked:', {
+        blockId: block.id,
+        blockType: block.type,
+        blockLayer: block.layer,
+        canPullFromLayers: gameState.canPullFromLayers,
+        isInteractive,
+        gameState: {
+          blocksRemoved: gameState.blocksRemoved,
+          currentScore: gameState.currentScore,
+          diceResult: gameState.diceResult
+        }
+      });
+
+      // Check if block is in an accessible layer
+      if (!gameState.canPullFromLayers.includes(block.layer)) {
+        console.log('❌ Block not accessible:', {
+          blockLayer: block.layer,
+          accessibleLayers: gameState.canPullFromLayers
+        });
+        alert(`Cannot remove this block from layer ${block.layer}. Available layers: ${gameState.canPullFromLayers.join(', ')}`);
+        return;
+      }
+
       const result = await mockGameService.pickBlock(block.id);
+      console.log('📦 Pick block result:', result);
       
       if (result.success && result.content) {
-        console.log('Block picked successfully:', result.content.title);
+        console.log('✅ Block picked successfully:', {
+          contentTitle: result.content.title,
+          contentCategory: result.content.category,
+          points: result.content.points
+        });
+        
         setCurrentContent(result.content);
         setShowContentModal(true);
         setSelectedBlockId(block.id);
@@ -79,15 +116,15 @@ const GamePage: React.FC = () => {
         
         // Check if tower needs reset
         if (mockGameService.calculateTowerStability() < 20) {
-          console.log('Tower becoming unstable, resetting...');
+          console.log('⚠️ Tower becoming unstable, resetting...');
           handleTowerReset();
         }
       } else {
-        console.log('Block pick failed:', result);
+        console.log('❌ Block pick failed:', result);
         alert('Cannot remove this block. Make sure you\'ve rolled the dice and the block is in an available layer.');
       }
     } catch (error) {
-      console.error('Error picking block:', error);
+      console.error('💥 Error picking block:', error);
       alert('Error removing block. Please try again.');
     }
   }, [gameState, isInteractive, mockGameService, handleTowerReset]);
@@ -330,6 +367,33 @@ const GamePage: React.FC = () => {
                   </p>
                 </div>
 
+                {/* Block Accessibility Status */}
+                {gameState.diceResult > 0 && (
+                  <div className="bitsacco-card p-3 m-3">
+                    <h3 className="text-lg font-semibold text-white mb-3 flex items-center gap-2">
+                      <ChevronDown className="w-5 h-5 text-green-400" />
+                      Accessible Layers
+                    </h3>
+                    <div className="space-y-2">
+                      <div className="text-center">
+                        <div className="text-green-400 text-sm font-semibold mb-2">
+                          Available: {gameState.canPullFromLayers.length} layers
+                        </div>
+                        <div className="flex flex-wrap gap-1 justify-center">
+                          {gameState.canPullFromLayers.map((layer) => (
+                            <div key={layer} className="w-6 h-6 bg-green-500/20 border border-green-400/40 rounded text-xs text-green-300 flex items-center justify-center">
+                              {layer}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                      <div className="text-xs text-gray-400 text-center mt-2">
+                        💡 Click on blocks in these layers to learn
+                      </div>
+                    </div>
+                  </div>
+                )}
+
                 {/* Quick Help Toggle */}
                 <button
                   onClick={() => setShowQuickHelp(!showQuickHelp)}
@@ -514,6 +578,37 @@ const GamePage: React.FC = () => {
               <div className="flex items-center gap-2">
                 <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
                 <span className="text-gray-300">Roll dice first</span>
+              </div>
+            </div>
+          </div>
+
+          {/* How to Play Instructions */}
+          <div className="bitsacco-card p-3 m-3">
+            <h3 className="text-lg font-semibold text-white mb-3 flex items-center gap-2">
+              <Gamepad2 className="w-5 h-5 text-blue-400" />
+              How to Play
+            </h3>
+            <div className="space-y-2 text-xs text-gray-300">
+              <div className="flex items-start gap-2">
+                <span className="text-blue-400 font-bold">1.</span>
+                <span>Roll the dice to unlock layers</span>
+              </div>
+              <div className="flex items-start gap-2">
+                <span className="text-blue-400 font-bold">2.</span>
+                <span>Click on colored blocks to learn privacy concepts</span>
+              </div>
+              <div className="flex items-start gap-2">
+                <span className="text-blue-400 font-bold">3.</span>
+                <span>Read tips, learn facts, or answer quiz questions</span>
+              </div>
+              <div className="flex items-start gap-2">
+                <span className="text-blue-400 font-bold">4.</span>
+                <span>Earn points and track your learning progress</span>
+              </div>
+              <div className="mt-3 p-2 bg-blue-500/10 rounded border border-blue-400/30">
+                <p className="text-xs text-blue-300 text-center">
+                  💡 <strong>Tip:</strong> Use arrow keys to navigate between blocks, Enter to select
+                </p>
               </div>
             </div>
           </div>

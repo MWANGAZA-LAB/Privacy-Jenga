@@ -266,6 +266,18 @@ const BlockComponent: React.FC<BlockProps> = ({
           />
         </mesh>
       )}
+
+      {/* Interactive Block Indicator - NEW: Shows which blocks are clickable */}
+      {canPullFromLayer && !isHovered && (
+        <mesh position={[0, 0, 0]}>
+          <Box args={[1.02, 0.31, 3.02]} />
+          <meshBasicMaterial 
+            color="#10b981" 
+            transparent
+            opacity={0.1}
+          />
+        </mesh>
+      )}
     </mesh>
   );
 };
