@@ -7,15 +7,11 @@ import { motion } from 'framer-motion';
 const HomePage: React.FC = () => {
   const navigate = useNavigate();
   const [showTutorial, setShowTutorial] = useState(false);
-  const [isFirstTime, setIsFirstTime] = useState(false);
+  const [showWelcome, setShowWelcome] = useState(true);
 
   useEffect(() => {
-    // Check if this is the first time visiting
-    const hasVisitedBefore = localStorage.getItem('privacy-jenga-has-visited');
-    if (!hasVisitedBefore) {
-      setIsFirstTime(true);
-      localStorage.setItem('privacy-jenga-has-visited', 'true');
-    }
+    // Always show welcome message when visiting homepage
+    setShowWelcome(true);
   }, []);
 
   const handleStartGame = () => {
@@ -58,13 +54,24 @@ const HomePage: React.FC = () => {
       {/* Hero Section */}
       <section className="relative py-20 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto text-center">
-          {/* First-time user welcome */}
-          {isFirstTime && (
+          {/* Welcome message - always shown */}
+          {showWelcome && (
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="mb-8 p-6 bg-teal-500/10 border border-teal-400/30 rounded-xl"
+              className="mb-8 p-6 bg-teal-500/10 border border-teal-400/30 rounded-xl relative"
             >
+              {/* Close button */}
+              <button
+                onClick={() => setShowWelcome(false)}
+                className="absolute top-3 right-3 text-teal-400 hover:text-teal-300 transition-colors"
+                aria-label="Close welcome message"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+              
               <div className="flex items-center justify-center gap-3 mb-3">
                 <Shield className="w-8 h-8 text-teal-400" />
                 <h2 className="text-2xl font-bold text-teal-300">Welcome to Privacy Jenga!</h2>
