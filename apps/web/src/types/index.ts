@@ -8,7 +8,7 @@ export interface Block {
   layer: number; // 1-18 layers
   position: number; // 1-3 positions per layer
   stability: number; // How much this block affects tower stability
-  category: 'password' | 'social-media' | 'wifi' | 'data-sharing' | 'encryption' | 'general' | 'phishing' | 'backup';
+  category: 'on-chain-privacy' | 'off-chain-practices' | 'coin-mixing' | 'wallet-setup' | 'lightning-network' | 'regulatory' | 'best-practices';
 }
 
 export interface Content {
@@ -23,7 +23,7 @@ export interface Content {
     explanation: string;
   };
   points: number; // Points awarded for this content
-  category: 'password' | 'social-media' | 'wifi' | 'data-sharing' | 'encryption' | 'general' | 'phishing' | 'backup';
+  category: 'on-chain-privacy' | 'off-chain-practices' | 'coin-mixing' | 'wallet-setup' | 'lightning-network' | 'regulatory' | 'best-practices';
   fact: string; // Educational fact about the topic
   impact: 'positive' | 'negative' | 'neutral'; // How this affects privacy
 }
@@ -130,4 +130,5 @@ export interface ContentModalProps {
 export interface GameStatsProps {
   gameState: GameState;
   onNewGame: () => void;
+  onClose: () => void;
 }

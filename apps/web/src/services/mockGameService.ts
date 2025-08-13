@@ -19,9 +19,11 @@ class MockGameService {
   private specialActions: SpecialAction[] = [];
 
   constructor() {
+    console.log('MockGameService constructor called');
     this.initializeMockData();
     this.initializeAchievements();
     this.initializeSpecialActions();
+    console.log('MockGameService initialization complete');
   }
 
   private initializeMockData() {
@@ -41,7 +43,7 @@ class MockGameService {
     // Create enhanced blocks with complete 54-block system
     this.blocks = this.createComplete54BlockSystem();
 
-    // Initialize game state
+    // Initialize game state with FRESH START (no progress)
     this.gameState = {
       currentPlayer,
       towerHeight: 18,
@@ -51,7 +53,7 @@ class MockGameService {
       gameMode: 'learning',
       difficulty: 1,
       diceResult: 0,
-      canPullFromLayers: [1, 2, 3],
+      canPullFromLayers: [], // Start with NO available layers until dice is rolled
       specialActions: [],
       gameHistory: [],
       layerStats: this.initializeLayerStats(),
@@ -127,17 +129,26 @@ class MockGameService {
   }
 
   private getContentForBlock(blockId: number, blockType: string, layer: number): Content {
-    const categories = ['password', 'social-media', 'wifi', 'data-sharing', 'encryption', 'general', 'phishing', 'backup'];
+    // New comprehensive privacy education categories
+    const categories = [
+      'on-chain-privacy',      // 15 blocks - Address reuse, transaction amounts, change addresses
+      'off-chain-practices',   // 10 blocks - VPNs, different wallets, operational security
+      'coin-mixing',           // 10 blocks - CoinJoin, traceability, user responsibility
+      'wallet-setup',          // 5 blocks - Hierarchical wallets, seed phrase security
+      'lightning-network',     // 5 blocks - Channel privacy, routing, unlinkability
+      'regulatory',            // 5 blocks - KYC risks, public records, subpoenas
+      'best-practices'         // 4 blocks - Tor, multisig, fund splitting
+    ];
     
-    // Determine category based on layer
-    let category: any;
-    if (layer <= 3) category = categories[0]; // password
-    else if (layer <= 6) category = categories[1]; // social-media
-    else if (layer <= 9) category = categories[2]; // wifi
-    else if (layer <= 12) category = categories[3]; // data-sharing
-    else if (layer <= 15) category = categories[4]; // encryption
-    else if (layer <= 18) category = categories[5]; // general
-    else category = categories[0]; // fallback
+    // Determine category based on blockId for better distribution
+    let category: 'on-chain-privacy' | 'off-chain-practices' | 'coin-mixing' | 'wallet-setup' | 'lightning-network' | 'regulatory' | 'best-practices';
+    if (blockId <= 15) category = categories[0] as 'on-chain-privacy';
+    else if (blockId <= 25) category = categories[1] as 'off-chain-practices';
+    else if (blockId <= 35) category = categories[2] as 'coin-mixing';
+    else if (blockId <= 40) category = categories[3] as 'wallet-setup';
+    else if (blockId <= 45) category = categories[4] as 'lightning-network';
+    else if (blockId <= 50) category = categories[5] as 'regulatory';
+    else category = categories[6] as 'best-practices';
 
     // Calculate points based on layer and type
     const basePoints = 10;
@@ -159,222 +170,372 @@ class MockGameService {
   }
 
   private getPrivacyTipText(blockId: number, category: string): string {
-    // Enhanced privacy tips for each category
+    // Comprehensive privacy education tips - 54 unique prompts
     const tips = {
-      'password': [
-        'Use a unique password for each account to prevent credential stuffing attacks.',
-        'Enable two-factor authentication (2FA) on all your accounts for extra security.',
-        'Create strong passwords with at least 12 characters including numbers and symbols.',
-        'Use a password manager to generate and store complex passwords securely.',
-        'Never share your passwords with anyone, including customer service representatives.',
-        'Change your passwords regularly, especially after security breaches.',
-        'Avoid using personal information like birthdays in your passwords.'
+      'on-chain-privacy': [
+        'Never reuse Bitcoin addresses - each transaction should use a new address to prevent address clustering.',
+        'Be aware that transaction amounts are publicly visible on the blockchain - consider using CoinJoin for large amounts.',
+        'Change addresses in transactions can reveal your spending patterns - use wallets that generate new change addresses.',
+        'Transaction timing can reveal your location and habits - vary the timing of your transactions.',
+        'Multiple inputs to a transaction can link different addresses to the same user - consolidate carefully.',
+        'Public transaction memos can reveal sensitive information - avoid adding personal notes to transactions.',
+        'Address reuse makes it easier for surveillance companies to track your entire financial history.',
+        'Large transactions attract more attention - consider breaking them into smaller, less noticeable amounts.',
+        'Using the same address for receiving multiple payments creates a clear spending pattern.',
+        'Change address reuse can reveal your total balance and spending habits to observers.',
+        'Transaction fees can reveal your urgency and potentially your location based on fee market conditions.',
+        'Public key reuse in different contexts can link your various online identities together.',
+        'Address clustering algorithms can group addresses that likely belong to the same user.',
+        'Timing analysis of transactions can reveal your daily routines and travel patterns.',
+        'UTXO consolidation can create a clear picture of your total holdings and spending patterns.'
       ],
-      'social-media': [
-        'Review your privacy settings monthly to ensure your posts are only visible to intended audiences.',
-        'Be cautious about sharing location data, as it can reveal your daily routines.',
-        'Think twice before posting personal information that could be used for identity theft.',
-        'Use strong privacy settings to limit who can see your profile and posts.',
-        'Be selective about accepting friend requests from people you don\'t know.',
-        'Regularly audit your friends list and remove connections you no longer trust.',
-        'Consider using a pseudonym instead of your real name for additional privacy.'
+      'off-chain-practices': [
+        'Use a VPN when broadcasting transactions to prevent IP address correlation with your Bitcoin addresses.',
+        'Operate different wallets for different purposes - never mix personal and business funds.',
+        'Use Tor or other privacy networks when accessing Bitcoin services to hide your location.',
+        'Avoid using the same device for both your Bitcoin wallet and social media accounts.',
+        'Use different email addresses for different Bitcoin services to prevent cross-service tracking.',
+        'Consider using a dedicated device for Bitcoin transactions to avoid browser fingerprinting.',
+        'Use cash or privacy-focused payment methods to acquire Bitcoin when possible.',
+        'Avoid sharing your Bitcoin addresses on public social media platforms.',
+        'Use different usernames across Bitcoin services to prevent identity correlation.',
+        'Consider the privacy implications of using centralized exchanges for Bitcoin transactions.'
       ],
-      'wifi': [
-        'Never connect to public WiFi networks without using a VPN for encryption.',
-        'Use WPA3 encryption on your home WiFi network for maximum security.',
-        'Change your WiFi password from the default to something strong and unique.',
-        'Disable WiFi when not in use to prevent automatic connections to unknown networks.',
-        'Use a mobile hotspot instead of public WiFi when possible.',
-        'Enable firewall protection on your devices when using public networks.',
-        'Avoid accessing sensitive accounts on public WiFi networks.'
+      'coin-mixing': [
+        'CoinJoin combines multiple users\' transactions to break the link between inputs and outputs.',
+        'CoinJoin effectiveness depends on the number of participants - larger groups provide better privacy.',
+        'Regular CoinJoin usage makes it harder for surveillance to distinguish your transactions from others.',
+        'CoinJoin transactions may have higher fees but provide significant privacy benefits.',
+        'Using CoinJoin regularly creates a consistent privacy pattern that\'s harder to analyze.',
+        'CoinJoin can be combined with other privacy techniques for enhanced protection.',
+        'The effectiveness of CoinJoin decreases if you frequently consolidate mixed coins.',
+        'CoinJoin participants should avoid revealing their participation to maintain privacy.',
+        'Regular CoinJoin usage makes it harder for blockchain analysis companies to track your funds.',
+        'CoinJoin is most effective when used as part of a broader privacy strategy.'
       ],
-      'data-sharing': [
-        'Read privacy policies before agreeing to share your personal information.',
-        'Limit the amount of personal data you share with apps and services.',
-        'Use privacy-focused alternatives to popular apps when possible.',
-        'Regularly review and revoke permissions for apps you no longer use.',
-        'Be cautious about sharing data with third-party services.',
-        'Use disposable email addresses for non-essential services.',
-        'Consider using a data broker opt-out service to remove your information.'
+      'wallet-setup': [
+        'Use hierarchical deterministic (HD) wallets to generate unlimited addresses from a single seed phrase.',
+        'Store your seed phrase offline in multiple secure locations - never store it digitally.',
+        'Consider using a hardware wallet for large amounts to protect against malware and theft.',
+        'Use different wallets for different purposes to prevent address correlation.',
+        'Regularly rotate your wallet addresses to maintain privacy and security.'
       ],
-      'encryption': [
-        'Use end-to-end encryption for all your communications and file storage.',
-        'Enable full-disk encryption on your devices to protect data at rest.',
-        'Use encrypted messaging apps like Signal for sensitive conversations.',
-        'Store important files in encrypted cloud storage or encrypted containers.',
-        'Use HTTPS for all web browsing to encrypt data in transit.',
-        'Consider using a VPN to encrypt all your internet traffic.',
-        'Use encrypted email services for sensitive communications.'
+      'lightning-network': [
+        'Lightning Network channels can provide near-instant, low-fee transactions with enhanced privacy.',
+        'Channel routing can reveal some information about your network position and connections.',
+        'Opening and closing channels are on-chain transactions that can be analyzed for patterns.',
+        'Lightning payments are not directly visible on the blockchain, providing transaction privacy.',
+        'Channel capacity and routing patterns can reveal information about your Lightning usage.'
       ],
-      'general': [
-        'Regularly update your software and operating systems to patch security vulnerabilities.',
-        'Use antivirus software and keep it updated to protect against malware.',
-        'Back up your important data regularly using multiple methods.',
-        'Be skeptical of unsolicited requests for personal information.',
-        'Use different email addresses for different purposes to compartmentalize your data.',
-        'Monitor your accounts regularly for suspicious activity.',
-        'Consider using privacy-focused browsers and search engines.'
+      'regulatory': [
+        'KYC/AML requirements at exchanges can create permanent records linking your identity to Bitcoin addresses.',
+        'Public records and subpoenas can force disclosure of your Bitcoin holdings and transactions.',
+        'Tax reporting requirements may force you to reveal your Bitcoin transaction history.',
+        'Regulatory compliance can conflict with privacy goals - understand the trade-offs involved.',
+        'Legal requirements vary by jurisdiction - understand the privacy implications in your area.'
       ],
-      'phishing': [
-        'Never click on links in suspicious emails, even if they look legitimate.',
-        'Verify the sender\'s email address carefully before responding to requests.',
-        'Be cautious of urgent requests for personal or financial information.',
-        'Use anti-phishing tools and browser extensions for additional protection.',
-        'Report phishing attempts to help protect others from similar attacks.',
-        'Never share passwords, PINs, or security codes via email or text.',
-        'When in doubt, contact the company directly using verified contact information.'
-      ],
-      'backup': [
-        'Create multiple backups of important data using different storage methods.',
-        'Use cloud backup services with strong encryption for off-site storage.',
-        'Test your backup and recovery procedures regularly to ensure they work.',
-        'Keep backups in different physical locations to protect against disasters.',
-        'Use version control for important documents to track changes over time.',
-        'Encrypt your backups to protect sensitive information.',
-        'Document your backup procedures for future reference.'
+      'best-practices': [
+        'Use Tor or other privacy networks when accessing Bitcoin services to hide your location.',
+        'Consider using multisig wallets for enhanced security and privacy.',
+        'Split large amounts across multiple addresses to avoid creating obvious large holdings.',
+        'Regularly review and update your privacy practices as new threats and solutions emerge.'
       ]
     };
 
-    const categoryTips = tips[category as keyof typeof tips] || tips.general;
+    const categoryTips = tips[category as keyof typeof tips] || tips['best-practices'];
+    // Use blockId to get unique tip for each block
     const tipIndex = (blockId - 1) % categoryTips.length;
     return categoryTips[tipIndex];
   }
 
   private getQuizForBlock(blockId: number, category: string): any {
-    // Enhanced quizzes for each category
+    // Enhanced quizzes for each category with more variety
     const quizzes = {
-      'password': [
+      'on-chain-privacy': [
         {
-          question: 'What is the minimum recommended length for a strong password?',
-          choices: ['8 characters', '12 characters', '16 characters', '20 characters'],
-          correctIndex: 1,
-          explanation: '12 characters is the minimum recommended length for strong passwords, though longer is better.'
-        },
-        {
-          question: 'Which of the following makes a password stronger?',
-          choices: ['Using your pet\'s name', 'Using random words with numbers', 'Using your birthday', 'Using your favorite color'],
-          correctIndex: 1,
-          explanation: 'Random words combined with numbers create much stronger passwords than personal information.'
-        }
-      ],
-      'social-media': [
-        {
-          question: 'What should you do before accepting a friend request?',
-          choices: ['Accept immediately', 'Check their profile and mutual friends', 'Ignore all requests', 'Accept if they have many friends'],
-          correctIndex: 1,
-          explanation: 'Always verify the person\'s identity by checking their profile and mutual connections before accepting.'
-        },
-        {
-          question: 'Which privacy setting is most secure for your posts?',
-          choices: ['Public', 'Friends of friends', 'Friends only', 'Custom'],
+          question: 'What is address clustering and why is it a concern?',
+          choices: ['It\'s a common feature of Bitcoin wallets', 'It makes it easier for users to consolidate UTXOs', 'It reveals your total balance and spending habits', 'It\'s a feature of all blockchain networks'],
           correctIndex: 2,
-          explanation: 'Friends only is the most secure default setting, though custom settings can be more precise.'
-        }
-      ],
-      'wifi': [
-        {
-          question: 'What should you do when connecting to public WiFi?',
-          choices: ['Connect immediately', 'Use a VPN', 'Share your password', 'Disable your firewall'],
-          correctIndex: 1,
-          explanation: 'Always use a VPN when connecting to public WiFi to encrypt your traffic and protect your data.'
+          explanation: 'Address clustering makes it easier for surveillance companies to track your entire financial history by grouping addresses that likely belong to the same user.'
         },
         {
-          question: 'Which WiFi encryption is most secure?',
-          choices: ['WEP', 'WPA', 'WPA2', 'WPA3'],
+          question: 'How can transaction amounts reveal your location?',
+          choices: ['Blockchain explorers show transaction details', 'Transaction fees can indicate your location', 'Transaction timing is always random', 'All of the above'],
+          correctIndex: 1,
+          explanation: 'Transaction fees can reveal your urgency and potentially your location based on fee market conditions.'
+        },
+        {
+          question: 'What is the purpose of change addresses in transactions?',
+          choices: ['To obfuscate the true source of funds', 'To make transactions look more legitimate', 'To prevent address reuse', 'To increase transaction size'],
+          correctIndex: 2,
+          explanation: 'Change addresses make it harder for surveillance to track your entire financial history by using new addresses for each transaction.'
+        },
+        {
+          question: 'How can public transaction memos be used to reveal sensitive information?',
+          choices: ['They are always encrypted', 'They can be used to add personal notes', 'They are visible to everyone', 'They are only visible to the sender and receiver'],
+          correctIndex: 1,
+          explanation: 'Public transaction memos can reveal sensitive information if they contain personal notes or sensitive data.'
+        },
+        {
+          question: 'What is the most effective way to prevent address reuse?',
+          choices: ['Always use new addresses', 'Change addresses only when necessary', 'Use the same address for all transactions', 'Never reuse addresses'],
+          correctIndex: 0,
+          explanation: 'Never reusing addresses is the most effective way to prevent address reuse.'
+        }
+      ],
+      'off-chain-practices': [
+        {
+          question: 'Which of the following is the most effective way to hide your Bitcoin address on social media?',
+          choices: ['Use a pseudonym', 'Never share your address', 'Use a different address for each post', 'Share your address openly'],
+          correctIndex: 1,
+          explanation: 'Never sharing your address is the most effective way to hide it on social media.'
+        },
+        {
+          question: 'What is operational security (OPSEC)?',
+          choices: ['It\'s a type of encryption', 'It\'s the practice of securing your digital devices', 'It\'s a type of wallet', 'It\'s a type of coin'],
+          correctIndex: 1,
+          explanation: 'Operational security is the practice of securing your digital devices and online accounts.'
+        },
+        {
+          question: 'Why is it important to use different wallets for different purposes?',
+          choices: ['To prevent address correlation', 'To manage multiple accounts', 'To increase transaction fees', 'To make transactions faster'],
+          correctIndex: 0,
+          explanation: 'Using different wallets for different purposes prevents address correlation and makes it harder for surveillance to track your entire financial history.'
+        },
+        {
+          question: 'What is the best way to acquire Bitcoin without revealing your address?',
+          choices: ['Use a centralized exchange', 'Use a privacy-focused wallet', 'Use a cash payment method', 'Share your address openly'],
+          correctIndex: 2,
+          explanation: 'Using a privacy-focused wallet and cash payment methods is the most effective way to acquire Bitcoin without revealing your address.'
+        },
+        {
+          question: 'Why is it important to use different email addresses for different services?',
+          choices: ['To prevent cross-service tracking', 'To increase transaction fees', 'To make transactions faster', 'To manage multiple accounts'],
+          correctIndex: 0,
+          explanation: 'Using different email addresses for different services prevents cross-service tracking and makes it harder for surveillance to link your various online identities.'
+        }
+      ],
+      'coin-mixing': [
+        {
+          question: 'What is CoinJoin and how does it work?',
+          choices: ['It\'s a type of encryption', 'It\'s a privacy-focused wallet', 'It combines multiple users\' transactions to break input-output links', 'It\'s a type of coin'],
+          correctIndex: 2,
+          explanation: 'CoinJoin combines multiple users\' transactions to break the link between inputs and outputs.'
+        },
+        {
+          question: 'How does the number of CoinJoin participants affect privacy?',
+          choices: ['More participants = better privacy', 'Fewer participants = better privacy', 'It doesn\'t matter', 'More participants = worse privacy'],
+          correctIndex: 0,
+          explanation: 'Larger groups of participants provide better privacy through the combined efforts of multiple users.'
+        },
+        {
+          question: 'What is the main benefit of regular CoinJoin usage?',
+          choices: ['It makes transactions look more legitimate', 'It reduces fees', 'It creates consistent privacy patterns', 'It increases transaction speed'],
+          correctIndex: 2,
+          explanation: 'Regular CoinJoin usage creates a consistent privacy pattern that\'s harder to analyze.'
+        },
+        {
+          question: 'How does CoinJoin affect the effectiveness of other privacy techniques?',
+          choices: ['It makes other techniques less effective', 'It enhances the effectiveness of other techniques', 'It has no effect', 'It replaces other techniques'],
+          correctIndex: 1,
+          explanation: 'CoinJoin can be combined with other privacy techniques for enhanced protection.'
+        },
+        {
+          question: 'What is the main drawback of frequent CoinJoin consolidation?',
+          choices: ['It makes transactions look suspicious', 'It reduces privacy benefits', 'It increases fees', 'It slows down transactions'],
+          correctIndex: 1,
+          explanation: 'Frequent consolidation of mixed coins reduces the privacy benefits of CoinJoin.'
+        }
+      ],
+      'wallet-setup': [
+        {
+          question: 'What is a seed phrase and why is it important?',
+          choices: ['It\'s a type of encryption', 'It\'s a type of wallet', 'It\'s a type of coin', 'It\'s a type of transaction'],
+          correctIndex: 1,
+          explanation: 'A seed phrase is a set of words that can be used to restore your wallet, making it crucial for wallet security.'
+        },
+        {
+          question: 'How should you store your seed phrase?',
+          choices: ['Write it down on a piece of paper', 'Store it digitally', 'Memorize it', 'Share it with a friend'],
+          correctIndex: 0,
+          explanation: 'You should write down your seed phrase on a piece of paper and store it in multiple secure locations.'
+        },
+        {
+          question: 'What is a hardware wallet and why is it recommended?',
+          choices: ['It\'s a type of encryption', 'It\'s a type of wallet', 'It\'s a type of coin', 'It\'s a type of transaction'],
+          correctIndex: 1,
+          explanation: 'A hardware wallet is a physical device that stores your private keys securely, making it highly recommended for large amounts.'
+        },
+        {
+          question: 'Why is it important to rotate your wallet addresses?',
+          choices: ['To prevent address correlation', 'To increase transaction fees', 'To make transactions faster', 'To manage multiple accounts'],
+          correctIndex: 0,
+          explanation: 'Regularly rotating your wallet addresses is crucial for maintaining privacy and security.'
+        }
+      ],
+      'lightning-network': [
+        {
+          question: 'What is the main advantage of the Lightning Network?',
+          choices: ['It\'s a type of encryption', 'It\'s a type of wallet', 'It\'s a type of coin', 'It\'s a type of transaction'],
           correctIndex: 3,
-          explanation: 'WPA3 is the most recent and secure WiFi encryption standard available.'
-        }
-      ],
-      'data-sharing': [
-        {
-          question: 'What should you do before agreeing to a privacy policy?',
-          choices: ['Skip it', 'Read it carefully', 'Accept without reading', 'Ignore it'],
-          correctIndex: 1,
-          explanation: 'Always read privacy policies to understand how your data will be used and shared.'
+          explanation: 'The Lightning Network provides near-instant, low-fee transactions with enhanced privacy.'
         },
         {
-          question: 'Which is safer for non-essential services?',
-          choices: ['Your primary email', 'A disposable email', 'Your work email', 'Your school email'],
+          question: 'How does channel routing reveal information?',
+          choices: ['It reveals your network position and connections', 'It\'s a type of encryption', 'It\'s a type of wallet', 'It\'s a type of coin'],
+          correctIndex: 0,
+          explanation: 'Channel routing can reveal some information about your network position and connections.'
+        },
+        {
+          question: 'What is the purpose of opening and closing channels?',
+          choices: ['To increase transaction fees', 'To provide transaction privacy', 'To make transactions faster', 'To manage multiple accounts'],
           correctIndex: 1,
-          explanation: 'Use disposable email addresses for services you don\'t trust or need long-term.'
+          explanation: 'Opening and closing channels are on-chain transactions that can be analyzed for patterns.'
+        },
+        {
+          question: 'How does Lightning payment privacy compare to Bitcoin blockchain privacy?',
+          choices: ['It\'s more private', 'It\'s less private', 'It\'s the same', 'It\'s a type of encryption'],
+          correctIndex: 0,
+          explanation: 'Lightning payments are not directly visible on the blockchain, providing transaction privacy.'
         }
       ],
-      'encryption': [
+      'regulatory': [
         {
-          question: 'What does end-to-end encryption protect?',
-          choices: ['Only files at rest', 'Only data in transit', 'Data from sender to recipient', 'Only cloud storage'],
+          question: 'What are KYC/AML requirements and why are they controversial?',
+          choices: ['They are a type of encryption', 'They are a type of wallet', 'They are a type of coin', 'They are a type of transaction'],
+          correctIndex: 1,
+          explanation: 'KYC/AML requirements are mandatory identification and verification processes for cryptocurrency exchanges, which can create permanent records linking your identity to Bitcoin addresses.'
+        },
+        {
+          question: 'How can public records and subpoenas force disclosure of your Bitcoin holdings?',
+          choices: ['They can force exchanges to reveal your identity', 'They can force you to reveal your private keys', 'They can force you to pay taxes', 'They can force you to delete your wallet'],
+          correctIndex: 0,
+          explanation: 'Public records and subpoenas can force exchanges to reveal your identity, which can then be linked to your Bitcoin addresses.'
+        },
+        {
+          question: 'What is tax reporting and why is it important?',
+          choices: ['It\'s a type of encryption', 'It\'s a type of wallet', 'It\'s a type of coin', 'It\'s a type of transaction'],
           correctIndex: 2,
-          explanation: 'End-to-end encryption protects data from the moment it leaves the sender until it reaches the intended recipient.'
+          explanation: 'Tax reporting requirements may force you to reveal your Bitcoin transaction history, which can then be linked to your identity.'
         },
         {
-          question: 'Which protocol ensures secure web browsing?',
-          choices: ['HTTP', 'HTTPS', 'FTP', 'SMTP'],
+          question: 'How do regulatory compliance and privacy goals conflict?',
+          choices: ['They are mutually exclusive', 'They are complementary', 'They are the same thing', 'They are a type of encryption'],
           correctIndex: 1,
-          explanation: 'HTTPS encrypts data between your browser and websites, protecting your information from interception.'
+          explanation: 'Regulatory compliance and privacy goals often conflict, as regulations may require disclosure of sensitive information.'
         }
       ],
-      'general': [
+      'best-practices': [
         {
-          question: 'How often should you update your software?',
-          choices: ['Never', 'Only when problems occur', 'When updates are available', 'Monthly'],
-          correctIndex: 2,
-          explanation: 'Install software updates as soon as they\'re available to patch security vulnerabilities.'
+          question: 'What is operational security (OPSEC) and why is it important?',
+          choices: ['It\'s a type of encryption', 'It\'s a type of wallet', 'It\'s a type of coin', 'It\'s a type of transaction'],
+          correctIndex: 1,
+          explanation: 'Operational security is the practice of securing your digital devices and online accounts to prevent unauthorized access.'
         },
         {
-          question: 'What is the best way to protect against malware?',
-          choices: ['Ignore security warnings', 'Use antivirus software', 'Disable firewalls', 'Share files freely'],
-          correctIndex: 1,
-          explanation: 'Antivirus software is essential for detecting and removing malicious software from your devices.'
-        }
-      ],
-      'phishing': [
-        {
-          question: 'What should you do with suspicious emails?',
-          choices: ['Click all links', 'Delete them immediately', 'Forward to friends', 'Reply with your password'],
-          correctIndex: 1,
-          explanation: 'Delete suspicious emails immediately without clicking any links or responding to them.'
+          question: 'How does multisig enhance security and privacy?',
+          choices: ['It makes transactions faster', 'It\'s a type of encryption', 'It\'s a type of wallet', 'It\'s a type of coin'],
+          correctIndex: 2,
+          explanation: 'Multisig requires multiple signatures for transactions, making it more secure and private.'
         },
         {
-          question: 'How can you verify a company\'s contact information?',
-          choices: ['Trust the email', 'Call the number in the email', 'Look up the company\'s official website', 'Ask friends'],
-          correctIndex: 2,
-          explanation: 'Always verify contact information through the company\'s official website, not through emails.'
-        }
-      ],
-      'backup': [
-        {
-          question: 'How many backup copies should you have?',
-          choices: ['One', 'Two', 'Three or more', 'None'],
-          correctIndex: 2,
-          explanation: 'The 3-2-1 rule recommends at least 3 copies, on 2 different media types, with 1 off-site.'
+          question: 'Why is fund splitting important?',
+          choices: ['It makes transactions look suspicious', 'It reduces privacy benefits', 'It\'s a type of encryption', 'It\'s a type of wallet'],
+          correctIndex: 1,
+          explanation: 'Fund splitting is crucial for privacy, as it makes it harder for blockchain analysis companies to track your funds.'
         },
         {
-          question: 'What should you do with your backups?',
-          choices: ['Keep them all in one place', 'Store them in different locations', 'Share them online', 'Ignore them'],
-          correctIndex: 1,
-          explanation: 'Store backups in different physical locations to protect against disasters like fires or floods.'
+          question: 'How often should you review and update your privacy practices?',
+          choices: ['Never', 'Once a year', 'Monthly', 'Daily'],
+          correctIndex: 2,
+          explanation: 'Regularly reviewing and updating your privacy practices is essential as new threats and solutions emerge.'
         }
       ]
     };
 
-    const categoryQuizzes = quizzes[category as keyof typeof quizzes] || quizzes.general;
-    const quizIndex = (blockId - 1) % categoryQuizzes.length;
-    return categoryQuizzes[quizIndex];
+    const categoryQuizzes = quizzes[category as keyof typeof quizzes] || quizzes['best-practices'];
+    // Use a more random approach to prevent predictable repetition
+    const randomSeed = (blockId * 7 + category.length * 13) % categoryQuizzes.length;
+    return categoryQuizzes[randomSeed];
   }
 
   private getPrivacyFact(category: string): string {
+    // Comprehensive privacy education facts for each category
     const facts = {
-      'password': 'The most common password in 2023 was "123456", used by over 2.5 million people.',
-      'social-media': 'Social media platforms collect an average of 1,500 data points per user.',
-      'wifi': 'Public WiFi networks can be compromised in as little as 30 seconds by experienced hackers.',
-      'data-sharing': 'Data brokers can sell your personal information to over 100 different companies.',
-      'encryption': 'End-to-end encryption ensures that even the service provider cannot read your messages.',
-      'general': 'Cybercrime costs the global economy over $6 trillion annually, more than the GDP of most countries.',
-      'phishing': 'Phishing attacks increased by 600% during the COVID-19 pandemic.',
-      'backup': '60% of companies that lose their data shut down within 6 months of the incident.'
+      'on-chain-privacy': [
+        'Every Bitcoin transaction is permanently recorded on a public blockchain, visible to anyone worldwide.',
+        'Address reuse is one of the biggest privacy mistakes - it creates a clear trail of all your financial activity.',
+        'Transaction amounts are always public and can reveal your financial situation and spending patterns.',
+        'Change addresses in transactions can reveal your total balance and spending habits to observers.',
+        'Multiple inputs to a transaction can link different addresses to the same user, creating address clusters.',
+        'Transaction timing can reveal your daily routines, travel patterns, and even approximate location.',
+        'Public transaction memos can contain sensitive information that becomes permanently public.',
+        'Large transactions attract more attention and are more likely to be analyzed by surveillance companies.',
+        'UTXO consolidation can create a clear picture of your total holdings and financial patterns.',
+        'Public key reuse in different contexts can link your various online identities together.',
+        'Address clustering algorithms can group addresses that likely belong to the same user.',
+        'Fee analysis can reveal your urgency and potentially your location based on fee market conditions.',
+        'Transaction patterns can reveal your spending habits, income sources, and financial relationships.',
+        'Blockchain analysis companies use sophisticated algorithms to track and profile Bitcoin users.',
+        'Once information is revealed on-chain, it becomes part of permanent public record.'
+      ],
+      'off-chain-practices': [
+        'Your IP address can be correlated with your Bitcoin addresses when broadcasting transactions.',
+        'Using the same device for Bitcoin and other online activities can create identity correlations.',
+        'Browser fingerprinting can link your Bitcoin activity to your online identity.',
+        'Email addresses used for Bitcoin services can be cross-referenced across platforms.',
+        'Social media posts about Bitcoin can reveal your addresses and spending patterns.',
+        'VPNs and Tor can help hide your location when accessing Bitcoin services.',
+        'Different wallets for different purposes can prevent address correlation.',
+        'Operational security practices are crucial for maintaining Bitcoin privacy.',
+        'Device isolation can prevent cross-contamination of privacy-sensitive activities.',
+        'Regular privacy audits can help identify and fix privacy vulnerabilities.'
+      ],
+      'coin-mixing': [
+        'CoinJoin is a privacy technique that combines multiple users\' transactions to break input-output links.',
+        'The effectiveness of CoinJoin depends on the number of participants and mixing patterns.',
+        'Regular CoinJoin usage creates consistent privacy patterns that are harder to analyze.',
+        'CoinJoin transactions may have higher fees but provide significant privacy benefits.',
+        'Mixing effectiveness decreases if you frequently consolidate mixed coins.',
+        'CoinJoin can be combined with other privacy techniques for enhanced protection.',
+        'Participants should avoid revealing their participation to maintain privacy.',
+        'CoinJoin makes it harder for blockchain analysis companies to track individual users.',
+        'The privacy benefits of CoinJoin increase with regular usage over time.',
+        'CoinJoin is most effective when used as part of a broader privacy strategy.'
+      ],
+      'wallet-setup': [
+        'HD wallets generate unlimited addresses from a single seed phrase, improving privacy and security.',
+        'Seed phrases should be stored offline in multiple secure locations for disaster recovery.',
+        'Hardware wallets provide enhanced security against malware and theft.',
+        'Different wallets for different purposes prevent address correlation.',
+        'Regular address rotation helps maintain privacy and security over time.'
+      ],
+      'lightning-network': [
+        'Lightning Network provides near-instant, low-fee transactions with enhanced privacy.',
+        'Individual Lightning payments are not directly visible on the blockchain.',
+        'Channel opening and closing are on-chain transactions that can be analyzed.',
+        'Channel routing can reveal some network position information.',
+        'Lightning can be combined with other privacy techniques for enhanced protection.'
+      ],
+      'regulatory': [
+        'KYC/AML requirements create permanent records linking identities to Bitcoin addresses.',
+        'Public records and subpoenas can force disclosure of Bitcoin holdings and transactions.',
+        'Tax reporting requirements may force revelation of Bitcoin transaction history.',
+        'Regulatory compliance often conflicts with privacy goals.',
+        'Privacy regulations vary significantly by jurisdiction.'
+      ],
+      'best-practices': [
+        'Privacy is an ongoing process that requires regular attention and updates.',
+        'Multiple privacy techniques work best when combined together.',
+        'Regular privacy audits can identify and fix vulnerabilities.',
+        'Staying informed about new threats and solutions is crucial for maintaining privacy.'
+      ]
     };
 
-    return facts[category as keyof typeof facts] || facts.general;
+    const categoryFacts = facts[category as keyof typeof facts] || facts['best-practices'];
+    // Return a random fact from the category
+    const randomIndex = Math.floor(Math.random() * categoryFacts.length);
+    return categoryFacts[randomIndex];
   }
 
   private initializeLayerStats(): LayerStats[] {
@@ -445,10 +606,13 @@ class MockGameService {
 
   // Public methods
   async startLearningMode(): Promise<void> {
+    console.log('startLearningMode called, gameState exists:', !!this.gameState);
     // Game state is already initialized in constructor
     if (this.gameState) {
       this.gameState.gameMode = 'learning';
       console.log('Learning mode started - tower will reset for continuous learning');
+    } else {
+      console.error('Game state not initialized when starting learning mode');
     }
   }
 
@@ -458,19 +622,19 @@ class MockGameService {
       block.removed = false;
     });
 
-    // Reset game state
+    // Reset game state to FRESH START
     if (this.gameState) {
       this.gameState.towerHeight = 18;
       this.gameState.blocksRemoved = 0;
       this.gameState.currentScore = 0;
       this.gameState.diceResult = 0;
-      this.gameState.canPullFromLayers = [1, 2, 3];
+      this.gameState.canPullFromLayers = []; // Start with NO available layers until dice is rolled
       this.gameState.gameHistory = [];
       this.gameState.layerStats = this.initializeLayerStats();
       this.gameState.blockTypeStats = this.initializeBlockTypeStats();
     }
 
-    console.log('Game reset - new learning session started');
+    console.log('Game reset - new learning session started with fresh state');
   }
 
   getGameState(): GameState | null {
@@ -483,6 +647,37 @@ class MockGameService {
 
   getAllBlocks(): Block[] {
     return this.blocks;
+  }
+
+  public getCategoryProgress(category: string): number {
+    // Only count blocks that have been REMOVED (not remaining blocks)
+    const removedBlocks = this.blocks.filter(block => 
+      block.removed && block.content.category === category
+    );
+    return removedBlocks.length;
+  }
+
+  public getTotalCategoryProgress(): { [key: string]: { completed: number; total: number } } {
+    const categoryTotals = {
+      'on-chain-privacy': 15,
+      'off-chain-practices': 10,
+      'coin-mixing': 10,
+      'wallet-setup': 5,
+      'lightning-network': 5,
+      'regulatory': 5,
+      'best-practices': 4
+    };
+
+    const result: { [key: string]: { completed: number; total: number } } = {};
+    
+    for (const [category, total] of Object.entries(categoryTotals)) {
+      result[category] = {
+        completed: this.getCategoryProgress(category),
+        total
+      };
+    }
+
+    return result;
   }
 
   async rollDice(): Promise<DiceResult> {

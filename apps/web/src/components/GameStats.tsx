@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { X, Brain, Trophy, BarChart3, Shield } from 'lucide-react';
 import { GameStatsProps } from '../types';
 
-const GameStats: React.FC<GameStatsProps> = ({ gameState, onNewGame }) => {
+const GameStats: React.FC<GameStatsProps> = ({ gameState, onNewGame, onClose }) => {
   const getGameModeInfo = () => {
     return {
       mode: 'Privacy Jenga Learning Mode',
@@ -35,7 +35,10 @@ const GameStats: React.FC<GameStatsProps> = ({ gameState, onNewGame }) => {
             {modeInfo.icon}
             <h2 className="text-2xl font-bold text-white">Game Statistics</h2>
           </div>
-          <button className="text-gray-400 hover:text-white transition-colors">
+          <button 
+            onClick={onClose}
+            className="text-gray-400 hover:text-white transition-colors"
+          >
             <X className="w-6 h-6" />
           </button>
         </div>

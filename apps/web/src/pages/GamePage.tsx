@@ -16,30 +16,39 @@ const GamePage: React.FC = () => {
   const [showTutorial, setShowTutorial] = useState(false);
   const [showStats, setShowStats] = useState(false);
   const [showGameInfo, setShowGameInfo] = useState(true);
-  const [showControls, setShowControls] = useState(true);
   const [showQuickHelp, setShowQuickHelp] = useState(false);
   const [selectedBlockId, setSelectedBlockId] = useState<string | undefined>(undefined);
   const [isInteractive, setIsInteractive] = useState(true);
 
+  // Fix: Memoize the service instance to prevent recreation on every render
   const mockGameService = useMemo(() => new MockGameService(), []);
 
+  // Fix: Memoize the initializeGame function with stable dependencies
   const initializeGame = useCallback(async () => {
     try {
+      console.log('Initializing game...');
       await mockGameService.startLearningMode();
       const state = mockGameService.getGameState();
+      console.log('Game state after initialization:', state);
+      
       if (state) {
         setGameState(state);
         setIsInteractive(true);
+        console.log('Game initialized successfully');
+      } else {
+        console.error('Failed to get game state after initialization');
       }
     } catch (error) {
       console.error('Failed to initialize game:', error);
     }
   }, [mockGameService]);
 
+  // Fix: Use useEffect with stable dependencies to prevent infinite loops
   useEffect(() => {
     initializeGame();
   }, [initializeGame]);
 
+  // Fix: Memoize handleTowerReset with stable dependencies
   const handleTowerReset = useCallback(async () => {
     if (!gameState) return;
     
@@ -51,13 +60,16 @@ const GamePage: React.FC = () => {
     }
   }, [gameState, mockGameService]);
 
+  // Fix: Memoize handleBlockClick with stable dependencies
   const handleBlockClick = useCallback(async (block: Block) => {
     if (!gameState || !isInteractive) return;
 
     try {
+      console.log('Clicking block:', block.id, 'Layer:', block.layer);
       const result = await mockGameService.pickBlock(block.id);
       
       if (result.success && result.content) {
+        console.log('Block picked successfully:', result.content.title);
         setCurrentContent(result.content);
         setShowContentModal(true);
         setSelectedBlockId(block.id);
@@ -67,25 +79,41 @@ const GamePage: React.FC = () => {
         
         // Check if tower needs reset
         if (mockGameService.calculateTowerStability() < 20) {
+          console.log('Tower becoming unstable, resetting...');
           handleTowerReset();
         }
+      } else {
+        console.log('Block pick failed:', result);
+        alert('Cannot remove this block. Make sure you\'ve rolled the dice and the block is in an available layer.');
       }
     } catch (error) {
       console.error('Error picking block:', error);
+      alert('Error removing block. Please try again.');
     }
   }, [gameState, isInteractive, mockGameService, handleTowerReset]);
 
+  // Fix: Memoize handleDiceRoll with stable dependencies
   const handleDiceRoll = useCallback(async () => {
-    if (!gameState || !isInteractive) return;
+    if (!gameState || !isInteractive) {
+      console.log('Dice roll blocked - gameState:', !!gameState, 'isInteractive:', isInteractive);
+      return;
+    }
 
     try {
-      await mockGameService.rollDice();
+      console.log('Rolling dice...');
+      const result = await mockGameService.rollDice();
+      console.log('Dice roll result:', result);
+      
       const updatedState = mockGameService.getGameState();
       if (updatedState) {
         setGameState(updatedState);
+        console.log('Game state updated after dice roll');
+      } else {
+        console.error('Failed to get updated game state after dice roll');
       }
     } catch (error) {
       console.error('Error rolling dice:', error);
+      alert('Error rolling dice. Please try again.');
     }
   }, [gameState, isInteractive, mockGameService]);
 
@@ -121,7 +149,10 @@ const GamePage: React.FC = () => {
       const newState = mockGameService.getGameState();
       if (newState) {
         setGameState(newState);
-        setShowStats(false);
+        setShowStats(false); // Ensure stats panel is closed
+        setShowContentModal(false); // Ensure content modal is closed
+        setCurrentContent(null);
+        setSelectedBlockId(undefined);
         alert('New learning session started!');
       }
     } catch (error) {
@@ -138,6 +169,18 @@ const GamePage: React.FC = () => {
     setShowTutorial(false);
     setIsInteractive(true);
   };
+
+  // Fix: Add a function to properly close the stats panel
+  const handleCloseStats = useCallback(() => {
+    console.log('Closing stats panel');
+    setShowStats(false);
+  }, []);
+
+  // Fix: Add a function to properly open the stats panel
+  const handleOpenStats = useCallback(() => {
+    console.log('Opening stats panel');
+    setShowStats(true);
+  }, []);
 
   if (!gameState) {
     return (
@@ -197,7 +240,7 @@ const GamePage: React.FC = () => {
 
           <div className="flex items-center gap-2">
             <button
-              onClick={() => setShowStats(!showStats)}
+              onClick={handleOpenStats}
               className="bitsacco-btn-secondary p-2"
               title="Game Statistics"
             >
@@ -225,53 +268,64 @@ const GamePage: React.FC = () => {
 
       {/* Main Game Area */}
       <div className="flex h-[calc(100vh-80px)]">
-        {/* Left Panel - Game Information */}
-        <div className="w-80 bg-gray-800 border-r border-gray-700 overflow-y-auto">
+        {/* Left Panel - Game Information (Reduced width for better proportions) */}
+        <div className="w-64 bg-gray-800 border-r border-gray-700 overflow-y-auto">
           {/* Game Information */}
-          <div className="bitsacco-panel p-4">
+          <div className="bitsacco-panel p-3">
             <h3 className="text-lg font-semibold text-white mb-3 flex items-center justify-between">
               Game Information
               <button onClick={() => setShowGameInfo(!showGameInfo)} className="text-gray-400 hover:text-white">
-                {showGameInfo ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
+                {showGameInfo ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
               </button>
             </h3>
             {showGameInfo && (
-              <div className="space-y-4">
+              <div className="space-y-3">
                 {/* Current Player */}
-                <div className="text-center p-3 rounded-lg border bg-teal-500/10 border-teal-400/30">
-                  <div className="text-lg font-semibold mb-1 text-teal-300">
+                <div className="text-center p-2 rounded-lg border bg-teal-500/10 border-teal-400/30">
+                  <div className="text-sm font-semibold mb-1 text-teal-300">
                     Current Player
                   </div>
-                  <div className="text-white text-2xl font-bold">
+                  <div className="text-white text-lg font-bold">
                     {gameState.currentPlayer.nickname}
                   </div>
-                  <p className="text-gray-400 text-sm mt-2">Learning privacy concepts</p>
+                  <p className="text-gray-400 text-xs mt-1">Learning privacy concepts</p>
                 </div>
 
                 {/* Dice Result */}
-                {gameState.diceResult > 0 && (
-                  <div className="text-center p-3 rounded-lg border bg-blue-500/10 border-blue-400/30">
-                    <div className="text-lg font-semibold mb-1 text-blue-300">
+                {gameState.diceResult > 0 ? (
+                  <div className="text-center p-2 rounded-lg border bg-blue-500/10 border-blue-400/30">
+                    <div className="text-sm font-semibold mb-1 text-blue-300">
                       Dice Result
                     </div>
-                    <div className="text-white text-4xl font-bold">
-                      <Dice1 className="w-12 h-12 mx-auto mb-2 text-blue-400" />
+                    <div className="text-white text-2xl font-bold">
+                      <Dice1 className="w-8 h-8 mx-auto mb-1 text-blue-400" />
                       {gameState.diceResult}
                     </div>
-                    <p className="text-gray-400 text-sm mt-2">Available layers: {gameState.canPullFromLayers.join(', ')}</p>
+                    <p className="text-gray-400 text-xs mt-1">Layers: {gameState.canPullFromLayers.join(', ')}</p>
+                  </div>
+                ) : (
+                  <div className="text-center p-2 rounded-lg border bg-gray-500/10 border-gray-400/30">
+                    <div className="text-sm font-semibold mb-1 text-gray-300">
+                      Game Status
+                    </div>
+                    <div className="text-white text-lg font-bold">
+                      Ready to Start
+                    </div>
+                    <p className="text-gray-400 text-xs mt-1">Roll dice to begin</p>
                   </div>
                 )}
 
                 {/* Tower Stability */}
-                <div className="text-center p-3 rounded-lg border bg-yellow-500/10 border-yellow-400/30">
-                  <div className="text-lg font-semibold mb-1 text-yellow-300">
-                    Tower Stability
+                <div className="text-center p-2 rounded-lg border bg-yellow-500/10 border-yellow-400/30">
+                  <div className="text-sm font-semibold mb-1 text-yellow-300">
+                    Tower Status
                   </div>
-                  <div className="text-white text-2xl font-bold">
-                    {mockGameService.calculateTowerStability().toFixed(0)}%
+                  <div className="text-white text-xl font-bold">
+                    {gameState.blocksRemoved === 0 ? '100%' : mockGameService.calculateTowerStability().toFixed(0) + '%'}
                   </div>
-                  <p className="text-gray-400 text-sm mt-2">
-                    {mockGameService.calculateTowerStability() > 70 ? 'Stable' : 
+                  <p className="text-gray-400 text-xs mt-1">
+                    {gameState.blocksRemoved === 0 ? 'Perfect' : 
+                     mockGameService.calculateTowerStability() > 70 ? 'Stable' : 
                      mockGameService.calculateTowerStability() > 40 ? 'Warning' : 'Danger'}
                   </p>
                 </div>
@@ -279,21 +333,20 @@ const GamePage: React.FC = () => {
                 {/* Quick Help Toggle */}
                 <button
                   onClick={() => setShowQuickHelp(!showQuickHelp)}
-                  className="bitsacco-btn-secondary w-full p-3"
+                  className="bitsacco-btn-secondary w-full p-2 text-sm"
                 >
-                  <HelpCircle className="w-5 h-5 mr-2" />
-                  {showQuickHelp ? 'Hide Quick Help' : 'Show Quick Help'}
+                  <HelpCircle className="w-4 h-4 mr-2" />
+                  {showQuickHelp ? 'Hide Help' : 'Quick Help'}
                 </button>
 
                 {showQuickHelp && (
-                  <div className="p-3 bg-gray-700/50 rounded-lg border border-gray-600">
-                    <h4 className="font-semibold text-teal-300 mb-2">Quick Tips:</h4>
-                    <ul className="text-sm text-gray-300 space-y-1">
+                  <div className="p-2 bg-gray-700/50 rounded-lg border border-gray-600">
+                    <h4 className="font-semibold text-teal-300 mb-2 text-sm">Quick Tips:</h4>
+                    <ul className="text-xs text-gray-300 space-y-1">
                       <li>• Roll dice to determine available layers</li>
                       <li>• Click blocks to learn privacy concepts</li>
                       <li>• Answer quizzes correctly for bonus points</li>
                       <li>• Watch tower stability indicator</li>
-                      <li>• Tower resets automatically when unstable</li>
                     </ul>
                   </div>
                 )}
@@ -301,70 +354,169 @@ const GamePage: React.FC = () => {
             )}
           </div>
 
-          {/* Game Controls */}
-          <div className="bitsacco-panel p-4">
-            <h3 className="text-lg font-semibold text-white mb-3 flex items-center justify-between">
+          {/* Game Controls Panel (Streamlined) */}
+          <div className="bitsacco-panel p-3 mt-3">
+            <h3 className="text-lg font-semibold text-white mb-3 flex items-center gap-2">
+              <Brain className="w-5 h-5 text-teal-400" />
               Game Controls
-              <button onClick={() => setShowControls(!showControls)} className="text-gray-400 hover:text-white">
-                {showControls ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
-              </button>
             </h3>
-            {showControls && (
-              <div className="space-y-4">
-                {/* Learning Experience */}
-                <div className="text-center p-3 rounded-lg border bg-teal-500/10 border-teal-400/30">
-                  <div className="text-lg font-semibold mb-1 text-teal-300">
-                    Learning Experience
-                  </div>
-                  <div className="text-white text-2xl font-bold">
-                    <span className="flex items-center justify-center gap-2 text-teal-400">
-                      <Brain className="w-6 h-6" />
-                      Continuous
-                    </span>
-                  </div>
-                  <p className="text-gray-400 text-sm mt-2">Tower resets for uninterrupted learning</p>
+            <div className="space-y-3">
+              {/* Learning Experience */}
+              <div className="text-center p-2 rounded-lg border bg-teal-500/10 border-teal-400/30">
+                <div className="text-sm font-semibold mb-1 text-teal-300">
+                  Learning Experience
                 </div>
-
-                {/* Dice Roll */}
-                <button
-                  onClick={handleDiceRoll}
-                  disabled={!isInteractive}
-                  className="bitsacco-btn-primary w-full p-4 text-lg font-semibold"
-                >
-                  <Dice1 className="w-6 h-6 mr-2" />
-                  Roll Dice
-                </button>
-
-                {/* New Game */}
-                <button
-                  onClick={handleNewGame}
-                  className="bitsacco-btn-secondary w-full p-3"
-                >
-                  <Trophy className="w-5 h-5 mr-2" />
-                  New Learning Session
-                </button>
-
-                {/* Game Stats */}
-                <button
-                  onClick={() => setShowStats(!showStats)}
-                  className="bitsacco-btn-secondary w-full p-3"
-                >
-                  <BarChart3 className="w-5 h-5 mr-2" />
-                  View Statistics
-                </button>
+                <span className="flex items-center justify-center gap-2 text-teal-400 text-sm">
+                  <Brain className="w-4 h-4" />
+                  Continuous
+                </span>
+                <p className="text-gray-400 text-xs mt-1">Tower resets for uninterrupted learning</p>
               </div>
-            )}
+
+              {/* Dice Roll */}
+              <button
+                onClick={handleDiceRoll}
+                disabled={!isInteractive}
+                className={`w-full p-3 text-base font-semibold ${
+                  gameState.diceResult === 0 
+                    ? 'bitsacco-btn-primary text-lg' 
+                    : 'bitsacco-btn-secondary'
+                }`}
+              >
+                <Dice1 className="w-5 h-5 mr-2" />
+                {gameState.diceResult === 0 ? 'Start Game - Roll Dice!' : 'Roll Dice Again'}
+              </button>
+
+              {/* New Game */}
+              <button
+                onClick={handleNewGame}
+                className="bitsacco-btn-secondary w-full p-2 text-sm"
+              >
+                <Trophy className="w-4 h-4 mr-2" />
+                New Session
+              </button>
+
+              {/* Game Stats */}
+              <button
+                onClick={handleOpenStats}
+                className="bitsacco-btn-secondary w-full p-2 text-sm"
+              >
+                <BarChart3 className="w-4 h-4 mr-2" />
+                View Statistics
+              </button>
+            </div>
           </div>
         </div>
 
-        {/* Center - 3D Tower */}
-        <div className="flex-1 relative">
+        {/* Center - 3D Tower (Main focal point - takes most space) */}
+        <div className="flex-1 relative bg-gray-900">
           <JengaTower
             blocks={mockGameService.getAllBlocks()}
             onBlockClick={handleBlockClick}
             selectedBlockId={selectedBlockId}
             gameState={gameState}
           />
+        </div>
+
+        {/* Right Panel - Game Info & Help (Compact sidebar) */}
+        <div className="w-56 bg-gray-800 border-l border-gray-700 overflow-y-auto">
+          {/* Game Info */}
+          <div className="bitsacco-card p-3 m-3">
+            <h3 className="text-lg font-semibold text-white mb-3 flex items-center gap-2">
+              <BookOpen className="w-5 h-5 text-green-400" />
+              Game Info
+            </h3>
+            <div className="space-y-2 text-sm">
+              <div className="flex justify-between">
+                <span className="text-gray-400">Mode:</span>
+                <span className="text-teal-400 font-semibold">Learning</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-400">Blocks:</span>
+                <span className="text-blue-400 font-semibold">{gameState?.blocksRemoved}/54</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-400">Layers:</span>
+                <span className="text-yellow-400 font-semibold">{gameState?.towerHeight}/18</span>
+              </div>
+            </div>
+            
+            {/* Category Progress (Compact) */}
+            <div className="mt-3 pt-3 border-t border-gray-600">
+              <h4 className="text-sm font-semibold text-gray-300 mb-2">Privacy Categories</h4>
+              <div className="space-y-1 text-xs">
+                <div className="flex justify-between">
+                  <span className="text-gray-400">On-Chain:</span>
+                  <span className="text-blue-400">{mockGameService.getCategoryProgress('on-chain-privacy')}/15</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-400">Off-Chain:</span>
+                  <span className="text-green-400">{mockGameService.getCategoryProgress('off-chain-practices')}/10</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-400">Coin Mixing:</span>
+                  <span className="text-purple-400">{mockGameService.getCategoryProgress('coin-mixing')}/10</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-400">Wallet Setup:</span>
+                  <span className="text-yellow-400">{mockGameService.getCategoryProgress('wallet-setup')}/5</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-400">Lightning:</span>
+                  <span className="text-orange-400">{mockGameService.getCategoryProgress('lightning-network')}/5</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-400">Regulatory:</span>
+                  <span className="text-red-400">{mockGameService.getCategoryProgress('regulatory')}/5</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-400">Best Practices:</span>
+                  <span className="text-teal-400">{mockGameService.getCategoryProgress('best-practices')}/4</span>
+                </div>
+              </div>
+              
+              {/* Progress Summary */}
+              {gameState.blocksRemoved === 0 ? (
+                <div className="mt-3 p-2 bg-gray-700/50 rounded-lg border border-gray-600">
+                  <p className="text-xs text-gray-300 text-center">
+                    🎯 Ready to learn! Roll dice to start exploring privacy concepts
+                  </p>
+                </div>
+              ) : (
+                <div className="mt-3 p-2 bg-teal-500/10 rounded-lg border border-teal-400/30">
+                  <p className="text-xs text-teal-300 text-center">
+                    📚 Learning in progress: {gameState.blocksRemoved}/54 concepts explored
+                  </p>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Quick Help */}
+          <div className="bitsacco-card p-3 m-3">
+            <h3 className="text-lg font-semibold text-white mb-3 flex items-center gap-2">
+              <HelpCircle className="w-5 h-5 text-purple-400" />
+              Quick Help
+            </h3>
+            <div className="space-y-2 text-xs">
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                <span className="text-gray-300">Green = Safe blocks</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 bg-red-500 rounded-full"></div>
+                <span className="text-gray-300">Red = Risky blocks</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 bg-yellow-500 rounded-full"></div>
+                <span className="text-gray-300">Yellow = Quiz blocks</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                <span className="text-gray-300">Roll dice first</span>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -394,10 +546,14 @@ const GamePage: React.FC = () => {
         onStartGame={handleStartGame}
       />
 
-      <GameStats
-        gameState={gameState}
-        onNewGame={handleNewGame}
-      />
+      {/* Fix: Only render GameStats when showStats is true */}
+      {showStats && (
+        <GameStats
+          gameState={gameState}
+          onNewGame={handleNewGame}
+          onClose={handleCloseStats}
+        />
+      )}
     </div>
   );
 };
