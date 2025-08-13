@@ -38,22 +38,39 @@ const BlockComponent: React.FC<BlockProps> = ({
   const [isHovered, setIsHovered] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
 
-  // ✅ SAFE COLOR MAP for block types
+  // ✅ BULLETPROOF COLOR MAP for block types - NO WHITE ALLOWED
   const BLOCK_COLORS: Record<string, string> = {
     safe: '#10b981',      // Green
     risky: '#ef4444',     // Red
     challenge: '#f59e0b', // Yellow
   };
 
-  // ✅ Returns a guaranteed valid hex color for a block
+  // ✅ Returns a guaranteed valid hex color for a block - ABSOLUTELY NO WHITE
   const getBlockColor = (block: Block): string => {
     if (block.removed) return '#374151'; // Dark gray for removed blocks
 
-    let color = BLOCK_COLORS[block.type] ?? '#6b7280'; // Gray fallback
+    // Validate block type first
+    if (!block.type || !['safe', 'risky', 'challenge'].includes(block.type)) {
+      console.warn(`Invalid block type "${block.type}" for block ${block.id}, defaulting to safe`);
+      return '#10b981'; // Always return green for invalid types
+    }
 
-    // Final safeguard against accidental white or invalid values
-    if (!/^#([0-9A-F]{3}){1,2}$/i.test(color) || color.toLowerCase() === '#ffffff' || color.toLowerCase() === 'white') {
-      console.warn(`Invalid or white color for block ${block.id}, falling back to green`);
+    let color = BLOCK_COLORS[block.type];
+    
+    // Multiple layers of protection against white
+    if (!color || 
+        color.toLowerCase() === '#ffffff' || 
+        color.toLowerCase() === 'white' ||
+        color.toLowerCase() === '#fff' ||
+        color.toLowerCase() === 'fff' ||
+        !/^#([0-9A-F]{3}){1,2}$/i.test(color)) {
+      console.warn(`Invalid or white color "${color}" for block ${block.id}, falling back to green`);
+      color = '#10b981';
+    }
+
+    // Final validation - if somehow we still have white, force green
+    if (color.toLowerCase() === '#ffffff' || color.toLowerCase() === 'white') {
+      console.error(`CRITICAL: White color still detected for block ${block.id}, forcing green`);
       color = '#10b981';
     }
 
@@ -77,20 +94,25 @@ const BlockComponent: React.FC<BlockProps> = ({
     />
   );
 
-  // ✅ Returns a safe material for a block
+  // ✅ Returns a bulletproof material for a block - NO WHITE MATERIALS
   const getBlockMaterial = (block: Block) => {
     const color = getBlockColor(block);
     const opacity = getBlockOpacity(block);
 
+    // Final safety check - if somehow we still have white, force green
+    const finalColor = (color.toLowerCase() === '#ffffff' || color.toLowerCase() === 'white') 
+      ? '#10b981' 
+      : color;
+
     // ✅ Force material update to prevent white flash
     const material = (
       <meshStandardMaterial
-        color={color}
+        color={finalColor}
         transparent
         opacity={opacity}
         metalness={0.0}
         roughness={1.0}
-        key={`${block.id}-${color}-${opacity}`} // Force re-render on changes
+        key={`${block.id}-${finalColor}-${opacity}`} // Force re-render on changes
       />
     );
 
@@ -146,6 +168,14 @@ const BlockComponent: React.FC<BlockProps> = ({
   // ✅ Guard against invalid blocks to prevent white flash
   if (!block || !block.type || isRemoved) {
     return null;
+  }
+
+  // ✅ Runtime validation - ensure no white blocks can render
+  const blockColor = getBlockColor(block);
+  if (blockColor.toLowerCase() === '#ffffff' || blockColor.toLowerCase() === 'white') {
+    console.error(`CRITICAL ERROR: White block detected at runtime for block ${block.id}, forcing green`);
+    // Force the block to be green
+    block.type = 'safe';
   }
 
 

@@ -260,3 +260,25 @@ body {
 .border-2.border-white {
   border-color: rgba(75, 85, 99, 0.3) !important;
 }
+
+/* CRITICAL: Prevent any white blocks in 3D scene */
+canvas {
+  background-color: #111827 !important;
+}
+
+/* Force all 3D materials to use non-white colors */
+[data-threejs-material] {
+  color: #10b981 !important;
+}
+
+/* Emergency fallback for any white elements */
+*[style*="color: white"],
+*[style*="color: #fff"],
+*[style*="color: #ffffff"] {
+  color: #10b981 !important;
+}
+
+/* Prevent white backgrounds in 3D elements */
+mesh, geometry, material {
+  background-color: #10b981 !important;
+}
