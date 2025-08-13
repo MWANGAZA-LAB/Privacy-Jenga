@@ -73,8 +73,29 @@ const GamePage: React.FC = () => {
 
   // Fix: Use useEffect with stable dependencies to prevent infinite loops
   useEffect(() => {
-    initializeGame();
-  }, [initializeGame]);
+    // Only initialize once when component mounts
+    if (!gameState) {
+      console.log('🎯 Component mounted, initializing game...');
+      initializeGame();
+    }
+  }, []); // Empty dependency array - only run once
+
+  // Debug: Log current game state for troubleshooting
+  useEffect(() => {
+    if (gameState) {
+      const blocks = mockGameService.getAllBlocks();
+      console.log('🎮 Current game state being used:', {
+        hasGameState: !!gameState,
+        canPullFromLayers: gameState.canPullFromLayers,
+        diceResult: gameState.diceResult,
+        blocksRemoved: gameState.blocksRemoved,
+        isInteractive,
+        totalBlocks: blocks.length,
+        removedBlocks: blocks.filter(b => b.removed).length,
+        availableBlocks: blocks.filter(b => !b.removed).length
+      });
+    }
+  }, [gameState, isInteractive, mockGameService]);
 
   // Fix: Memoize handleTowerReset with stable dependencies
   const handleTowerReset = useCallback(async () => {
@@ -512,12 +533,22 @@ const GamePage: React.FC = () => {
 
         {/* Center - 3D Tower (Main focal point - takes most space) */}
         <div className="flex-1 relative bg-gray-900">
-          <JengaTower
-            blocks={mockGameService.getAllBlocks()}
-            onBlockClick={handleBlockClick}
-            selectedBlockId={selectedBlockId}
-            gameState={gameState}
-          />
+          {!gameState ? (
+            <div className="flex items-center justify-center h-full">
+              <div className="text-center">
+                <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-teal-500 mx-auto mb-4"></div>
+                <p className="text-white text-lg">Loading Privacy Jenga...</p>
+                <p className="text-gray-400 text-sm mt-2">Initializing game components</p>
+              </div>
+            </div>
+          ) : (
+            <JengaTower
+              blocks={mockGameService.getAllBlocks()}
+              onBlockClick={handleBlockClick}
+              gameState={gameState}
+              selectedBlockId={selectedBlockId}
+            />
+          )}
         </div>
 
         {/* Right Panel - Game Info & Help (Compact sidebar) */}
