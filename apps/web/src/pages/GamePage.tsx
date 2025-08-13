@@ -21,25 +21,53 @@ const GamePage: React.FC = () => {
   const [isInteractive, setIsInteractive] = useState(true);
 
   // Fix: Memoize the service instance to prevent recreation on every render
-  const mockGameService = useMemo(() => new MockGameService(), []);
+  const mockGameService = useMemo(() => {
+    console.log('🔧 Creating MockGameService instance...');
+    const service = new MockGameService();
+    
+    // CRITICAL: Validate that all required methods exist
+    console.log('🔍 Service validation:', {
+      hasStartLearningMode: typeof service.startLearningMode === 'function',
+      hasGetGameState: typeof service.getGameState === 'function',
+      hasRollDice: typeof service.rollDice === 'function',
+      hasPickBlock: typeof service.pickBlock === 'function',
+      hasResetGame: typeof service.resetGame === 'function',
+      serviceInstance: service
+    });
+    
+    return service;
+  }, []);
 
   // Fix: Memoize the initializeGame function with stable dependencies
   const initializeGame = useCallback(async () => {
     try {
-      console.log('Initializing game...');
+      console.log('🚀 EMERGENCY DEBUG: Starting game initialization...');
+      console.log('MockGameService instance:', mockGameService);
+      
       await mockGameService.startLearningMode();
+      console.log('✅ startLearningMode completed');
+      
       const state = mockGameService.getGameState();
-      console.log('Game state after initialization:', state);
+      console.log('📊 Game state after initialization:', state);
+      console.log('🔍 State details:', {
+        hasState: !!state,
+        canPullFromLayers: state?.canPullFromLayers,
+        diceResult: state?.diceResult,
+        blocksRemoved: state?.blocksRemoved,
+        gameMode: state?.gameMode
+      });
       
       if (state) {
         setGameState(state);
         setIsInteractive(true);
-        console.log('Game initialized successfully');
+        console.log('🎯 Game initialized successfully, isInteractive set to:', true);
       } else {
-        console.error('Failed to get game state after initialization');
+        console.error('❌ CRITICAL: Failed to get game state after initialization');
+        alert('Game initialization failed! Check console for details.');
       }
     } catch (error) {
-      console.error('Failed to initialize game:', error);
+      console.error('💥 CRITICAL ERROR during game initialization:', error);
+      alert('Game initialization error! Check console for details.');
     }
   }, [mockGameService]);
 
@@ -132,25 +160,35 @@ const GamePage: React.FC = () => {
   // Fix: Memoize handleDiceRoll with stable dependencies
   const handleDiceRoll = useCallback(async () => {
     if (!gameState || !isInteractive) {
-      console.log('Dice roll blocked - gameState:', !!gameState, 'isInteractive:', isInteractive);
+      console.log('🚨 Dice roll blocked - gameState:', !!gameState, 'isInteractive:', isInteractive);
       return;
     }
 
     try {
-      console.log('Rolling dice...');
+      console.log('🎲 EMERGENCY DEBUG: Rolling dice...');
+      console.log('Current game state before dice roll:', gameState);
+      
       const result = await mockGameService.rollDice();
-      console.log('Dice roll result:', result);
+      console.log('🎲 Dice roll result:', result);
       
       const updatedState = mockGameService.getGameState();
+      console.log('📊 Updated game state after dice roll:', updatedState);
+      
       if (updatedState) {
         setGameState(updatedState);
-        console.log('Game state updated after dice roll');
+        console.log('✅ Game state updated after dice roll');
+        console.log('🔍 New state details:', {
+          canPullFromLayers: updatedState.canPullFromLayers,
+          diceResult: updatedState.diceResult,
+          blocksRemoved: updatedState.blocksRemoved
+        });
       } else {
-        console.error('Failed to get updated game state after dice roll');
+        console.error('❌ CRITICAL: Failed to get updated game state after dice roll');
+        alert('Dice roll failed! Check console for details.');
       }
     } catch (error) {
-      console.error('Error rolling dice:', error);
-      alert('Error rolling dice. Please try again.');
+      console.error('💥 CRITICAL ERROR rolling dice:', error);
+      alert('Error rolling dice! Check console for details.');
     }
   }, [gameState, isInteractive, mockGameService]);
 
