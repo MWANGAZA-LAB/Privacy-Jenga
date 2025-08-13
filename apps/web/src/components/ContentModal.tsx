@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Shield, AlertTriangle, AlertCircle, CheckCircle } from 'lucide-react';
+import { X, Shield, AlertTriangle, AlertCircle, CheckCircle, Volume2, VolumeX } from 'lucide-react';
 import { Content, GameState } from '../types';
 
 interface ContentModalProps {
@@ -9,7 +9,7 @@ interface ContentModalProps {
   onClose: () => void;
   onQuizAnswer?: (selectedAnswer: number) => Promise<void>;
   showQuiz?: boolean;
-  gameState: GameState;
+  gameState?: GameState;
 }
 
 const ContentModal: React.FC<ContentModalProps> = ({
@@ -17,21 +17,80 @@ const ContentModal: React.FC<ContentModalProps> = ({
   isOpen,
   onClose,
   onQuizAnswer,
-  showQuiz = false,
-  gameState
+  showQuiz = false
 }) => {
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showExplanation, setShowExplanation] = useState(false);
+  const [soundEnabled, setSoundEnabled] = useState(true);
+
+  // Enhanced sound effects
+  const playSound = useCallback((type: 'open' | 'close' | 'select' | 'submit' | 'correct' | 'incorrect') => {
+    if (!soundEnabled) return;
+    
+    // Simulate sound effects with visual feedback
+    const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+    const oscillator = audioContext.createOscillator();
+    const gainNode = audioContext.createGain();
+    
+    oscillator.connect(gainNode);
+    gainNode.connect(audioContext.destination);
+    
+    switch (type) {
+      case 'open':
+        oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
+        break;
+      case 'close':
+        oscillator.frequency.setValueAtTime(400, audioContext.currentTime);
+        break;
+      case 'select':
+        oscillator.frequency.setValueAtTime(600, audioContext.currentTime);
+        break;
+      case 'submit':
+        oscillator.frequency.setValueAtTime(1000, audioContext.currentTime);
+        break;
+      case 'correct':
+        oscillator.frequency.setValueAtTime(1200, audioContext.currentTime);
+        break;
+      case 'incorrect':
+        oscillator.frequency.setValueAtTime(300, audioContext.currentTime);
+        break;
+    }
+    
+    gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
+    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1);
+    
+    oscillator.start(audioContext.currentTime);
+    oscillator.stop(audioContext.currentTime + 0.1);
+  }, [soundEnabled]);
+
+  // Play sound on modal open
+  useEffect(() => {
+    if (isOpen) {
+      playSound('open');
+    }
+  }, [isOpen, playSound]);
 
   const handleAnswerSubmit = async () => {
     if (selectedAnswer === null || !onQuizAnswer) return;
     
     setIsSubmitting(true);
+    playSound('submit');
+    
     try {
       await onQuizAnswer(selectedAnswer);
+      playSound('correct');
+      setShowExplanation(true);
+    } catch (error) {
+      playSound('incorrect');
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  const handleClose = () => {
+    playSound('close');
+    onClose();
   };
 
   const getSeverityIcon = (severity: string) => {
@@ -70,81 +129,94 @@ const ContentModal: React.FC<ContentModalProps> = ({
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
-          onClick={onClose}
+          onClick={handleClose}
         >
           <motion.div
-            initial={{ scale: 0.9, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            exit={{ scale: 0.9, opacity: 0 }}
+            initial={{ scale: 0.9, opacity: 0, y: 20 }}
+            animate={{ scale: 1, opacity: 1, y: 0 }}
+            exit={{ scale: 0.9, opacity: 0, y: 20 }}
+            transition={{ type: "spring", damping: 25, stiffness: 300 }}
             className="bitsacco-modal w-full max-w-2xl max-h-[90vh] overflow-y-auto"
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Header */}
-            <div className="flex items-center justify-between p-6 border-b border-gray-700">
+            {/* Enhanced Header */}
+            <div className="flex items-center justify-between p-6 border-b border-gray-700 bg-gradient-to-r from-gray-800 to-gray-900">
               <div className="flex items-center gap-3">
                 {getSeverityIcon(content.severity)}
                 <div>
                   <h2 className="text-xl font-bold text-white">{content.title}</h2>
-                  <div className="flex items-center gap-2 mt-1">
-                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${getSeverityColor(content.severity)}`}>
-                      {content.severity.charAt(0).toUpperCase() + content.severity.slice(1)}
-                    </span>
-                    <span className="px-2 py-1 bg-teal-500/20 border border-teal-400/30 rounded-full text-xs text-teal-300">
-                      {content.points} points
-                    </span>
-                    <span className="px-2 py-1 bg-purple-500/20 border border-purple-400/30 rounded-full text-xs text-purple-300">
-                      {content.category.replace('-', ' ')}
-                    </span>
-                  </div>
+                  <div className="text-sm text-gray-400">Privacy Learning</div>
                 </div>
               </div>
-              <button
-                onClick={onClose}
-                className="p-2 hover:bg-gray-700 rounded-lg transition-colors"
-              >
-                <X className="w-5 h-5 text-gray-400" />
-              </button>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => setSoundEnabled(!soundEnabled)}
+                  className="p-2 hover:bg-gray-700 rounded-lg transition-colors"
+                  title={soundEnabled ? 'Disable Sound' : 'Enable Sound'}
+                >
+                  {soundEnabled ? <Volume2 className="w-5 h-5 text-teal-400" /> : <VolumeX className="w-5 h-5 text-gray-400" />}
+                </button>
+                <button
+                  onClick={handleClose}
+                  className="p-2 hover:bg-gray-700 rounded-lg transition-colors"
+                >
+                  <X className="w-5 h-5 text-gray-400" />
+                </button>
+              </div>
             </div>
 
-            {/* Content */}
-            <div className="p-6">
-              <div className="mb-6">
-                <p className="text-gray-300 text-lg leading-relaxed mb-4">
-                  {content.text}
-                </p>
-                
-                {/* Educational Fact */}
-                <div className="p-4 bg-blue-500/10 border border-blue-400/30 rounded-lg">
-                  <div className="flex items-start gap-3">
-                    <CheckCircle className="w-5 h-5 text-blue-400 mt-0.5 flex-shrink-0" />
-                    <div>
-                      <h4 className="font-semibold text-blue-300 mb-1">Did You Know?</h4>
-                      <p className="text-blue-200 text-sm">{content.fact}</p>
-                    </div>
-                  </div>
+            {/* Enhanced Content */}
+            <div className="p-6 space-y-6">
+              {/* Main Content */}
+              <div className={`p-4 rounded-lg border ${getSeverityColor(content.severity)}`}>
+                <div className="text-gray-300 leading-relaxed">{content.text}</div>
+              </div>
+
+              {/* Educational Fact */}
+              <div className="bg-blue-500/10 border border-blue-400/30 rounded-lg p-4">
+                <div className="text-blue-300 font-semibold mb-2">💡 Did You Know?</div>
+                <div className="text-blue-200 text-sm">{content.fact}</div>
+              </div>
+
+              {/* Impact Indicator */}
+              <div className="flex items-center gap-3 p-3 bg-gray-700/50 rounded-lg">
+                <div className={`w-3 h-3 rounded-full ${
+                  content.impact === 'positive' ? 'bg-green-500' :
+                  content.impact === 'negative' ? 'bg-red-500' : 'bg-yellow-500'
+                }`}></div>
+                <div className="text-gray-300 text-sm">
+                  <span className="font-semibold">Impact:</span> {
+                    content.impact === 'positive' ? 'This practice improves your privacy' :
+                    content.impact === 'negative' ? 'This practice reduces your privacy' :
+                    'This practice has neutral impact on privacy'
+                  }
                 </div>
               </div>
 
               {/* Quiz Section */}
               {showQuiz && content.quiz && (
                 <div className="space-y-4">
-                  <div className="p-4 bg-yellow-500/10 border border-yellow-400/30 rounded-lg">
-                    <h3 className="text-lg font-semibold text-yellow-300 mb-3 flex items-center gap-2">
-                      <AlertTriangle className="w-5 h-5" />
-                      Privacy Challenge
-                    </h3>
-                    <p className="text-yellow-200 mb-4">{content.quiz.question}</p>
+                  <div className="text-center">
+                    <div className="text-lg font-semibold text-teal-300 mb-2">🧠 Privacy Quiz</div>
+                    <div className="text-gray-300 text-sm">Test your knowledge!</div>
+                  </div>
+                  
+                  <div className="bg-gray-700/50 rounded-lg p-4">
+                    <div className="text-white font-medium mb-4">{content.quiz.question}</div>
                     
-                    <div className="space-y-2">
+                    <div className="space-y-3">
                       {content.quiz.choices.map((choice, index) => (
                         <button
                           key={index}
-                          onClick={() => setSelectedAnswer(index)}
+                          onClick={() => {
+                            setSelectedAnswer(index);
+                            playSound('select');
+                          }}
                           disabled={isSubmitting}
-                          className={`w-full p-3 text-left rounded-lg border transition-all duration-200 ${
+                          className={`w-full text-left p-3 rounded-lg border transition-all duration-200 ${
                             selectedAnswer === index
-                              ? 'border-teal-400 bg-teal-400/20 text-teal-200'
-                              : 'border-gray-600 bg-gray-700/50 text-gray-300 hover:border-gray-500 hover:bg-gray-600/50'
+                              ? 'border-teal-400 bg-teal-400/20 text-teal-200 scale-105'
+                              : 'border-gray-600 bg-gray-700/50 text-gray-300 hover:border-gray-500 hover:bg-gray-600/50 hover:scale-102'
                           } disabled:opacity-50 disabled:cursor-not-allowed`}
                         >
                           <span className="font-medium mr-2">{String.fromCharCode(65 + index)}.</span>
@@ -181,43 +253,28 @@ const ContentModal: React.FC<ContentModalProps> = ({
                 </div>
               )}
 
-              {/* Game State Info */}
-              <div className="mt-6 p-4 bg-gray-700/50 rounded-lg">
-                <h4 className="font-semibold text-gray-300 mb-2">Current Game Status</h4>
-                <div className="grid grid-cols-2 gap-4 text-sm">
-                  <div>
-                    <span className="text-gray-400">Score:</span>
-                    <span className="ml-2 text-teal-400 font-semibold">{gameState.currentScore}</span>
-                  </div>
-                  <div>
-                    <span className="text-gray-400">Blocks Removed:</span>
-                    <span className="ml-2 text-red-400 font-semibold">{gameState.blocksRemoved}/54</span>
-                  </div>
-                  <div>
-                    <span className="text-gray-400">Tower Height:</span>
-                    <span className="ml-2 text-blue-400 font-semibold">{gameState.towerHeight}/18</span>
-                  </div>
-                  <div>
-                    <span className="text-gray-400">Game Mode:</span>
-                    <span className="ml-2 text-purple-400 font-semibold capitalize">{gameState.gameMode}</span>
-                  </div>
-                </div>
-              </div>
+              {/* Enhanced Explanation */}
+              {showExplanation && content.quiz && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  exit={{ opacity: 0, height: 0 }}
+                  className="bg-teal-500/10 border border-teal-400/30 rounded-lg p-4"
+                >
+                  <div className="text-teal-300 font-semibold mb-2">📚 Explanation</div>
+                  <div className="text-teal-200 text-sm">{content.quiz.explanation}</div>
+                </motion.div>
+              )}
             </div>
 
-            {/* Footer */}
-            <div className="flex items-center justify-between p-6 border-t border-gray-700">
+            {/* Enhanced Footer */}
+            <div className="flex items-center justify-between p-6 border-t border-gray-700 bg-gradient-to-r from-gray-900 to-gray-800">
               <div className="text-sm text-gray-400">
-                Impact: <span className={`font-medium ${
-                  content.impact === 'positive' ? 'text-green-400' : 
-                  content.impact === 'negative' ? 'text-red-400' : 'text-yellow-400'
-                }`}>
-                  {content.impact.charAt(0).toUpperCase() + content.impact.slice(1)}
-                </span>
+                Points: <span className="text-teal-400 font-semibold">+{content.points}</span>
               </div>
               
               <button
-                onClick={onClose}
+                onClick={handleClose}
                 className="bitsacco-btn bitsacco-btn-secondary"
               >
                 Close

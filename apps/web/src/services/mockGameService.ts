@@ -231,6 +231,45 @@ class MockGameService {
             correctIndex: 2,
             explanation: 'All accounts using the same password become vulnerable to attack.'
           }
+        },
+        {
+          title: 'Password Recovery Security',
+          text: 'Use secure recovery methods like backup codes or authenticator apps instead of easily guessable security questions.',
+          severity: 'warning' as const,
+          fact: 'Security questions like "mother\'s maiden name" can often be found through social media research.',
+          impact: 'positive' as const,
+          quiz: {
+            question: 'What is the most secure password recovery method?',
+            choices: ['Security questions', 'Backup codes', 'Email recovery', 'Phone recovery'],
+            correctIndex: 1,
+            explanation: 'Backup codes are the most secure recovery method as they cannot be guessed or socially engineered.'
+          }
+        },
+        {
+          title: 'Password Expiration Strategy',
+          text: 'Change passwords regularly, especially for critical accounts like banking and email.',
+          severity: 'tip' as const,
+          fact: 'The average time for a password breach to be discovered is 197 days.',
+          impact: 'positive' as const,
+          quiz: {
+            question: 'How often should you change critical account passwords?',
+            choices: ['Never', 'Every 5 years', 'Every 6 months', 'Every month'],
+            correctIndex: 2,
+            explanation: 'Changing critical passwords every 6 months reduces the risk of long-term exposure.'
+          }
+        },
+        {
+          title: 'Password Sharing Risks',
+          text: 'Never share passwords with others, even family members or colleagues.',
+          severity: 'critical' as const,
+          fact: 'Shared passwords are the leading cause of account compromises in organizations.',
+          impact: 'negative' as const,
+          quiz: {
+            question: 'Is it safe to share passwords with trusted family members?',
+            choices: ['Yes, always', 'Only for streaming services', 'Never', 'Only for work accounts'],
+            correctIndex: 2,
+            explanation: 'Never share passwords, as it creates multiple security vulnerabilities and makes tracking impossible.'
+          }
         }
       ],
       'social-media': [
@@ -271,6 +310,45 @@ class MockGameService {
             choices: ['Nothing', 'People can see where you were', 'Photos get better quality', 'You get more likes'],
             correctIndex: 1,
             explanation: 'Location data in photos can reveal your whereabouts to anyone who sees them.'
+          }
+        },
+        {
+          title: 'Social Media Addiction Awareness',
+          text: 'Be mindful of how much time you spend on social media and its impact on mental health.',
+          severity: 'warning' as const,
+          fact: 'The average person spends 2 hours and 27 minutes per day on social media.',
+          impact: 'negative' as const,
+          quiz: {
+            question: 'How much time does the average person spend on social media daily?',
+            choices: ['30 minutes', '1 hour', '2.5 hours', '4 hours'],
+            correctIndex: 2,
+            explanation: 'The average person spends 2 hours and 27 minutes per day on social media platforms.'
+          }
+        },
+        {
+          title: 'Fake News Recognition',
+          text: 'Verify information before sharing and be skeptical of sensational headlines.',
+          severity: 'warning' as const,
+          fact: 'False news spreads 6 times faster than true news on social media.',
+          impact: 'positive' as const,
+          quiz: {
+            question: 'How much faster does false news spread compared to true news?',
+            choices: ['2 times', '4 times', '6 times', '10 times'],
+            correctIndex: 2,
+            explanation: 'False news spreads 6 times faster than true news on social media platforms.'
+          }
+        },
+        {
+          title: 'Social Media Cleanup',
+          text: 'Regularly review and remove old posts that may contain sensitive information.',
+          severity: 'tip' as const,
+          fact: 'Social media posts from years ago can still be found and used against you.',
+          impact: 'positive' as const,
+          quiz: {
+            question: 'How often should you review old social media posts?',
+            choices: ['Never', 'Once a year', 'Every 6 months', 'Monthly'],
+            correctIndex: 1,
+            explanation: 'Reviewing old posts annually helps remove potentially embarrassing or sensitive content.'
           }
         }
       ],
@@ -313,6 +391,45 @@ class MockGameService {
             correctIndex: 3,
             explanation: 'WPA3 is the latest and most secure WiFi encryption standard.'
           }
+        },
+        {
+          title: 'WiFi Network Naming',
+          text: 'Avoid using personal information in your WiFi network name (SSID).',
+          severity: 'warning' as const,
+          fact: 'Network names like "JohnsHouse" can reveal your identity to nearby devices.',
+          impact: 'positive' as const,
+          quiz: {
+            question: 'What should you avoid in your WiFi network name?',
+            choices: ['Random numbers', 'Personal names', 'Technical terms', 'Color names'],
+            correctIndex: 1,
+            explanation: 'Avoid using personal names in WiFi network names as they can reveal your identity.'
+          }
+        },
+        {
+          title: 'Guest Network Setup',
+          text: 'Create a separate guest network for visitors to keep your main network secure.',
+          severity: 'tip' as const,
+          fact: 'Guest networks isolate visitor devices from your personal devices and data.',
+          impact: 'positive' as const,
+          quiz: {
+            question: 'Why should you use a guest WiFi network?',
+            choices: ['To save money', 'To isolate visitors', 'To get faster speeds', 'To share passwords'],
+            correctIndex: 1,
+            explanation: 'Guest networks isolate visitor devices from your personal network for security.'
+          }
+        },
+        {
+          title: 'WiFi Router Updates',
+          text: 'Keep your WiFi router firmware updated to patch security vulnerabilities.',
+          severity: 'warning' as const,
+          fact: 'Router firmware updates often include critical security patches.',
+          impact: 'positive' as const,
+          quiz: {
+            question: 'How often should you update your WiFi router firmware?',
+            choices: ['Never', 'Once a year', 'Every 6 months', 'Monthly'],
+            correctIndex: 1,
+            explanation: 'Updating router firmware annually helps patch security vulnerabilities.'
+          }
         }
       ],
       'data-sharing': [
@@ -353,6 +470,45 @@ class MockGameService {
             choices: ['Keep it private', 'Sell it to advertisers', 'Delete it', 'Give it to you'],
             correctIndex: 1,
             explanation: 'Data brokers collect and sell personal information to advertisers and other companies.'
+          }
+        },
+        {
+          title: 'Cookie Management',
+          text: 'Regularly clear cookies and use browser settings to limit tracking.',
+          severity: 'tip' as const,
+          fact: 'Cookies can track your browsing history across multiple websites.',
+          impact: 'positive' as const,
+          quiz: {
+            question: 'What can cookies track across websites?',
+            choices: ['Nothing', 'Only current site', 'Browsing history', 'Passwords'],
+            correctIndex: 2,
+            explanation: 'Cookies can track your browsing history and behavior across multiple websites.'
+          }
+        },
+        {
+          title: 'Data Retention Policies',
+          text: 'Understand how long companies keep your data and request deletion when possible.',
+          severity: 'warning' as const,
+          fact: 'Many companies keep your data indefinitely unless you specifically request deletion.',
+          impact: 'positive' as const,
+          quiz: {
+            question: 'How long do most companies keep your personal data?',
+            choices: ['1 year', '5 years', 'Indefinitely', 'Until you ask'],
+            correctIndex: 2,
+            explanation: 'Many companies keep your data indefinitely unless you specifically request deletion.'
+          }
+        },
+        {
+          title: 'Data Portability Rights',
+          text: 'Exercise your right to download and transfer your data between services.',
+          severity: 'tip' as const,
+          fact: 'GDPR and other privacy laws give you the right to download your personal data.',
+          impact: 'positive' as const,
+          quiz: {
+            question: 'What right do privacy laws give you regarding your data?',
+            choices: ['Nothing', 'Download your data', 'Delete companies', 'Get paid'],
+            correctIndex: 1,
+            explanation: 'Privacy laws give you the right to download and transfer your personal data.'
           }
         }
       ],
@@ -395,6 +551,45 @@ class MockGameService {
             correctIndex: 1,
             explanation: 'Without the encryption key, encrypted data cannot be recovered.'
           }
+        },
+        {
+          title: 'Browser Encryption',
+          text: 'Always use HTTPS websites to ensure your data is encrypted in transit.',
+          severity: 'critical' as const,
+          fact: 'HTTP websites send data in plain text that anyone can intercept.',
+          impact: 'positive' as const,
+          quiz: {
+            question: 'What does HTTPS protect?',
+            choices: ['Nothing', 'Data in transit', 'Stored data', 'Your identity'],
+            correctIndex: 1,
+            explanation: 'HTTPS encrypts data as it travels between your device and the website.'
+          }
+        },
+        {
+          title: 'Email Encryption',
+          text: 'Use encrypted email services for sensitive communications.',
+          severity: 'tip' as const,
+          fact: 'Standard email is sent in plain text and can be read by anyone who intercepts it.',
+          impact: 'positive' as const,
+          quiz: {
+            question: 'How is standard email sent?',
+            choices: ['Encrypted', 'Plain text', 'Compressed', 'Hidden'],
+            correctIndex: 1,
+            explanation: 'Standard email is sent in plain text and can be read by anyone who intercepts it.'
+          }
+        },
+        {
+          title: 'Disk Encryption',
+          text: 'Enable full disk encryption on your devices to protect all stored data.',
+          severity: 'critical' as const,
+          fact: 'Full disk encryption protects all your data if your device is lost or stolen.',
+          impact: 'positive' as const,
+          quiz: {
+            question: 'What does full disk encryption protect?',
+            choices: ['Only files', 'Only folders', 'All data', 'Nothing'],
+            correctIndex: 2,
+            explanation: 'Full disk encryption protects all data stored on your device.'
+          }
         }
       ],
       'general': [
@@ -435,6 +630,45 @@ class MockGameService {
             choices: ['3 backups, 2 locations, 1 password', '3 copies, 2 media types, 1 offsite', '3 days, 2 weeks, 1 month', '3 files, 2 folders, 1 drive'],
             correctIndex: 1,
             explanation: '3 copies, 2 different media types, 1 offsite location for maximum data protection.'
+          }
+        },
+        {
+          title: 'Physical Security',
+          text: 'Lock your devices when not in use and be aware of shoulder surfing.',
+          severity: 'warning' as const,
+          fact: 'Shoulder surfing attacks can capture passwords and PINs in under 10 seconds.',
+          impact: 'positive' as const,
+          quiz: {
+            question: 'What is shoulder surfing?',
+            choices: ['A sport', 'Looking over someone\'s shoulder', 'A type of malware', 'A security feature'],
+            correctIndex: 1,
+            explanation: 'Shoulder surfing is when someone looks over your shoulder to see your passwords or PINs.'
+          }
+        },
+        {
+          title: 'Social Engineering Awareness',
+          text: 'Be suspicious of unsolicited requests for personal information.',
+          severity: 'critical' as const,
+          fact: 'Social engineering attacks rely on human psychology rather than technical vulnerabilities.',
+          impact: 'positive' as const,
+          quiz: {
+            question: 'What do social engineering attacks target?',
+            choices: ['Computer systems', 'Human psychology', 'Network security', 'Software bugs'],
+            correctIndex: 1,
+            explanation: 'Social engineering attacks manipulate human psychology to gain access to information.'
+          }
+        },
+        {
+          title: 'Incident Response Planning',
+          text: 'Have a plan for what to do if your accounts are compromised.',
+          severity: 'tip' as const,
+          fact: 'Having a response plan can reduce the damage from a security incident by 50%.',
+          impact: 'positive' as const,
+          quiz: {
+            question: 'How much can a response plan reduce incident damage?',
+            choices: ['10%', '25%', '50%', '75%'],
+            correctIndex: 2,
+            explanation: 'Having a response plan can reduce the damage from a security incident by 50%.'
           }
         }
       ],
@@ -477,6 +711,45 @@ class MockGameService {
             correctIndex: 1,
             explanation: 'Social engineering attacks manipulate human psychology to gain access to information.'
           }
+        },
+        {
+          title: 'Vishing Awareness',
+          text: 'Be cautious of phone calls requesting personal information or urgent action.',
+          severity: 'critical' as const,
+          fact: 'Voice phishing (vishing) attacks increased by 350% in recent years.',
+          impact: 'negative' as const,
+          quiz: {
+            question: 'What is vishing?',
+            choices: ['Video phishing', 'Voice phishing', 'Visual phishing', 'Virtual phishing'],
+            correctIndex: 1,
+            explanation: 'Vishing is voice phishing, where attackers call to steal personal information.'
+          }
+        },
+        {
+          title: 'Smishing Protection',
+          text: 'Be suspicious of text messages asking for personal information or containing suspicious links.',
+          severity: 'warning' as const,
+          fact: 'SMS phishing (smishing) attacks have a 45% success rate.',
+          impact: 'negative' as const,
+          quiz: {
+            question: 'What is smishing?',
+            choices: ['Social media phishing', 'SMS phishing', 'Software phishing', 'Secure phishing'],
+            correctIndex: 1,
+            explanation: 'Smishing is SMS phishing, where attackers use text messages to steal information.'
+          }
+        },
+        {
+          title: 'Phishing Reporting',
+          text: 'Report phishing attempts to help protect others and improve security systems.',
+          severity: 'tip' as const,
+          fact: 'Reporting phishing helps security teams identify and block new attack patterns.',
+          impact: 'positive' as const,
+          quiz: {
+            question: 'Why should you report phishing attempts?',
+            choices: ['To get revenge', 'To help protect others', 'To get money back', 'To avoid spam'],
+            correctIndex: 1,
+            explanation: 'Reporting phishing helps security teams protect others from similar attacks.'
+          }
         }
       ],
       'backup': [
@@ -517,6 +790,45 @@ class MockGameService {
             choices: ['Never', 'Once a year', 'Every 6 months', 'Monthly'],
             correctIndex: 2,
             explanation: 'Testing backups every 6 months ensures they work when you need them.'
+          }
+        },
+        {
+          title: 'Backup Frequency',
+          text: 'Backup important data regularly, with critical files backed up daily.',
+          severity: 'tip' as const,
+          fact: 'The average person loses 1,000 photos and 500 documents due to device failure.',
+          impact: 'positive' as const,
+          quiz: {
+            question: 'How often should you backup critical files?',
+            choices: ['Never', 'Monthly', 'Weekly', 'Daily'],
+            correctIndex: 3,
+            explanation: 'Critical files should be backed up daily to minimize data loss.'
+          }
+        },
+        {
+          title: 'Backup Location Strategy',
+          text: 'Use multiple backup locations including local, cloud, and offsite options.',
+          severity: 'warning' as const,
+          fact: 'Having backups in multiple locations protects against natural disasters and theft.',
+          impact: 'positive' as const,
+          quiz: {
+            question: 'Why use multiple backup locations?',
+            choices: ['To save money', 'To protect from disasters', 'To get faster access', 'To organize files'],
+            correctIndex: 1,
+            explanation: 'Multiple backup locations protect against natural disasters, theft, and other risks.'
+          }
+        },
+        {
+          title: 'Backup Verification',
+          text: 'Verify backup integrity by checking file sizes and performing test restores.',
+          severity: 'tip' as const,
+          fact: 'Corrupted backups are often discovered only when trying to restore data.',
+          impact: 'positive' as const,
+          quiz: {
+            question: 'What should you verify about your backups?',
+            choices: ['Nothing', 'File sizes only', 'Integrity and restorability', 'Cost only'],
+            correctIndex: 2,
+            explanation: 'Verify both backup integrity and ability to restore data when needed.'
           }
         }
       ]
@@ -668,7 +980,7 @@ class MockGameService {
       gameMode: 'classic',
       difficulty: 1,
       diceResult: 0,
-      canPullFromLayers: [1, 2, 3, 4, 5, 6], // Start with bottom 6 layers
+      canPullFromLayers: [1, 2, 3], // Start with bottom 3 layers for better gameplay balance
       specialActions: this.specialActions,
       gameHistory: [],
       layerStats: this.calculateLayerStats(),
@@ -723,7 +1035,7 @@ class MockGameService {
     };
   }
 
-  async pickBlock(blockId: string): Promise<{ content: Content; gameState: GameState } | null> {
+  async pickBlock(blockId: string): Promise<{ content: Content; gameState: GameState; gameOver?: boolean; mode?: string } | null> {
     const block = this.blocks.find(b => b.id === blockId && !b.removed);
     if (block && this.gameState) {
       // Check if block can be removed based on dice restrictions
@@ -764,12 +1076,285 @@ class MockGameService {
       // Check for achievements
       this.checkAchievements();
 
+      // Check for game over conditions
+      const gameOverResult = this.checkGameOverConditions();
+      
       return { 
         content: block.content, 
-        gameState: this.gameState 
+        gameState: this.gameState,
+        gameOver: gameOverResult.gameOver,
+        mode: gameOverResult.mode
       };
     }
     return null;
+  }
+
+  // Enhanced game over logic for different modes
+  private checkGameOverConditions(): { gameOver: boolean; mode: string; reason?: string } {
+    if (!this.gameState) {
+      return { gameOver: false, mode: 'unknown' };
+    }
+
+    const { gameMode, blocksRemoved, towerHeight } = this.gameState;
+
+    // Classic Mode: Game ends when tower becomes unstable or all blocks are removed
+    if (gameMode === 'classic') {
+      // Tower collapse condition (tower height becomes too low)
+      if (towerHeight <= 3) {
+        return { 
+          gameOver: true, 
+          mode: 'classic', 
+          reason: 'Tower collapsed! Game over in Classic mode.' 
+        };
+      }
+
+      // All blocks removed condition
+      if (blocksRemoved >= 54) {
+        return { 
+          gameOver: true, 
+          mode: 'classic', 
+          reason: 'All blocks removed! Perfect victory in Classic mode!' 
+        };
+      }
+
+      // Stability threshold condition
+      if (this.calculateTowerStability() <= 20) {
+        return { 
+          gameOver: true, 
+          mode: 'classic', 
+          reason: 'Tower became too unstable! Game over in Classic mode.' 
+        };
+      }
+    }
+
+    // Endless Mode: Tower resets when it becomes unstable, but game continues
+    if (gameMode === 'endless') {
+      // Check if tower needs reset
+      if (towerHeight <= 3 || this.calculateTowerStability() <= 20) {
+        // Auto-reset tower in endless mode
+        this.resetTowerForEndlessMode();
+        return { 
+          gameOver: false, 
+          mode: 'endless', 
+          reason: 'Tower reset in Endless mode! Continue playing!' 
+        };
+      }
+    }
+
+    return { gameOver: false, mode: gameMode };
+  }
+
+  // Calculate tower stability based on remaining blocks and their positions
+  private calculateTowerStability(): number {
+    if (!this.gameState) return 100;
+
+    const remainingBlocks = this.blocks.filter(b => !b.removed);
+    let stability = 100;
+
+    // Reduce stability based on blocks removed
+    stability -= this.gameState.blocksRemoved * 1.5;
+
+    // Additional stability reduction for removing blocks from higher layers
+    const highLayerBlocks = remainingBlocks.filter(b => b.layer > 12);
+    stability -= highLayerBlocks.length * 2;
+
+    // Stability boost for having blocks in lower layers
+    const lowLayerBlocks = remainingBlocks.filter(b => b.layer <= 6);
+    stability += lowLayerBlocks.length * 0.5;
+
+    return Math.max(0, Math.min(100, stability));
+  }
+
+  // Reset tower specifically for endless mode
+  private resetTowerForEndlessMode(): void {
+    // Reset all blocks
+    this.blocks.forEach(block => {
+      block.removed = false;
+      block.removedBy = undefined;
+    });
+
+    // Create new random blocks
+    this.blocks = this.createComplete54BlockSystem();
+
+    // Update game state for endless mode
+    if (this.gameState) {
+      this.gameState.towerHeight = 18;
+      this.gameState.blocksRemoved = 0;
+      this.gameState.canPullFromLayers = [1, 2, 3]; // Reset to initial layer access
+      this.gameState.diceResult = 0;
+      
+      // Keep the score and achievements
+      // Update stats
+      this.gameState.layerStats = this.calculateLayerStats();
+      this.gameState.blockTypeStats = this.calculateBlockTypeStats();
+
+      console.log('Tower reset in Endless mode. Score maintained:', this.gameState.currentScore);
+    }
+  }
+
+  // Enhanced mode switching with proper state management
+  async switchGameMode(mode: 'classic' | 'endless'): Promise<void> {
+    if (!this.gameState) {
+      throw new Error('No active game to switch modes');
+    }
+
+    const previousMode = this.gameState.gameMode;
+    
+    if (previousMode === mode) {
+      console.log(`Already in ${mode} mode`);
+      return;
+    }
+
+    // Save current progress if switching from endless to classic
+    if (previousMode === 'endless' && mode === 'classic') {
+      // In endless mode, we can switch to classic and keep current progress
+      this.gameState.gameMode = mode;
+      console.log(`Switched from Endless to Classic mode. Current score: ${this.gameState.currentScore}`);
+    } else if (previousMode === 'classic' && mode === 'endless') {
+      // Switching to endless mode - reset tower but keep score
+      this.gameState.gameMode = mode;
+      this.resetTowerForEndlessMode();
+      console.log(`Switched from Classic to Endless mode. Tower reset, score maintained: ${this.gameState.currentScore}`);
+    }
+
+    // Update high score if applicable
+    if (this.gameState.currentScore > this.gameState.currentPlayer.highScore) {
+      this.gameState.currentPlayer.highScore = this.gameState.currentScore;
+      console.log(`New high score achieved: ${this.gameState.currentScore}`);
+    }
+  }
+
+  // Enhanced endless mode support
+  async startEndlessMode(): Promise<void> {
+    this.initializeGameState();
+    if (this.gameState) {
+      this.gameState.gameMode = 'endless';
+      console.log('Endless mode started - tower will reset when unstable');
+    }
+  }
+
+  // Enhanced classic mode support
+  async startClassicMode(): Promise<void> {
+    this.initializeGameState();
+    if (this.gameState) {
+      this.gameState.gameMode = 'classic';
+      console.log('Classic mode started - game ends when tower falls');
+    }
+  }
+
+  async resetGame(): Promise<void> {
+    // Reset all blocks
+    this.blocks.forEach(block => {
+      block.removed = false;
+      block.removedBy = undefined;
+    });
+
+    // Create new random blocks
+    this.blocks = this.createComplete54BlockSystem();
+
+    // Reset game state but keep score and mode preference
+    if (this.gameState) {
+      const currentScore = this.gameState.currentScore;
+      const currentMode = this.gameState.gameMode;
+      this.initializeGameState();
+      if (this.gameState) {
+        this.gameState.currentScore = currentScore;
+        this.gameState.gameMode = currentMode; // Maintain the current mode
+      }
+    }
+  }
+
+  async resetTower(): Promise<void> {
+    // Reset all blocks
+    this.blocks.forEach(block => {
+      block.removed = false;
+      block.removedBy = undefined;
+    });
+
+    // Create new random blocks
+    this.blocks = this.createComplete54BlockSystem();
+
+    // Reset game state but keep score
+    if (this.gameState) {
+      const currentScore = this.gameState.currentScore;
+      this.initializeGameState();
+      if (this.gameState) {
+        this.gameState.currentScore = currentScore;
+        this.gameState.gameMode = 'endless'; // This method is for endless mode
+      }
+    }
+  }
+
+  // Save/load game state
+  saveGameState(): void {
+    if (this.gameState) {
+      localStorage.setItem('privacyJenga_gameState', JSON.stringify(this.gameState));
+      localStorage.setItem('privacyJenga_highScore', this.gameState.currentPlayer.highScore.toString());
+    }
+  }
+
+  loadGameState(): void {
+    const savedState = localStorage.getItem('privacyJenga_gameState');
+    const highScore = localStorage.getItem('privacyJenga_highScore');
+    
+    if (savedState) {
+      try {
+        this.gameState = JSON.parse(savedState);
+        if (highScore) {
+          this.gameState!.currentPlayer.highScore = parseInt(highScore);
+        }
+      } catch (error) {
+        console.error('Failed to load game state:', error);
+      }
+    }
+  }
+
+  // Get current game mode information
+  getGameModeInfo(): { mode: string; description: string; rules: string[] } {
+    if (!this.gameState) {
+      return {
+        mode: 'unknown',
+        description: 'No active game',
+        rules: []
+      };
+    }
+
+    if (this.gameState.gameMode === 'classic') {
+      return {
+        mode: 'Classic',
+        description: 'Traditional Jenga experience - game ends when tower falls',
+        rules: [
+          'Remove blocks carefully to avoid tower collapse',
+          'Game ends when tower becomes unstable or collapses',
+          'Try to achieve the highest score possible',
+          'Perfect for focused, strategic gameplay'
+        ]
+      };
+    } else {
+      return {
+        mode: 'Endless',
+        description: 'Continuous gameplay - tower resets when unstable',
+        rules: [
+          'Tower automatically resets when it becomes unstable',
+          'Score accumulates across multiple tower resets',
+          'Perfect for extended learning sessions',
+          'No pressure - focus on learning and improving'
+        ]
+      };
+    }
+  }
+
+  // Check if game can continue in current mode
+  canContinueGame(): boolean {
+    if (!this.gameState) return false;
+
+    if (this.gameState.gameMode === 'classic') {
+      // In classic mode, check if tower is still stable
+      return this.calculateTowerStability() > 20 && this.gameState.towerHeight > 3;
+    } else {
+      // In endless mode, game can always continue
+      return true;
+    }
   }
 
   private checkAchievements() {
@@ -835,6 +1420,7 @@ class MockGameService {
     if (this.gameState) {
       this.gameState.diceResult = diceValue;
       this.gameState.canPullFromLayers = result.layerRestrictions;
+      console.log(`Dice rolled: ${diceValue}, New layer access: ${result.layerRestrictions.join(', ')}`);
     }
     
     return result;
@@ -975,80 +1561,6 @@ class MockGameService {
 
   getSpecialActions(): SpecialAction[] {
     return this.specialActions;
-  }
-
-  // Endless mode support
-  async startEndlessMode(): Promise<void> {
-    this.initializeGameState();
-    if (this.gameState) {
-      this.gameState.gameMode = 'endless';
-    }
-  }
-
-  async resetGame(): Promise<void> {
-    // Reset all blocks
-    this.blocks.forEach(block => {
-      block.removed = false;
-      block.removedBy = undefined;
-    });
-
-    // Create new random blocks
-    this.blocks = this.createComplete54BlockSystem();
-
-    // Reset game state but keep score
-    if (this.gameState) {
-      const currentScore = this.gameState.currentScore;
-      this.initializeGameState();
-      if (this.gameState) {
-        this.gameState.currentScore = currentScore;
-        this.gameState.gameMode = 'classic';
-      }
-    }
-  }
-
-  async resetTower(): Promise<void> {
-    // Reset all blocks
-    this.blocks.forEach(block => {
-      block.removed = false;
-      block.removedBy = undefined;
-    });
-
-    // Create new random blocks
-    this.blocks = this.createComplete54BlockSystem();
-
-    // Reset game state but keep score
-    if (this.gameState) {
-      const currentScore = this.gameState.currentScore;
-      this.initializeGameState();
-      if (this.gameState) {
-        this.gameState.currentScore = currentScore;
-        this.gameState.gameMode = 'endless';
-      }
-    }
-  }
-
-  // Save/load game state
-  saveGameState(): void {
-    if (this.gameState) {
-      localStorage.setItem('privacyJenga_gameState', JSON.stringify(this.gameState));
-      localStorage.setItem('privacyJenga_highScore', this.gameState.currentPlayer.highScore.toString());
-    }
-  }
-
-  loadGameState(): void {
-    const savedState = localStorage.getItem('privacyJenga_gameState');
-    const highScore = localStorage.getItem('privacyJenga_highScore');
-    
-    if (savedState) {
-      try {
-        this.gameState = JSON.parse(savedState);
-        if (highScore) {
-          this.gameState!.currentPlayer.highScore = parseInt(highScore);
-        }
-      } catch (error) {
-        console.error('Failed to load game state:', error);
-      }
-    }
   }
 }
 

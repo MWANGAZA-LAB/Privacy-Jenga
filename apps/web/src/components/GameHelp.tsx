@@ -218,7 +218,7 @@ const GameHelp: React.FC<GameHelpProps> = ({ isOpen, onClose }) => {
                 Common Mistakes
               </h3>
               <ul className="space-y-2 text-gray-300 text-sm">
-                <li>• <strong>Rushing:</strong> Don't remove blocks without reading content</li>
+                <li>• <strong>Rushing:</strong> Don&apos;t remove blocks without reading content</li>
                 <li>• <strong>Ignoring Dice:</strong> Always check allowed layers</li>
                 <li>• <strong>Risk Overload:</strong> Too many red blocks too quickly</li>
                 <li>• <strong>Quiz Guessing:</strong> Take time to think through answers</li>
@@ -247,7 +247,7 @@ const GameHelp: React.FC<GameHelpProps> = ({ isOpen, onClose }) => {
                 </div>
                 <div className="p-3 bg-purple-500/10 border border-purple-400/30 rounded-lg">
                   <div className="font-semibold text-purple-300 mb-1">📚 Learning Focus</div>
-                  <div className="text-purple-200">Read every block's content - knowledge is more valuable than points</div>
+                  <div className="text-purple-200">Read every block&apos;s content - knowledge is more valuable than points</div>
                 </div>
                 <div className="p-3 bg-yellow-500/10 border border-yellow-400/30 rounded-lg">
                   <div className="font-semibold text-yellow-300 mb-1">⚖️ Risk Balance</div>

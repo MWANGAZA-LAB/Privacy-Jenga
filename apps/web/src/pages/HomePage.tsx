@@ -90,7 +90,7 @@ const HomePage: React.FC = () => {
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
             <button
-              onClick={handleStartGame}
+              onClick={() => handleStartGame()}
               className="bitsacco-btn bitsacco-btn-primary text-lg px-8 py-4 flex items-center gap-3"
             >
               <Play className="w-6 h-6" />
@@ -201,75 +201,51 @@ const HomePage: React.FC = () => {
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
-              Choose Your Game Mode
+              Continuous Learning Experience
             </h2>
             <p className="text-xl text-gray-300 max-w-2xl mx-auto">
-              Two exciting ways to play and learn about privacy
+              Master privacy concepts through uninterrupted practice and progressive learning
             </p>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            {/* Classic Mode */}
+          <div className="max-w-4xl mx-auto">
+            {/* Unified Learning Mode */}
             <div className="bitsacco-card p-8 text-center">
-              <div className="w-20 h-20 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center mx-auto mb-6">
-                <Play className="w-10 h-10 text-white" />
+              <div className="w-20 h-20 bg-gradient-to-br from-teal-400 to-teal-600 rounded-full flex items-center justify-center mx-auto mb-6">
+                <Brain className="w-10 h-10 text-white" />
               </div>
-              <h3 className="text-2xl font-bold text-white mb-4">Classic Mode</h3>
+              <h3 className="text-2xl font-bold text-white mb-4">Privacy Jenga Learning Mode</h3>
               <p className="text-gray-300 mb-6">
-                Experience the traditional Privacy Jenga gameplay. Build your knowledge 
-                tower block by block until it reaches its limit.
+                Progressive learning with intelligent difficulty scaling. When the tower falls, it automatically resets, 
+                allowing you to practice privacy concepts, complete interactive quizzes, and unlock achievements.
               </p>
-              <ul className="text-left text-gray-300 space-y-2 mb-6">
+              <ul className="text-left text-gray-300 space-y-2 mb-6 max-w-2xl mx-auto">
                 <li className="flex items-center gap-2">
-                  <div className="w-2 h-2 bg-blue-400 rounded-full"></div>
-                  Learn at your own pace
+                  <div className="w-2 h-2 bg-teal-400 rounded-full"></div>
+                  Continuous tower resets for uninterrupted learning
                 </li>
                 <li className="flex items-center gap-2">
-                  <div className="w-2 h-2 bg-blue-400 rounded-full"></div>
-                  Focus on understanding concepts
+                  <div className="w-2 h-2 bg-teal-400 rounded-full"></div>
+                  All 54 privacy tips accessible in one experience
                 </li>
                 <li className="flex items-center gap-2">
-                  <div className="w-2 h-2 bg-blue-400 rounded-full"></div>
-                  Perfect for beginners
+                  <div className="w-2 h-2 bg-teal-400 rounded-full"></div>
+                  Achievement-based progression system
+                </li>
+                <li className="flex items-center gap-2">
+                  <div className="w-2 h-2 bg-teal-400 rounded-full"></div>
+                  Adaptive difficulty based on your skill level
+                </li>
+                <li className="flex items-center gap-2">
+                  <div className="w-2 h-2 bg-teal-400 rounded-full"></div>
+                  Interactive quizzes and privacy challenges
                 </li>
               </ul>
               <button
-                onClick={handleStartGame}
-                className="bitsacco-btn bitsacco-btn-primary w-full"
+                onClick={() => handleStartGame()}
+                className="bitsacco-btn bitsacco-btn-primary text-lg px-8 py-4"
               >
-                Start Classic Game
-              </button>
-            </div>
-
-            {/* Endless Mode */}
-            <div className="bitsacco-card p-8 text-center">
-              <div className="w-20 h-20 bg-gradient-to-br from-purple-400 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-6">
-                <Zap className="w-10 h-10 text-white" />
-              </div>
-              <h3 className="text-2xl font-bold text-white mb-4">Endless Mode</h3>
-              <p className="text-gray-300 mb-6">
-                Challenge yourself with continuous gameplay. The tower resets after each 
-                collapse, letting you build higher scores and deeper knowledge.
-              </p>
-              <ul className="text-left text-gray-300 space-y-2 mb-6">
-                <li className="flex items-center gap-2">
-                  <div className="w-2 h-2 bg-purple-400 rounded-full"></div>
-                  Continuous learning experience
-                </li>
-                <li className="flex items-center gap-2">
-                  <div className="w-2 h-2 bg-purple-400 rounded-full"></div>
-                  Beat your high scores
-                </li>
-                <li className="flex items-center gap-2">
-                  <div className="w-2 h-2 bg-purple-400 rounded-full"></div>
-                  Advanced privacy challenges
-                </li>
-              </ul>
-              <button
-                onClick={handleStartGame}
-                className="bitsacco-btn bitsacco-btn-outline w-full"
-              >
-                Start Endless Game
+                Start Learning Journey
               </button>
             </div>
           </div>
@@ -288,7 +264,7 @@ const HomePage: React.FC = () => {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <button
-              onClick={handleStartGame}
+              onClick={() => handleStartGame()}
               className="bitsacco-btn bitsacco-btn-primary text-lg px-8 py-4"
             >
               Start Your Privacy Journey

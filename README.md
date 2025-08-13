@@ -2,12 +2,13 @@
 
 > **Learn online privacy and security through an engaging tower-building experience!**
 
-[![Build Status](https://github.com/yourusername/privacy-jenga/actions/workflows/static.yml/badge.svg)](https://github.com/yourusername/privacy-jenga/actions/workflows/static.yml)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 ## 🌟 **What is Privacy Jenga?**
 
 Privacy Jenga is an **interactive educational game** that teaches online privacy and security concepts through the classic tower-building mechanics of Jenga. Each block contains valuable knowledge about protecting yourself online, making learning both fun and memorable.
+
+### 🧠 **Unified Learning Philosophy**
+Privacy Jenga eliminates the traditional "game over" concept in favor of **continuous learning**. When the tower becomes unstable, it automatically resets, allowing players to focus entirely on mastering privacy concepts without interruption. This approach ensures that all 54 privacy tips are accessible and that learning never stops.
 
 ## ✨ **Key Features**
 
@@ -33,9 +34,10 @@ Privacy Jenga is an **interactive educational game** that teaches online privacy
 - **Interactive Quizzes** - Test your knowledge with immediate feedback
 - **Achievement System** - Unlock badges for learning milestones
 
-### 🎯 **Game Modes**
-- **Classic Mode** - Traditional gameplay until tower collapse
-- **Endless Mode** - Continuous play with tower resets and high score tracking
+### 🎯 **Unified Learning Experience**
+- **Continuous Learning Mode** - Tower automatically resets when unstable for uninterrupted learning
+- **Progressive Difficulty** - Intelligent scaling based on player skill and progress
+- **Achievement System** - Long-term engagement through progress tracking and milestones
 
 ## 🚀 **Getting Started**
 
@@ -84,10 +86,11 @@ npm run build
 - Challenge blocks offer bonus points for correct answers
 - Higher layers = more points (risk vs. reward)
 
-### **5. Monitor Stability**
+### **5. Continuous Learning**
 - Watch the tower stability indicator
 - Green = Stable, Yellow = Warning, Red = Danger
-- Game ends when tower becomes unstable
+- When tower becomes unstable, it automatically resets for continuous learning
+- Your score and progress are preserved across tower resets
 
 ## 🏗️ **Architecture & Technology**
 
@@ -134,8 +137,8 @@ npm run build
 
 ### **First-Time User Experience**
 - **Automatic tutorial** for new players
-- **Welcome overlay** explaining game concepts
-- **Progressive disclosure** of game mechanics
+- **Welcome overlay** explaining the unified learning experience
+- **Progressive disclosure** of game mechanics and privacy concepts
 
 ### **Help System**
 - **Contextual help** accessible during gameplay
@@ -230,12 +233,10 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 📞 **Support & Contact**
 
-- **Issues**: [GitHub Issues](https://github.com/yourusername/privacy-jenga/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/yourusername/privacy-jenga/discussions)
-- **Email**: privacy-jenga@example.com
+- **Issues**: [GitHub Issues](https://github.com/MWANGAZA-LAB/privacy-jenga/issues)
 
 ---
 
-**🎯 Ready to master online privacy? [Start playing now!](https://yourusername.github.io/privacy-jenga/)**
+**🧠 Ready to master online privacy through continuous learning? [Start your journey now!](https://MWANGAZA-LAB.github.io/privacy-jenga/)**
 
-*Built with ❤️ for privacy education • Powered by React & Three.js*
+*Built with ❤️ for privacy education and continuous skill development!*

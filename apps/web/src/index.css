@@ -51,32 +51,6 @@ body {
   background: var(--bitsacco-teal-dark);
 }
 
-/* BITSACCO Button Styles */
-.bitsacco-btn {
-  @apply px-6 py-3 rounded-lg font-semibold transition-all duration-200 transform hover:scale-105;
-}
-
-.bitsacco-btn-primary {
-  @apply bg-gradient-to-r from-teal-400 to-teal-500 text-white shadow-lg hover:shadow-xl hover:from-teal-500 hover:to-teal-600;
-}
-
-.bitsacco-btn-secondary {
-  @apply border-2 border-teal-400 text-teal-400 hover:bg-teal-400 hover:text-white;
-}
-
-.bitsacco-btn-outline {
-  @apply border-2 border-gray-400 text-gray-300 hover:border-teal-400 hover:text-teal-400;
-}
-
-/* BITSACCO Card Styles */
-.bitsacco-card {
-  @apply bg-gradient-to-br from-gray-800 to-gray-900 border border-gray-700 rounded-xl shadow-2xl backdrop-blur-sm;
-}
-
-.bitsacco-card-hover {
-  @apply hover:from-gray-700 hover:to-gray-800 hover:border-teal-400/50 transition-all duration-300;
-}
-
 /* BITSACCO Input Styles */
 .bitsacco-input {
   @apply bg-gray-800 border border-gray-600 text-white placeholder-gray-400 rounded-lg px-4 py-3 focus:border-teal-400 focus:ring-2 focus:ring-teal-400/20 transition-all duration-200;
@@ -84,7 +58,50 @@ body {
 
 /* BITSACCO Modal Styles */
 .bitsacco-modal {
-  @apply bg-gray-900/95 backdrop-blur-md border border-gray-700 rounded-2xl shadow-2xl;
+  @apply bg-gray-900/95 backdrop-blur-md border border-gray-700/50 rounded-2xl shadow-2xl;
+}
+
+/* BITSACCO Button Styles */
+.bitsacco-btn {
+  @apply px-6 py-3 rounded-lg font-semibold transition-all duration-200 transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-900;
+}
+
+.bitsacco-btn-primary {
+  @apply bg-gradient-to-r from-teal-500 to-teal-600 text-white shadow-lg hover:from-teal-600 hover:to-teal-700 focus:ring-teal-400;
+}
+
+.bitsacco-btn-secondary {
+  @apply bg-gradient-to-r from-gray-600 to-gray-700 text-white shadow-lg hover:from-gray-700 hover:to-gray-800 focus:ring-gray-400;
+}
+
+.bitsacco-btn-danger {
+  @apply bg-gradient-to-r from-red-500 to-red-600 text-white shadow-lg hover:from-red-600 hover:to-red-700 focus:ring-red-400;
+}
+
+.bitsacco-btn-success {
+  @apply bg-gradient-to-r from-green-500 to-green-600 text-white shadow-lg hover:from-green-600 hover:to-green-700 focus:ring-green-400;
+}
+
+/* BITSACCO Card Styles */
+.bitsacco-card {
+  @apply bg-gray-800/80 backdrop-blur-sm border border-gray-700/50 rounded-xl shadow-xl hover:border-gray-600/50 transition-all duration-300;
+}
+
+.bitsacco-card-hover {
+  @apply hover:bg-gray-800/90 hover:border-gray-600/50 hover:shadow-2xl;
+}
+
+/* BITSACCO Panel Styles */
+.bitsacco-panel {
+  @apply bg-gray-800/90 backdrop-blur-sm border border-gray-700/50 rounded-lg shadow-lg;
+}
+
+.bitsacco-panel-header {
+  @apply bg-gradient-to-r from-gray-800 to-gray-700 border-b border-gray-600/50 px-4 py-3 rounded-t-lg;
+}
+
+.bitsacco-panel-body {
+  @apply p-4;
 }
 
 /* BITSACCO Text Styles */
@@ -98,6 +115,35 @@ body {
 
 .bitsacco-text-gradient {
   @apply bg-gradient-to-r from-teal-400 to-teal-500 bg-clip-text text-transparent;
+}
+
+/* Enhanced Border System */
+.bitsacco-border-subtle {
+  @apply border border-gray-700/30;
+}
+
+.bitsacco-border-medium {
+  @apply border border-gray-600/50;
+}
+
+.bitsacco-border-strong {
+  @apply border border-gray-500/70;
+}
+
+.bitsacco-border-accent {
+  @apply border border-teal-400/50;
+}
+
+.bitsacco-border-warning {
+  @apply border border-yellow-400/50;
+}
+
+.bitsacco-border-danger {
+  @apply border border-red-400/50;
+}
+
+.bitsacco-border-success {
+  @apply border border-green-400/50;
 }
 
 /* Animation Classes */
@@ -143,14 +189,14 @@ body {
 /* Jenga Tower Specific Styles */
 .jenga-tower-container {
   background: linear-gradient(135deg, var(--bitsacco-dark) 0%, var(--bitsacco-darker) 100%);
-  border: 2px solid var(--bitsacco-teal);
-  box-shadow: 0 0 30px rgba(0, 212, 170, 0.3);
+  border: 2px solid rgba(0, 212, 170, 0.3);
+  box-shadow: 0 0 30px rgba(0, 212, 170, 0.2);
 }
 
 /* Game Stats Styles */
 .game-stats-container {
   background: linear-gradient(135deg, var(--bitsacco-card) 0%, var(--bitsacco-hover) 100%);
-  border: 1px solid var(--bitsacco-border);
+  border: 1px solid rgba(75, 85, 99, 0.3);
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
 }
 
@@ -174,4 +220,43 @@ body {
 .block-challenge {
   background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
   box-shadow: 0 2px 10px rgba(245, 158, 11, 0.3);
+}
+
+/* Enhanced UI Components */
+.bitsacco-info-box {
+  @apply bg-gray-800/60 backdrop-blur-sm border border-gray-600/30 rounded-lg p-4 shadow-lg;
+}
+
+.bitsacco-status-indicator {
+  @apply inline-flex items-center px-3 py-1 rounded-full text-xs font-medium;
+}
+
+.bitsacco-status-active {
+  @apply bg-green-500/20 text-green-300 border border-green-400/30;
+}
+
+.bitsacco-status-warning {
+  @apply bg-yellow-500/20 text-yellow-300 border border-yellow-400/30;
+}
+
+.bitsacco-status-error {
+  @apply bg-red-500/20 text-red-300 border border-red-400/30;
+}
+
+.bitsacco-status-info {
+  @apply bg-blue-500/20 text-blue-300 border border-blue-400/30;
+}
+
+/* Remove default browser borders */
+* {
+  border-color: inherit;
+}
+
+/* Override any default white borders */
+.border-white {
+  border-color: rgba(75, 85, 99, 0.3) !important;
+}
+
+.border-2.border-white {
+  border-color: rgba(75, 85, 99, 0.3) !important;
 }
