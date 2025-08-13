@@ -11,6 +11,7 @@ function App() {
         <Route path="/" element={<HomePage />} />
         <Route path="/game" element={<GamePage />} />
         <Route path="/test" element={<div className="p-8 text-center"><h1 className="text-2xl font-bold text-red-600">Routing Test - This should work!</h1></div>} />
+        <Route path="/debug" element={<div className="p-8 text-center"><h1 className="text-2xl font-bold text-blue-600">Debug Route - GitHub Pages routing is working!</h1><p className="mt-4 text-gray-600">If you can see this, the SPA routing is functioning correctly.</p></div>} />
       </Routes>
 
       {/* Footer */}
