@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, HelpCircle, BookOpen, Target, Trophy, Zap, Shield, AlertTriangle, Dice1, Info, Star } from 'lucide-react';
+import { X, HelpCircle, BookOpen, Target, Trophy, Zap, Shield, AlertTriangle, Dice1, Info, Star, Brain } from 'lucide-react';
 
 interface GameHelpProps {
   isOpen: boolean;
@@ -259,16 +259,15 @@ const GameHelp: React.FC<GameHelpProps> = ({ isOpen, onClose }) => {
             <div className="bitsacco-card p-4">
               <h3 className="text-lg font-semibold text-teal-300 mb-3 flex items-center gap-2">
                 <Info className="w-5 h-5" />
-                Game Modes
+                Game Mode
               </h3>
               <div className="space-y-3 text-sm">
-                <div className="p-3 bg-gray-700/50 rounded-lg">
-                  <div className="font-semibold text-gray-300 mb-1">Classic Mode</div>
-                  <div className="text-gray-400">Standard gameplay until tower collapse. Perfect for learning and practice.</div>
-                </div>
-                <div className="p-3 bg-gray-700/50 rounded-lg">
-                  <div className="font-semibold text-gray-300 mb-1">Endless Mode</div>
-                  <div className="text-gray-400">Tower resets after collapse. Try to beat your high score continuously.</div>
+                <div className="p-3 bg-teal-500/10 border border-teal-400/30 rounded-lg">
+                  <div className="font-semibold text-teal-300 mb-1 flex items-center gap-2">
+                    <Brain className="w-4 h-4" />
+                    Learning Mode
+                  </div>
+                  <div className="text-teal-200">Continuous learning experience with automatic tower resets. Perfect for mastering all 54 privacy concepts without interruption.</div>
                 </div>
               </div>
             </div>

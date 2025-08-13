@@ -15,8 +15,7 @@ const HomePage: React.FC = () => {
   }, []);
 
   const handleStartGame = () => {
-    const roomCode = Math.random().toString(36).substring(2, 8).toUpperCase();
-    navigate(`/game?room=${roomCode}`);
+    navigate('/game');
   };
 
   const handleStartTutorial = () => {
@@ -266,8 +265,7 @@ const HomePage: React.FC = () => {
             Ready to Master Online Privacy?
           </h2>
           <p className="text-xl text-gray-300 mb-8">
-            Join thousands of players who are already improving their digital security 
-            knowledge through Privacy Jenga.
+            Join thousands of learners who are already improving their digital security
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <button

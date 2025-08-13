@@ -3,7 +3,6 @@ export interface Block {
   id: string;
   content: Content;
   removed: boolean;
-  removedBy?: string;
   type: 'safe' | 'risky' | 'challenge';
   difficulty: number; // 1-18 scale (layer number)
   layer: number; // 1-18 layers
@@ -29,18 +28,8 @@ export interface Content {
   impact: 'positive' | 'negative' | 'neutral'; // How this affects privacy
 }
 
-export interface ChatMessage {
-  id: number;
-  text: string;
-  player: string;
-  timestamp: string;
-  playerId?: string;
-  nickname?: string;
-}
-
 export interface Player {
   nickname: string;
-  isHost: boolean;
   score: number;
   achievements: Achievement[];
   highScore: number;
@@ -58,21 +47,6 @@ export interface Achievement {
   icon: string;
   unlockedAt: Date;
   points: number;
-}
-
-export interface Room {
-  id: string;
-  code: string;
-  players: string[];
-  status: 'waiting' | 'playing' | 'finished';
-  currentTurn?: string;
-  blocks: Block[];
-  settings?: {
-    maxPlayers: number;
-    turnTimeoutSeconds: number;
-    allowChat: boolean;
-    difficulty: string;
-  };
 }
 
 export interface GameState {
@@ -108,7 +82,6 @@ export interface BlockTypeStats {
 
 export interface GameMove {
   id: string;
-  playerId: string;
   blockId: string;
   blockType: string;
   layer: number;
@@ -137,46 +110,12 @@ export interface DiceResult {
   specialEvent?: string;
 }
 
-// Mock Types for Service
-export interface MockPlayer {
-  id: string;
-  nickname: string;
-  avatar: string;
-  points: number;
-  score: number;
-  achievements: Achievement[];
-  highScore: number;
-  gamesPlayed: number;
-  totalPoints: number;
-  totalBlocksRemoved: number;
-  correctAnswers: number;
-  incorrectAnswers: number;
-}
-
-export interface MockRoom {
-  id: string;
-  code: string;
-  players: string[];
-  status: 'waiting' | 'playing' | 'finished';
-  currentTurn: number;
-  blocks: Block[];
-}
-
 // Component Props Types
 export interface JengaTowerProps {
   blocks: Block[];
   onBlockClick: (block: Block) => void;
-  isInteractive: boolean;
   selectedBlockId?: string;
   gameState: GameState;
-  onDiceRoll: () => void;
-}
-
-export interface ChatProps {
-  messages: ChatMessage[];
-  onSendMessage: (message: string) => void;
-  disabled?: boolean;
-  currentPlayerId?: string;
 }
 
 export interface ContentModalProps {
@@ -188,15 +127,7 @@ export interface ContentModalProps {
   gameState: GameState;
 }
 
-export interface PlayerListProps {
-  players: Player[];
-  currentTurn?: string;
-  currentPlayerId?: string;
-  gameState: GameState;
-}
-
 export interface GameStatsProps {
   gameState: GameState;
   onNewGame: () => void;
-  onEndlessMode: () => void;
 }
