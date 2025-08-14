@@ -338,7 +338,21 @@ const HomePage: React.FC = () => {
             </div>
           </div>
           <div className="border-t border-teal-800 mt-6 pt-6 text-center text-sm text-teal-300">
-            Built with ❤️ by MWANGAZA-LAB for Bitsacco education in Africa
+            <div className="mb-2">
+              Built with ❤️ by MWANGAZA-LAB for Bitsacco education in Africa
+            </div>
+            <div className="text-xs text-teal-400">
+              Educational content inspired by{' '}
+              <a 
+                href="https://bitcoinjenga.com" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="underline hover:text-teal-300 transition-colors"
+              >
+                bitcoinjenga.com
+              </a>
+              {' '}by Amiti Uttarwar & D++
+            </div>
           </div>
         </div>
       </footer>
