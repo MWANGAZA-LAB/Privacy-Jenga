@@ -11,6 +11,9 @@
 
 Privacy Jenga is an **interactive educational game** that teaches Bitcoin privacy and security concepts through engaging 3D tower mechanics. Each of the 54 blocks contains authentic Bitcoin privacy practices, making learning both fun and memorable.
 
+<img width="1920" height="972" alt="image" src="https://github.com/user-attachments/assets/24fce154-2a7e-4343-bb16-fb645259275e" />
+
+
 ### 🧠 **Educational Philosophy**
 This implementation focuses on **continuous learning** and eliminates traditional "game over" mechanics. When the tower becomes unstable, it smoothly resets, allowing players to explore all 54 privacy concepts without interruption.
 
