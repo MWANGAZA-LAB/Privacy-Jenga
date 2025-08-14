@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { Brain, ChevronUp, ChevronDown, Dice1, Trophy, BookOpen, HelpCircle, BarChart3, ArrowLeft, Gamepad2 } from 'lucide-react';
+import { Brain, ChevronUp, ChevronDown, Dice1, Trophy, BookOpen, HelpCircle, BarChart3, ArrowLeft, Gamepad2, Menu, X } from 'lucide-react';
 // Import refactored components
 import { JengaTowerRefactored } from '../components/jenga/JengaTowerRefactored';
 import { PerformanceMonitor } from '../components/jenga/hooks/usePerformanceMonitoring.tsx';
@@ -9,6 +9,10 @@ import ContentModal from '../components/ContentModal';
 import GameHelp from '../components/GameHelp';
 import GameTutorial from '../components/GameTutorial';
 import GameStats from '../components/GameStats';
+import { MobileControls } from '../components/mobile/MobileControls';
+
+// Import responsive design hooks
+import { useResponsiveDesign } from '../hooks/useResponsiveDesign';
 
 // Import game service
 import mockGameService from '../services/mockGameService';
@@ -42,6 +46,10 @@ const GamePage: React.FC = () => {
   // Strategic enhancement: Component architecture toggle
   const [useRefactoredTower, setUseRefactoredTower] = useState(true);
   const [showPerformanceMonitor, setShowPerformanceMonitor] = useState(process.env.NODE_ENV === 'development');
+
+  // 📱 MOBILE RESPONSIVENESS STATE
+  const { isMobile, isTablet } = useResponsiveDesign();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   // FIX 2: Rename to avoid circular reference and fix validation
   const gameService = useMemo(() => {
@@ -481,9 +489,96 @@ const GamePage: React.FC = () => {
       </header>
 
       {/* Main Game Area */}
-      <div className="flex h-[calc(100vh-80px)]">
-        {/* Left Panel - Game Information (Reduced width for better proportions) */}
-        <div className="w-64 bg-gray-800 border-r border-gray-700 overflow-y-auto">
+      <div className={`${isMobile ? 'flex flex-col' : 'flex'} h-[calc(100vh-80px)]`}>
+        
+        {/* 📱 Mobile Header Controls */}
+        {isMobile && (
+          <div className="bg-gray-800 border-b border-gray-700 p-3">
+            <div className="flex items-center justify-between">
+              <h2 className="text-lg font-semibold text-white">Privacy Jenga</h2>
+              <button
+                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                className="p-2 rounded text-gray-300 hover:text-white hover:bg-gray-700"
+              >
+                {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+              </button>
+            </div>
+            
+            {/* Mobile Quick Stats */}
+            <div className="flex justify-between items-center mt-2 text-sm">
+              <span className="text-gray-300">Blocks: {gameState.blocksRemoved}/54</span>
+              <span className="text-gray-300">Stability: {Math.round(towerStability)}%</span>
+              <button
+                onClick={handleDiceRoll}
+                disabled={isDiceRolling || !isInteractive}
+                className={`px-3 py-1 rounded text-sm font-medium ${
+                  isDiceRolling || !isInteractive
+                    ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
+                    : 'bg-teal-500 text-white hover:bg-teal-600'
+                }`}
+              >
+                {isDiceRolling ? 'Rolling...' : 'Roll Dice'}
+              </button>
+            </div>
+            
+            {/* Mobile Menu Dropdown */}
+            {mobileMenuOpen && (
+              <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                className="mt-3 p-3 bg-gray-700 rounded-lg"
+              >
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    onClick={() => {
+                      setShowHelp(true);
+                      setMobileMenuOpen(false);
+                    }}
+                    className="bitsacco-btn-secondary p-2 text-sm"
+                  >
+                    <HelpCircle className="w-4 h-4 mr-1" />
+                    Help
+                  </button>
+                  <button
+                    onClick={() => {
+                      setShowStats(true);
+                      setMobileMenuOpen(false);
+                    }}
+                    className="bitsacco-btn-secondary p-2 text-sm"
+                  >
+                    <BarChart3 className="w-4 h-4 mr-1" />
+                    Stats
+                  </button>
+                  <button
+                    onClick={() => {
+                      handleTowerReset();
+                      setMobileMenuOpen(false);
+                    }}
+                    className="bitsacco-btn-secondary p-2 text-sm"
+                  >
+                    Reset
+                  </button>
+                  <button
+                    onClick={() => {
+                      setShowTutorial(true);
+                      setMobileMenuOpen(false);
+                    }}
+                    className="bitsacco-btn-secondary p-2 text-sm"
+                  >
+                    <BookOpen className="w-4 h-4 mr-1" />
+                    Tutorial
+                  </button>
+                </div>
+              </motion.div>
+            )}
+          </div>
+        )}
+
+        {/* Left Panel - Game Information (Hidden on mobile) */}
+        <div className={`${
+          isMobile ? 'hidden' : isTablet ? 'w-72' : 'w-64'
+        } bg-gray-800 border-r border-gray-700 overflow-y-auto`}>
           {/* Game Information */}
           <div className="bitsacco-panel p-3">
             <h3 className="text-lg font-semibold text-white mb-3 flex items-center justify-between">
@@ -712,8 +807,10 @@ const GamePage: React.FC = () => {
           </div>
         </div>
 
-        {/* Center - 3D Tower (Main focal point - takes most space) */}
-        <div className="flex-1 relative bg-gray-900">
+        {/* Center - 3D Tower (Main focal point) */}
+        <div className={`flex-1 relative bg-gray-900 ${
+          isMobile ? 'min-h-[60vh] pb-20' : ''
+        }`}>
           {!gameState ? (
             <div className="flex items-center justify-center h-full">
               <div className="text-center">
@@ -752,8 +849,10 @@ const GamePage: React.FC = () => {
           )}
         </div>
 
-        {/* Right Panel - Game Info & Help (Compact sidebar) */}
-        <div className="w-56 bg-gray-800 border-l border-gray-700 overflow-y-auto">
+        {/* Right Panel - Game Info & Help (Hidden on mobile) */}
+        <div className={`${
+          isMobile ? 'hidden' : isTablet ? 'w-64' : 'w-56'
+        } bg-gray-800 border-l border-gray-700 overflow-y-auto`}>
           {/* Game Info */}
           <div className="bitsacco-card p-3 m-3">
             <h3 className="text-lg font-semibold text-white mb-3 flex items-center gap-2">
@@ -951,6 +1050,40 @@ const GamePage: React.FC = () => {
           )}
         </div>
       </div>
+
+      {/* 📱 MOBILE CONTROLS - Bottom Sheet */}
+      {isMobile && (
+        <div className="fixed bottom-0 left-0 right-0 bg-gray-800 border-t border-gray-700 p-4 z-10">
+          <MobileControls
+            onBlockSelect={(direction: 'up' | 'down' | 'left' | 'right') => {
+              // Handle directional block selection for mobile
+              console.log('Mobile block selection:', direction);
+            }}
+            onConfirmSelection={() => {
+              if (selectedBlockId) {
+                const block = blocks.find(b => b.id === selectedBlockId);
+                if (block) {
+                  handleBlockClick(block);
+                }
+              }
+            }}
+            onCancelSelection={() => {
+              setSelectedBlockId(undefined);
+            }}
+            onToggleInfo={() => {
+              setShowHelp(!showHelp);
+            }}
+            onToggleSettings={() => {
+              setMobileMenuOpen(!mobileMenuOpen);
+            }}
+            onResetView={handleTowerReset}
+            onGoHome={() => window.history.back()}
+            isGamePaused={!isInteractive}
+            onTogglePause={() => setIsInteractive(!isInteractive)}
+            selectedBlockId={selectedBlockId || null}
+          />
+        </div>
+      )}
 
       {/* Modals */}
       <ContentModal
