@@ -82,6 +82,10 @@ body {
   @apply bg-gradient-to-r from-green-500 to-green-600 text-white shadow-lg hover:from-green-600 hover:to-green-700 focus:ring-green-400;
 }
 
+.bitsacco-btn-outline {
+  @apply border-2 border-teal-500 text-teal-400 bg-transparent hover:bg-teal-500/10 hover:border-teal-400 hover:text-teal-300 focus:ring-teal-400;
+}
+
 /* BITSACCO Card Styles */
 .bitsacco-card {
   @apply bg-gray-800/80 backdrop-blur-sm border border-gray-700/50 rounded-xl shadow-xl hover:border-gray-600/50 transition-all duration-300;
@@ -281,4 +285,72 @@ canvas {
 /* Prevent white backgrounds in 3D elements */
 mesh, geometry, material {
   background-color: #10b981 !important;
+}
+
+/* Enhanced Dice Rolling Animations */
+@keyframes diceRoll {
+  0% { transform: rotate(0deg) scale(1); }
+  25% { transform: rotate(90deg) scale(1.1); }
+  50% { transform: rotate(180deg) scale(1.2); }
+  75% { transform: rotate(270deg) scale(1.1); }
+  100% { transform: rotate(360deg) scale(1); }
+}
+
+@keyframes diceGlow {
+  0%, 100% { box-shadow: 0 0 5px rgba(0, 212, 170, 0.3); }
+  50% { box-shadow: 0 0 20px rgba(0, 212, 170, 0.8), 0 0 30px rgba(0, 212, 170, 0.6); }
+}
+
+@keyframes resultPulse {
+  0%, 100% { transform: scale(1); opacity: 0.9; }
+  50% { transform: scale(1.05); opacity: 1; }
+}
+
+@keyframes tactileClick {
+  0% { transform: scale(1) translateY(0); }
+  30% { transform: scale(1.1) translateY(-2px); }
+  60% { transform: scale(0.95) translateY(1px); }
+  100% { transform: scale(1) translateY(0); }
+}
+
+@keyframes stabilityWarning {
+  0%, 100% { transform: scale(1) rotate(0deg); }
+  25% { transform: scale(1.02) rotate(-1deg); }
+  75% { transform: scale(1.02) rotate(1deg); }
+}
+
+/* Dice Animation Classes */
+.dice-rolling {
+  animation: diceRoll 1.5s ease-in-out infinite, diceGlow 1s ease-in-out infinite;
+}
+
+.dice-result-highlight {
+  animation: resultPulse 2s ease-in-out;
+}
+
+.button-tactile-click {
+  animation: tactileClick 0.3s ease-out;
+}
+
+.tower-stability-warning {
+  animation: stabilityWarning 0.8s ease-in-out infinite;
+}
+
+/* Enhanced Button Hover Effects */
+.bitsacco-btn-primary:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 212, 170, 0.4);
+  transition: all 0.2s ease;
+}
+
+.bitsacco-btn-secondary:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(75, 85, 99, 0.3);
+  transition: all 0.2s ease;
+}
+
+/* Tactile Feedback for Interactive Elements */
+.interactive-feedback:active {
+  transform: scale(0.98);
+  transition: transform 0.1s ease;
 }

@@ -7,16 +7,18 @@ interface ContentModalProps {
   content: Content | null;
   isOpen: boolean;
   onClose: () => void;
-  onQuizAnswer?: (selectedAnswer: number) => Promise<void>;
+  onQuizAnswer?: (blockId: string, selectedAnswer: number) => Promise<void>;
   showQuiz?: boolean;
   gameState?: GameState;
+  blockId?: string;
 }
 
 const ContentModal: React.FC<ContentModalProps> = ({ 
   content, 
   isOpen, 
   onClose, 
-  onQuizAnswer
+  onQuizAnswer,
+  blockId
 }) => {
   const [showExplanation, setShowExplanation] = useState(false);
   const [soundEnabled, setSoundEnabled] = useState(true);
@@ -57,10 +59,10 @@ const ContentModal: React.FC<ContentModalProps> = ({
   if (!content) return null;
 
   const handleAnswerSubmit = async () => {
-    if (selectedAnswer === null || !onQuizAnswer) return;
+    if (selectedAnswer === null || !onQuizAnswer || !blockId) return;
     
     try {
-      await onQuizAnswer(selectedAnswer);
+      await onQuizAnswer(blockId, selectedAnswer);
       playSound('correct');
       // Close modal after quiz answer
       onClose();

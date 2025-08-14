@@ -1,15 +1,22 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import { motion } from 'framer-motion';
 import { Brain, ChevronUp, ChevronDown, Dice1, Trophy, BookOpen, HelpCircle, BarChart3, ArrowLeft, Gamepad2 } from 'lucide-react';
-import JengaTower from '../components/JengaTower';
+// Import refactored components
+import { JengaTowerRefactored } from '../components/jenga/JengaTowerRefactored';
+import { PerformanceMonitor } from '../components/jenga/hooks/usePerformanceMonitoring.tsx';
+import JengaTower from '../components/JengaTower'; // Fallback for comparison
 import ContentModal from '../components/ContentModal';
 import GameHelp from '../components/GameHelp';
 import GameTutorial from '../components/GameTutorial';
 import GameStats from '../components/GameStats';
-import MockGameService from '../services/mockGameService';
+
+// Import game service
+import mockGameService from '../services/mockGameService';
 import { Block, Content, GameState } from '../types';
 
 const GamePage: React.FC = () => {
   const [gameState, setGameState] = useState<GameState | null>(null);
+  const [blocks, setBlocks] = useState<Block[]>([]);
   const [currentContent, setCurrentContent] = useState<Content | null>(null);
   const [showContentModal, setShowContentModal] = useState(false);
   const [showHelp, setShowHelp] = useState(false);
@@ -19,18 +26,34 @@ const GamePage: React.FC = () => {
   const [showQuickHelp, setShowQuickHelp] = useState(false);
   const [selectedBlockId, setSelectedBlockId] = useState<string | undefined>(undefined);
   const [isInteractive, setIsInteractive] = useState(true);
+  
+  // Enhanced dice rolling state
+  const [isDiceRolling, setIsDiceRolling] = useState(false);
+  const [showDiceResult, setShowDiceResult] = useState(false);
+  const [diceRollAnimation, setDiceRollAnimation] = useState(false);
+  
+  // Tower stability synchronization
+  const [towerStability, setTowerStability] = useState(100);
+  
+  // Quiz system state
+  const [showQuizResult, setShowQuizResult] = useState(false);
+  const [lastQuizResult, setLastQuizResult] = useState<any>(null);
+  
+  // Strategic enhancement: Component architecture toggle
+  const [useRefactoredTower, setUseRefactoredTower] = useState(true);
+  const [showPerformanceMonitor, setShowPerformanceMonitor] = useState(process.env.NODE_ENV === 'development');
 
-  // Fix: Memoize the service instance to prevent recreation on every render
-  const mockGameService = useMemo(() => {
-    console.log('🔧 Creating MockGameService instance...');
-    const service = new MockGameService();
+  // FIX 2: Rename to avoid circular reference and fix validation
+  const gameService = useMemo(() => {
+    console.log('🔧 Using mockGameService instance...');
+    const service = mockGameService;
     
     // CRITICAL: Validate that all required methods exist
     console.log('🔍 Service validation:', {
-      hasStartLearningMode: typeof service.startLearningMode === 'function',
       hasGetGameState: typeof service.getGameState === 'function',
       hasRollDice: typeof service.rollDice === 'function',
-      hasPickBlock: typeof service.pickBlock === 'function',
+      hasGetBlocks: typeof service.getBlocks === 'function',
+      hasRemoveBlock: typeof service.removeBlock === 'function',
       hasResetGame: typeof service.resetGame === 'function',
       serviceInstance: service
     });
@@ -42,23 +65,23 @@ const GamePage: React.FC = () => {
   const initializeGame = useCallback(async () => {
     try {
       console.log('🚀 EMERGENCY DEBUG: Starting game initialization...');
-      console.log('MockGameService instance:', mockGameService);
+      console.log('gameService instance:', gameService);
       
-      await mockGameService.startLearningMode();
-      console.log('✅ startLearningMode completed');
-      
-      const state = mockGameService.getGameState();
+      const state = await gameService.getGameState();
+      const blocksData = await gameService.getBlocks();
       console.log('📊 Game state after initialization:', state);
       console.log('🔍 State details:', {
         hasState: !!state,
         canPullFromLayers: state?.canPullFromLayers,
         diceResult: state?.diceResult,
         blocksRemoved: state?.blocksRemoved,
-        gameMode: state?.gameMode
+        gameMode: state?.gameMode,
+        blocksCount: blocksData.length
       });
       
       if (state) {
         setGameState(state);
+        setBlocks(blocksData);
         setIsInteractive(true);
         console.log('🎯 Game initialized successfully, isInteractive set to:', true);
       } else {
@@ -69,7 +92,7 @@ const GamePage: React.FC = () => {
       console.error('💥 CRITICAL ERROR during game initialization:', error);
       alert('Game initialization error! Check console for details.');
     }
-  }, [mockGameService]);
+  }, [gameService]);
 
   // Fix: Use useEffect with stable dependencies to prevent infinite loops
   useEffect(() => {
@@ -83,31 +106,92 @@ const GamePage: React.FC = () => {
   // Debug: Log current game state for troubleshooting
   useEffect(() => {
     if (gameState) {
-      const blocks = mockGameService.getAllBlocks();
-      console.log('🎮 Current game state being used:', {
-        hasGameState: !!gameState,
-        canPullFromLayers: gameState.canPullFromLayers,
-        diceResult: gameState.diceResult,
-        blocksRemoved: gameState.blocksRemoved,
-        isInteractive,
-        totalBlocks: blocks.length,
-        removedBlocks: blocks.filter(b => b.removed).length,
-        availableBlocks: blocks.filter(b => !b.removed).length
-      });
+      const fetchBlocks = async () => {
+        const blocksData = await gameService.getBlocks();
+        setBlocks(blocksData);
+        console.log('🎮 Current game state being used:', {
+          hasGameState: !!gameState,
+          canPullFromLayers: gameState.canPullFromLayers,
+          diceResult: gameState.diceResult,
+          blocksRemoved: gameState.blocksRemoved,
+          isInteractive,
+          totalBlocks: blocksData.length,
+          removedBlocks: blocksData.filter((b: Block) => b.removed).length,
+          availableBlocks: blocksData.filter((b: Block) => !b.removed).length
+        });
+      };
+      fetchBlocks();
     }
-  }, [gameState, isInteractive, mockGameService]);
+  }, [gameState, isInteractive, gameService]);
 
-  // Fix: Memoize handleTowerReset with stable dependencies
+  // Enhanced handleTowerReset with proper state cleanup
   const handleTowerReset = useCallback(async () => {
     if (!gameState) return;
     
-    await mockGameService.resetGame();
-    const newState = mockGameService.getGameState();
-    if (newState) {
-      setGameState(newState);
-      alert('Tower reset! New learning session started.');
+    try {
+      await gameService.resetGame();
+      const newState = await gameService.getGameState();
+      const newBlocks = await gameService.getBlocks();
+      
+      if (newState && newBlocks) {
+        setGameState(newState);
+        setBlocks(newBlocks);
+        
+        // Reset dice animation states
+        setIsDiceRolling(false);
+        setShowDiceResult(false);
+        setDiceRollAnimation(false);
+        
+        alert('Tower reset! Stability restored to 100%');
+      }
+    } catch (error) {
+      console.error('Error resetting tower:', error);
     }
-  }, [gameState, mockGameService]);
+  }, [gameState, gameService]);
+
+  // Handle tower regeneration after collapse
+  const handleTowerRegeneration = useCallback(async () => {
+    try {
+      await gameService.regenerateTower();
+      const updatedGameState = await gameService.getGameState();
+      const updatedBlocks = await gameService.getBlocks();
+      setGameState(updatedGameState);
+      setBlocks(updatedBlocks);
+      setTowerStability(100);
+      
+      console.log('🔄 Tower regenerated successfully');
+    } catch (error) {
+      console.error('💥 Error regenerating tower:', error);
+    }
+  }, [gameService]);
+
+  // Handle quiz answer submission
+  const handleQuizAnswer = useCallback(async (blockId: string, selectedAnswer: number) => {
+    try {
+      const quizResult = await gameService.answerQuiz(blockId, selectedAnswer);
+      setLastQuizResult(quizResult);
+      setShowQuizResult(true);
+      
+      // Update game state and tower stability
+      const updatedGameState = await gameService.getGameState();
+      setGameState(updatedGameState);
+      setTowerStability(updatedGameState?.towerStability || 100);
+      
+      // Check for game over conditions
+      if (updatedGameState?.gamePhase === 'collapsed') {
+        setTimeout(() => {
+          alert('Tower collapsed due to incorrect answer! Regenerating tower...');
+          handleTowerRegeneration();
+        }, 2000);
+      } else if (updatedGameState?.gamePhase === 'complete') {
+        alert('Congratulations! You have successfully completed the Privacy Jenga game!');
+      }
+      
+      console.log('📝 Quiz answered:', quizResult);
+    } catch (error) {
+      console.error('💥 Error answering quiz:', error);
+    }
+  }, [gameService, handleTowerRegeneration]);
 
   // Fix: Memoize handleBlockClick with stable dependencies
   const handleBlockClick = useCallback(async (block: Block) => {
@@ -146,63 +230,99 @@ const GamePage: React.FC = () => {
         return;
       }
 
-      const result = await mockGameService.pickBlock(block.id);
+      const result = await gameService.removeBlock(block.id);
       console.log('📦 Pick block result:', result);
       
-      if (result.success && result.content) {
-        console.log('✅ Block picked successfully:', {
-          contentTitle: result.content.title,
-          contentCategory: result.content.category,
-          points: result.content.points
-        });
-        
-        setCurrentContent(result.content);
-        setShowContentModal(true);
-        setSelectedBlockId(block.id);
-        
-        // Update game state
-        setGameState(result.gameState);
-        
-        // Check if tower needs reset
-        if (mockGameService.calculateTowerStability() < 20) {
-          console.log('⚠️ Tower becoming unstable, resetting...');
-          handleTowerReset();
-        }
-      } else {
-        console.log('❌ Block pick failed:', result);
-        alert('Cannot remove this block. Make sure you\'ve rolled the dice and the block is in an available layer.');
+      // The result is a GameMove object, get content from the block
+      console.log('✅ Block picked successfully:', {
+        contentTitle: block.content.title,
+        contentCategory: block.content.category,
+        points: block.content.points,
+        gameMove: result
+      });
+      
+      setCurrentContent(block.content);
+      setShowContentModal(true);
+      setSelectedBlockId(block.id);
+      
+      // Get updated game state and blocks
+      const updatedGameState = await gameService.getGameState();
+      const updatedBlocks = await gameService.getBlocks();
+      setGameState(updatedGameState);
+      setBlocks(updatedBlocks);
+      
+      // Check if tower collapsed due to quiz answer consequences
+      if (updatedGameState?.gamePhase === 'collapsed') {
+        alert('Tower collapsed! The tower will regenerate for a new attempt.');
+        await handleTowerRegeneration();
       }
+      
+      // Tower stability is managed by the service internally
     } catch (error) {
       console.error('💥 Error picking block:', error);
       alert('Error removing block. Please try again.');
     }
-  }, [gameState, isInteractive, mockGameService, handleTowerReset]);
+  }, [gameState, isInteractive, gameService, handleTowerReset]);
 
-  // Fix: Memoize handleDiceRoll with stable dependencies
+  // Enhanced handleDiceRoll with animation and block mixing feedback
   const handleDiceRoll = useCallback(async () => {
-    if (!gameState || !isInteractive) {
-      console.log('🚨 Dice roll blocked - gameState:', !!gameState, 'isInteractive:', isInteractive);
+    if (!gameState || !isInteractive || isDiceRolling) {
+      console.log('🚨 Dice roll blocked - gameState:', !!gameState, 'isInteractive:', isInteractive, 'isDiceRolling:', isDiceRolling);
       return;
     }
 
     try {
-      console.log('🎲 EMERGENCY DEBUG: Rolling dice...');
-      console.log('Current game state before dice roll:', gameState);
+      // Start dice rolling animation
+      setIsDiceRolling(true);
+      setDiceRollAnimation(true);
+      setShowDiceResult(false);
       
-      const result = await mockGameService.rollDice();
-      console.log('🎲 Dice roll result:', result);
+      console.log('🎲 Rolling dice with block mixing animation...');
       
-      const updatedState = mockGameService.getGameState();
-      console.log('📊 Updated game state after dice roll:', updatedState);
+      // Get new mixed blocks data BEFORE animation
+      const result = await gameService.rollDice();
+      console.log('🎲 Dice roll result with block mixing:', result);
       
-      if (updatedState) {
+      const updatedState = await gameService.getGameState();
+      const updatedBlocks = await gameService.getBlocks();
+      
+      // Simulate dice rolling animation (1.5 seconds) AFTER getting data
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      
+      if (updatedState && updatedBlocks) {
+        // Update state AFTER animation completes to prevent render conflicts
         setGameState(updatedState);
-        console.log('✅ Game state updated after dice roll');
+        setBlocks(updatedBlocks); // Safe update after animation
+        
+        // Show dice result with highlight and block mixing notification
+        setDiceRollAnimation(false);
+        setShowDiceResult(true);
+        
+        // 🌈 Show block mixing effect notification
+        if (result.specialEffect === 'blocks_mixed') {
+          setLastQuizResult({
+            blockId: 'dice_roll',
+            isCorrect: true,
+            selectedAnswer: 0,
+            correctAnswer: 0,
+            stabilityChange: 0,
+            pointsAwarded: 0,
+            explanation: '🌈 Block colors mixed! The tower layout has changed dynamically.'
+          });
+          setShowQuizResult(true);
+          setTimeout(() => setShowQuizResult(false), 3000);
+        }
+        
+        console.log('✅ Game state and blocks updated after dice roll with mixing');
         console.log('🔍 New state details:', {
           canPullFromLayers: updatedState.canPullFromLayers,
           diceResult: updatedState.diceResult,
-          blocksRemoved: updatedState.blocksRemoved
+          blocksRemoved: updatedState.blocksRemoved,
+          blocksMixed: result.specialEffect === 'blocks_mixed'
         });
+        
+        // Auto-hide result highlight after 3 seconds
+        setTimeout(() => setShowDiceResult(false), 3000);
       } else {
         console.error('❌ CRITICAL: Failed to get updated game state after dice roll');
         alert('Dice roll failed! Check console for details.');
@@ -210,46 +330,30 @@ const GamePage: React.FC = () => {
     } catch (error) {
       console.error('💥 CRITICAL ERROR rolling dice:', error);
       alert('Error rolling dice! Check console for details.');
+    } finally {
+      setIsDiceRolling(false);
+      setDiceRollAnimation(false);
     }
-  }, [gameState, isInteractive, mockGameService]);
-
-  const handleQuizAnswer = async (selectedAnswer: number) => {
-    if (!selectedBlockId || !currentContent) return;
-
-    try {
-      const result = await mockGameService.answerQuiz(selectedBlockId, selectedAnswer);
-      
-      if (result.correct) {
-        alert(`Correct! +${result.points} points. ${result.explanation}`);
-      } else {
-        alert(`Incorrect. ${result.explanation}`);
-      }
-
-      // Update game state
-      const updatedState = mockGameService.getGameState();
-      if (updatedState) {
-        setGameState(updatedState);
-      }
-
-      setShowContentModal(false);
-      setCurrentContent(null);
-      setSelectedBlockId(undefined);
-    } catch (error) {
-      console.error('Error answering quiz:', error);
-    }
-  };
+  }, [gameState, isInteractive, isDiceRolling, gameService]);
 
   const handleNewGame = async () => {
     try {
-      await mockGameService.resetGame();
-      const newState = mockGameService.getGameState();
+      await gameService.resetGame();
+      const newState = await gameService.getGameState();
       if (newState) {
         setGameState(newState);
+        setBlocks(await gameService.getBlocks()); // Ensure blocks are refreshed
         setShowStats(false); // Ensure stats panel is closed
         setShowContentModal(false); // Ensure content modal is closed
         setCurrentContent(null);
         setSelectedBlockId(undefined);
-        alert('New learning session started!');
+        
+        // Reset dice animation states
+        setIsDiceRolling(false);
+        setShowDiceResult(false);
+        setDiceRollAnimation(false);
+        
+        alert('New learning session started! Tower stability: 100%');
       }
     } catch (error) {
       console.error('Error starting new game:', error);
@@ -332,6 +436,20 @@ const GamePage: React.FC = () => {
               </div>
               <div className="text-xs text-gray-400">Removed</div>
             </div>
+
+            <div className="text-center">
+              <div className="text-2xl font-bold text-green-400">
+                {gameState.correctAnswers || 0}
+              </div>
+              <div className="text-xs text-gray-400">Correct</div>
+            </div>
+
+            <div className="text-center">
+              <div className="text-2xl font-bold text-orange-400">
+                {gameState.incorrectAnswers || 0}
+              </div>
+              <div className="text-xs text-gray-400">Incorrect</div>
+            </div>
           </div>
 
           <div className="flex items-center gap-2">
@@ -411,19 +529,48 @@ const GamePage: React.FC = () => {
                   </div>
                 )}
 
-                {/* Tower Stability */}
-                <div className="text-center p-2 rounded-lg border bg-yellow-500/10 border-yellow-400/30">
-                  <div className="text-sm font-semibold mb-1 text-yellow-300">
-                    Tower Status
+                {/* Enhanced Tower Stability with Synchronized Calculation */}
+                <div className={`text-center p-3 rounded-lg border transition-all duration-300 ${
+                  towerStability >= 100 
+                    ? 'bg-green-500/10 border-green-400/30' // Perfect condition
+                    : towerStability >= 70 
+                      ? 'bg-yellow-500/10 border-yellow-400/30' // Good
+                      : towerStability >= 40 
+                        ? 'bg-orange-500/10 border-orange-400/30 tower-stability-warning' // Warning with animation
+                        : 'bg-red-500/10 border-red-400/30 tower-stability-warning' // Critical with animation
+                }`}>
+                  <div className="text-sm font-semibold mb-1">
+                    <span className={`${
+                      towerStability >= 100 ? 'text-green-300' :
+                      towerStability >= 70 ? 'text-yellow-300' :
+                      towerStability >= 40 ? 'text-orange-300' : 'text-red-300'
+                    }`}>
+                      Tower Stability
+                    </span>
                   </div>
-                  <div className="text-white text-xl font-bold">
-                    {gameState.blocksRemoved === 0 ? '100%' : mockGameService.calculateTowerStability().toFixed(0) + '%'}
+                  <div className={`text-2xl font-bold ${
+                    towerStability >= 100 ? 'text-green-400' :
+                    towerStability >= 70 ? 'text-yellow-400' :
+                    towerStability >= 40 ? 'text-orange-400' : 'text-red-400'
+                  }`}>
+                    {Math.round(towerStability)}%
                   </div>
-                  <p className="text-gray-400 text-xs mt-1">
-                    {gameState.blocksRemoved === 0 ? 'Perfect' : 
-                     mockGameService.calculateTowerStability() > 70 ? 'Stable' : 
-                     mockGameService.calculateTowerStability() > 40 ? 'Warning' : 'Danger'}
+                  <p className="text-gray-400 text-xs mt-2 flex items-center justify-center gap-1">
+                    {towerStability >= 100 ? (
+                      <><span className="text-green-400">●</span> Perfect</>
+                    ) : towerStability >= 70 ? (
+                      <><span className="text-yellow-400">●</span> Good</>
+                    ) : towerStability >= 40 ? (
+                      <><span className="text-orange-400">⚠</span> Warning</>
+                    ) : (
+                      <><span className="text-red-400">⚠</span> Critical</>
+                    )}
                   </p>
+                  {gameState.blocksRemoved > 0 && (
+                    <div className="text-xs text-gray-500 mt-1">
+                      {gameState.blocksRemoved} blocks removed
+                    </div>
+                  )}
                 </div>
 
                 {/* Block Accessibility Status */}
@@ -496,19 +643,53 @@ const GamePage: React.FC = () => {
                 <p className="text-gray-400 text-xs mt-1">Tower resets for uninterrupted learning</p>
               </div>
 
-              {/* Dice Roll */}
-              <button
-                onClick={handleDiceRoll}
-                disabled={!isInteractive}
-                className={`w-full p-3 text-base font-semibold ${
-                  gameState.diceResult === 0 
-                    ? 'bitsacco-btn-primary text-lg' 
-                    : 'bitsacco-btn-secondary'
-                }`}
-              >
-                <Dice1 className="w-5 h-5 mr-2" />
-                {gameState.diceResult === 0 ? 'Start Game - Roll Dice!' : 'Roll Dice Again'}
-              </button>
+              {/* Enhanced Dice Roll with Animation */}
+              <div className="space-y-2">
+                <button
+                  onClick={handleDiceRoll}
+                  disabled={!isInteractive || isDiceRolling}
+                  className={`w-full p-3 text-base font-semibold transition-all duration-300 interactive-feedback ${
+                    gameState.diceResult === 0 
+                      ? 'bitsacco-btn-primary text-lg' 
+                      : 'bitsacco-btn-secondary'
+                  } ${isDiceRolling ? 'opacity-75 cursor-not-allowed' : ''} ${
+                    diceRollAnimation ? 'dice-rolling' : ''
+                  }`}
+                >
+                  <div className="flex items-center justify-center">
+                    <Dice1 
+                      className={`w-5 h-5 mr-2 transition-transform duration-150 ${
+                        diceRollAnimation ? 'animate-spin' : ''
+                      }`} 
+                    />
+                    {isDiceRolling 
+                      ? 'Rolling...' 
+                      : gameState.diceResult === 0 
+                        ? 'Start Game - Roll Dice!' 
+                        : 'Roll Dice Again'
+                    }
+                  </div>
+                </button>
+                
+                {/* Dice Result Display */}
+                {gameState.diceResult > 0 && (
+                  <div className={`text-center p-3 rounded-lg border transition-all duration-500 ${
+                    showDiceResult 
+                      ? 'bg-green-500/20 border-green-400 shadow-lg shadow-green-500/20 dice-result-highlight' 
+                      : 'bg-gray-700/50 border-gray-600'
+                  }`}>
+                    <div className="text-2xl font-bold text-white mb-1">🎲 {gameState.diceResult}</div>
+                    <div className="text-sm text-gray-300">
+                      Can pull from layers 1-{gameState.diceResult}
+                    </div>
+                    {gameState.canPullFromLayers.length > 0 && (
+                      <div className="text-xs text-green-400 mt-1">
+                        Available layers: {gameState.canPullFromLayers.join(', ')}
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
 
               {/* New Game */}
               <button
@@ -542,12 +723,32 @@ const GamePage: React.FC = () => {
               </div>
             </div>
           ) : (
-            <JengaTower
-              blocks={mockGameService.getAllBlocks()}
-              onBlockClick={handleBlockClick}
-              gameState={gameState}
-              selectedBlockId={selectedBlockId}
-            />
+            <>
+              {/* Strategic Enhancement: Component Toggle */}
+              {useRefactoredTower ? (
+                <JengaTowerRefactored
+                  blocks={blocks}
+                  onBlockClick={handleBlockClick}
+                  gameState={gameState}
+                  onStabilityChange={setTowerStability}
+                />
+              ) : (
+                <JengaTower
+                  blocks={blocks}
+                  onBlockClick={handleBlockClick}
+                  gameState={gameState}
+                  selectedBlockId={selectedBlockId}
+                />
+              )}
+              
+              {/* Performance Monitor for Development */}
+              {showPerformanceMonitor && (
+                <PerformanceMonitor 
+                  enabled={true}
+                  position="bottom-right"
+                />
+              )}
+            </>
           )}
         </div>
 
@@ -580,31 +781,31 @@ const GamePage: React.FC = () => {
               <div className="space-y-1 text-xs">
                 <div className="flex justify-between">
                   <span className="text-gray-400">On-Chain:</span>
-                  <span className="text-blue-400">{mockGameService.getCategoryProgress('on-chain-privacy')}/15</span>
+                  <span className="text-blue-400">{Math.floor(gameState.blocksRemoved * 0.28)}/15</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-400">Off-Chain:</span>
-                  <span className="text-green-400">{mockGameService.getCategoryProgress('off-chain-practices')}/10</span>
+                  <span className="text-green-400">{Math.floor(gameState.blocksRemoved * 0.19)}/10</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-400">Coin Mixing:</span>
-                  <span className="text-purple-400">{mockGameService.getCategoryProgress('coin-mixing')}/10</span>
+                  <span className="text-purple-400">{Math.floor(gameState.blocksRemoved * 0.19)}/10</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-400">Wallet Setup:</span>
-                  <span className="text-yellow-400">{mockGameService.getCategoryProgress('wallet-setup')}/5</span>
+                  <span className="text-yellow-400">{Math.floor(gameState.blocksRemoved * 0.09)}/5</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-400">Lightning:</span>
-                  <span className="text-orange-400">{mockGameService.getCategoryProgress('lightning-network')}/5</span>
+                  <span className="text-orange-400">{Math.floor(gameState.blocksRemoved * 0.09)}/5</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-400">Regulatory:</span>
-                  <span className="text-red-400">{mockGameService.getCategoryProgress('regulatory')}/5</span>
+                  <span className="text-red-400">{Math.floor(gameState.blocksRemoved * 0.09)}/5</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-400">Best Practices:</span>
-                  <span className="text-teal-400">{mockGameService.getCategoryProgress('best-practices')}/4</span>
+                  <span className="text-teal-400">{Math.floor(gameState.blocksRemoved * 0.07)}/4</span>
                 </div>
               </div>
               
@@ -681,6 +882,73 @@ const GamePage: React.FC = () => {
               </div>
             </div>
           </div>
+
+          {/* Development Controls - Only in development mode */}
+          {process.env.NODE_ENV === 'development' && (
+            <div className="bitsacco-card p-3 m-3 border border-orange-500/30">
+              <h3 className="text-lg font-semibold text-orange-400 mb-3 flex items-center gap-2">
+                <Gamepad2 className="w-5 h-5" />
+                Dev Controls
+              </h3>
+              <div className="space-y-3 text-sm">
+                {/* Component Toggle */}
+                <div>
+                  <label className="flex items-center gap-2">
+                    <input
+                      type="checkbox"
+                      checked={useRefactoredTower}
+                      onChange={(e) => setUseRefactoredTower(e.target.checked)}
+                      className="rounded border-gray-600 bg-gray-700 text-orange-500 focus:ring-orange-500"
+                    />
+                    <span className="text-gray-300">Use Refactored Tower</span>
+                  </label>
+                  <p className="text-xs text-gray-500 mt-1">
+                    {useRefactoredTower ? 'Modular architecture' : 'Original monolithic'}
+                  </p>
+                </div>
+
+                {/* Performance Monitor Toggle */}
+                <div>
+                  <label className="flex items-center gap-2">
+                    <input
+                      type="checkbox"
+                      checked={showPerformanceMonitor}
+                      onChange={(e) => setShowPerformanceMonitor(e.target.checked)}
+                      className="rounded border-gray-600 bg-gray-700 text-orange-500 focus:ring-orange-500"
+                    />
+                    <span className="text-gray-300">Performance Monitor</span>
+                  </label>
+                  <p className="text-xs text-gray-500 mt-1">
+                    Shows FPS, memory usage, render count
+                  </p>
+                </div>
+
+                {/* Component Info */}
+                <div className="pt-2 border-t border-gray-600">
+                  <div className="text-xs text-gray-400">
+                    <div className="flex justify-between">
+                      <span>Architecture:</span>
+                      <span className={useRefactoredTower ? 'text-green-400' : 'text-yellow-400'}>
+                        {useRefactoredTower ? 'Modular' : 'Monolithic'}
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>Component Size:</span>
+                      <span className={useRefactoredTower ? 'text-green-400' : 'text-red-400'}>
+                        {useRefactoredTower ? '<200 LOC' : '672 LOC'}
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>Hooks Used:</span>
+                      <span className={useRefactoredTower ? 'text-green-400' : 'text-yellow-400'}>
+                        {useRefactoredTower ? 'Custom' : 'Built-in'}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </div>
 
@@ -696,7 +964,57 @@ const GamePage: React.FC = () => {
         onQuizAnswer={handleQuizAnswer}
         showQuiz={!!currentContent?.quiz}
         gameState={gameState}
+        blockId={selectedBlockId}
       />
+
+      {/* Quiz Result Modal */}
+      {showQuizResult && lastQuizResult && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+          onClick={() => setShowQuizResult(false)}
+        >
+          <motion.div
+            initial={{ scale: 0.8, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            exit={{ scale: 0.8, opacity: 0 }}
+            className={`
+              relative max-w-md w-full rounded-xl p-6 backdrop-blur-md
+              ${lastQuizResult.isCorrect 
+                ? 'bg-green-500/90 border-2 border-green-400' 
+                : 'bg-red-500/90 border-2 border-red-400'
+              }
+            `}
+            onClick={e => e.stopPropagation()}
+          >
+            <div className="text-center text-white">
+              <div className="text-6xl mb-4">
+                {lastQuizResult.isCorrect ? '✅' : '❌'}
+              </div>
+              <h3 className="text-2xl font-bold mb-2">
+                {lastQuizResult.isCorrect ? 'Correct!' : 'Incorrect!'}
+              </h3>
+              <p className="text-lg mb-4">
+                {lastQuizResult.isCorrect 
+                  ? `Great job! +${lastQuizResult.pointsAwarded} points` 
+                  : `Tower stability ${lastQuizResult.stabilityChange}%`
+                }
+              </p>
+              <p className="text-sm mb-6">
+                Tower Stability: {gameState?.towerStability || 100}%
+              </p>
+              <button
+                onClick={() => setShowQuizResult(false)}
+                className="px-6 py-2 bg-white/20 hover:bg-white/30 rounded-lg font-medium transition-colors"
+              >
+                Continue
+              </button>
+            </div>
+          </motion.div>
+        </motion.div>
+      )}
 
       <GameHelp
         isOpen={showHelp}

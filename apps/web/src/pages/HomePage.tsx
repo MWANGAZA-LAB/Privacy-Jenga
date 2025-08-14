@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Brain, Target, Zap, Play, HelpCircle, BookOpen, Trophy, Shield, AlertTriangle } from 'lucide-react';
 import GameTutorial from '../components/GameTutorial';
+import BitsaccoLogo from '../components/BitsaccoLogo';
 import { motion } from 'framer-motion';
 
 const HomePage: React.FC = () => {
@@ -31,10 +32,17 @@ const HomePage: React.FC = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center space-x-4">
-              <div className="w-10 h-10 bg-gradient-to-br from-teal-400 to-teal-600 rounded-lg flex items-center justify-center">
-                <Shield className="w-6 h-6 text-white" />
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-gradient-to-br from-teal-400 to-teal-600 rounded-lg flex items-center justify-center">
+                  <Shield className="w-6 h-6 text-white" />
+                </div>
+                <h1 className="text-2xl font-bold text-white">Privacy Jenga</h1>
               </div>
-              <h1 className="text-2xl font-bold text-white">Privacy Jenga</h1>
+              <div className="flex items-center gap-2">
+                <span className="text-teal-200 text-sm">×</span>
+                <BitsaccoLogo className="w-8 h-8" />
+                <span className="text-teal-200 text-sm font-medium">Bitsacco</span>
+              </div>
             </div>
             
             <div className="flex items-center space-x-3">
@@ -45,6 +53,17 @@ const HomePage: React.FC = () => {
                 <HelpCircle className="w-4 h-4" />
                 How to Play
               </button>
+              <a 
+                href="https://bitsacco.com/" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="bitsacco-btn bitsacco-btn-outline flex items-center gap-1 group"
+              >
+                Bitsacco
+                <svg className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                </svg>
+              </a>
             </div>
           </div>
         </div>
@@ -283,6 +302,46 @@ const HomePage: React.FC = () => {
           </div>
         </div>
       </section>
+
+      {/* Attribution Footer */}
+            {/* Footer */}
+      <footer className="bg-gradient-to-r from-teal-800 to-cyan-700 text-white">
+        <div className="container mx-auto px-4 py-8">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <BitsaccoLogo className="w-8 h-8" />
+              <div>
+                <h3 className="text-lg font-bold">Privacy Jenga</h3>
+                <p className="text-teal-200 text-sm">
+                  Educational privacy game powered by Bitsacco
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center gap-6 text-sm text-teal-200">
+              <a href="#" className="hover:text-white transition-colors">
+                About
+              </a>
+              <a href="#" className="hover:text-white transition-colors">
+                Privacy Policy
+              </a>
+              <a 
+                href="https://bitsacco.com/" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="hover:text-white transition-colors flex items-center gap-1 group"
+              >
+                Bitsacco
+                <svg className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                </svg>
+              </a>
+            </div>
+          </div>
+          <div className="border-t border-teal-800 mt-6 pt-6 text-center text-sm text-teal-300">
+            Built with ❤️ by MWANGAZA-LAB for Bitsacco education in Africa
+          </div>
+        </div>
+      </footer>
 
       {/* Tutorial Modal */}
       <GameTutorial

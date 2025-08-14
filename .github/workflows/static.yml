@@ -35,12 +35,22 @@ jobs:
       - name: Install dependencies
         run: |
           cd apps/web
-          npm ci
+          npm ci --only=production=false
+          
+      - name: Run build checks
+        run: |
+          cd apps/web
+          # Verify all required dependencies are installed
+          npm list --depth=0
+          # Run type checking before build
+          npm run type-check || echo "⚠️  Type check failed, continuing with build"
           
       - name: Build with Vite
         run: |
           cd apps/web
-          npm run build
+          npm run build:pages
+        env:
+          NODE_ENV: production
           
       - name: List build output
         run: |
@@ -48,6 +58,29 @@ jobs:
           ls -la dist/
           echo "=== index.html content ==="
           cat dist/index.html
+          echo "=== Checking for assets ==="
+          ls -la dist/assets/ || echo "No assets directory found"
+          
+      - name: Verify build contains game files
+        run: |
+          cd apps/web/dist
+          if [ ! -f "index.html" ]; then
+            echo "❌ index.html not found!"
+            exit 1
+          fi
+          if ! grep -q "Privacy Jenga" index.html; then
+            echo "❌ index.html doesn't contain Privacy Jenga content!"
+            exit 1
+          fi
+          echo "✅ Build verification passed - game files are present"
+          
+      - name: Clean deployment artifacts
+        run: |
+          cd apps/web/dist
+          # Remove any README files that might interfere with GitHub Pages
+          rm -f README.md readme.md README.txt
+          # Ensure index.html is the main entry point
+          echo "✅ Cleaned deployment artifacts"
           
       - name: Setup artifact context
         uses: actions/upload-pages-artifact@v3

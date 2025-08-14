@@ -45,8 +45,8 @@ export interface Achievement {
   name: string;
   description: string;
   icon: string;
-  unlockedAt: Date;
-  points: number;
+  unlocked: boolean;
+  category: string;
 }
 
 export interface GameState {
@@ -63,34 +63,49 @@ export interface GameState {
   gameHistory: GameMove[];
   layerStats: LayerStats[];
   blockTypeStats: BlockTypeStats;
+  // Enhanced game mechanics
+  correctAnswers: number;
+  incorrectAnswers: number;
+  consecutiveCorrectAnswers: number;
+  consecutiveIncorrectAnswers: number;
+  towerStability: number;
+  isGameComplete: boolean;
+  gamePhase: 'rolling' | 'selecting' | 'answering' | 'complete' | 'collapsed';
+  availableBlocks: string[]; // Blocks available after dice roll
 }
 
 export interface LayerStats {
   layer: number;
-  safeBlocks: number;
-  riskyBlocks: number;
-  challengeBlocks: number;
   totalBlocks: number;
   removedBlocks: number;
+  stability: number;
+  points: number;
 }
 
 export interface BlockTypeStats {
   safe: { total: number; removed: number; points: number };
   risky: { total: number; removed: number; points: number };
-  challenge: { total: number; removed: number; points: number; correct: number; incorrect: number };
+  challenge: { total: number; removed: number; points: number };
 }
 
 export interface GameMove {
-  id: string;
   blockId: string;
-  blockType: string;
-  layer: number;
-  points: number;
-  stability: number;
+  playerId: string;
   timestamp: Date;
-  quizAnswered?: boolean;
-  quizCorrect?: boolean;
-  content: Content;
+  points: number;
+  newTowerStability: number;
+  achievementsUnlocked: Achievement[];
+  quizResult?: QuizResult;
+}
+
+export interface QuizResult {
+  blockId: string;
+  isCorrect: boolean;
+  selectedAnswer: number;
+  correctAnswer: number;
+  stabilityChange: number;
+  pointsAwarded: number;
+  explanation?: string; // Optional explanation for the answer
 }
 
 export interface SpecialAction {
@@ -104,10 +119,9 @@ export interface SpecialAction {
 
 export interface DiceResult {
   value: number;
-  effect: string;
-  layerRestrictions: number[];
-  bonusMultiplier: number;
-  specialEvent?: string;
+  availableLayers: number[];
+  availableBlocks: string[]; // NEW: Specific blocks available after dice roll
+  specialEffect: string | null;
 }
 
 // Component Props Types

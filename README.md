@@ -1,43 +1,56 @@
-# 🎯 Privacy Jenga - Interactive Privacy Education Game
+# 🎯 Privacy Jenga - Interactive Bitcoin Privacy Education Game
 
-> **Learn online privacy and security through an engaging tower-building experience!**
+> **Learn Bitcoin privacy and security through an engaging 3D tower-building experience!**
 
+[![React](https://img.shields.io/badge/React-18-blue.svg)](https://reactjs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue.svg)](https://www.typescriptlang.org/)
+[![Three.js](https://img.shields.io/badge/Three.js-3D-green.svg)](https://threejs.org/)
+[![Vite](https://img.shields.io/badge/Vite-5.0-purple.svg)](https://vitejs.dev/)
 
 ## 🌟 **What is Privacy Jenga?**
 
-Privacy Jenga is an **interactive educational game** that teaches online privacy and security concepts through the classic tower-building mechanics of Jenga. Each block contains valuable knowledge about protecting yourself online, making learning both fun and memorable.
+Privacy Jenga is an **interactive educational game** that teaches Bitcoin privacy and security concepts through engaging 3D tower mechanics. Each of the 54 blocks contains authentic Bitcoin privacy practices, making learning both fun and memorable.
 
-### 🧠 **Unified Learning Philosophy**
-Privacy Jenga eliminates the traditional "game over" concept in favor of **continuous learning**. When the tower becomes unstable, it automatically resets, allowing players to focus entirely on mastering privacy concepts without interruption. This approach ensures that all 54 privacy tips are accessible and that learning never stops.
+### 🧠 **Educational Philosophy**
+This implementation focuses on **continuous learning** and eliminates traditional "game over" mechanics. When the tower becomes unstable, it smoothly resets, allowing players to explore all 54 privacy concepts without interruption.
 
 ## ✨ **Key Features**
 
-### 🎮 **Gameplay Mechanics**
-- **54-Block Tower System** - Complete Jenga experience with 18 layers
-- **Dice-Based Access Control** - Roll to determine which layers you can access
-- **Three Block Types:**
-  - 🟢 **Safe Blocks** - Good privacy practices (+points, +stability)
-  - 🔴 **Risky Blocks** - Bad practices (+points, -stability)  
-  - 🟡 **Challenge Blocks** - Quiz questions (correct = bonus, wrong = penalty)
+### 🎮 **Enhanced 3D Gameplay**
+- **54-Block Educational System** - Complete Jenga tower with 18 layers
+- **Realistic Physics** - Beautiful block falling animations with gravity and tumbling
+- **Interactive 3D Environment** - Rotate, zoom, and explore the tower
+- **Dice-Based Layer Access** - Roll to determine which layers you can access
+- **Real-time Tower Stability** - Dynamic stability calculation with visual feedback
 
-### 🎲 **Dice Mechanics**
-- **Layer 1-3**: Safe Zone (Green) - Perfect for beginners
-- **Layer 1-6**: Steady (Blue) - Balanced risk/reward
-- **Layer 1-9**: Risky (Yellow) - Increased challenge
-- **Layer 1-12**: Danger Zone (Orange) - High risk, high reward
-- **Layer 1-15**: Extreme (Red) - Expert level challenges
-- **All Layers**: Ultimate Challenge (Purple) - Maximum difficulty
+### 🎯 **Bitcoin Privacy Education**
+- **Authentic Privacy Practices** - Based on real Bitcoin privacy principles
+- **Three Risk Categories:**
+  - � **Red Blocks (1-18)** - "Never do these" - Severe privacy risks
+  - 🟠 **Orange Blocks (19-36)** - "Avoid these" - Moderate risks  
+  - � **Green Blocks (37-54)** - "Consider these" - Mild recommendations
 
-### 📚 **Educational Content**
-- **Progressive Learning** - Start with basics, advance to complex topics
-- **Real-World Examples** - Practical privacy scenarios and solutions
-- **Interactive Quizzes** - Test your knowledge with immediate feedback
-- **Achievement System** - Unlock badges for learning milestones
+### 🎲 **Advanced Game Mechanics**
+- **Animated Dice Rolling** - 1.5-second rolling animation with visual feedback
+- **Layer Access Control** - Strategic gameplay based on dice results
+- **Progressive Difficulty** - Higher layers offer more points but increased risk
+- **Synchronized UI** - All stability indicators show consistent values
+- **Tactile Feedback** - Immediate visual response to block interactions
 
-### 🎯 **Unified Learning Experience**
-- **Continuous Learning Mode** - Tower automatically resets when unstable for uninterrupted learning
-- **Progressive Difficulty** - Intelligent scaling based on player skill and progress
-- **Achievement System** - Long-term engagement through progress tracking and milestones
+### 📚 **Educational Content Categories**
+- **On-Chain Privacy** (15 blocks) - Address reuse, transaction amounts, change addresses
+- **Off-Chain Practices** (10 blocks) - VPNs, operational security, wallet management
+- **Coin Mixing** (10 blocks) - CoinJoin, traceability, privacy tools
+- **Wallet Setup** (5 blocks) - Hierarchical wallets, seed phrase security
+- **Lightning Network** (5 blocks) - Channel privacy, routing, unlinkability
+- **Regulatory** (5 blocks) - KYC risks, public records, compliance
+- **Best Practices** (4 blocks) - Tor usage, multisig, fund management
+
+### 🎯 **Continuous Learning Experience**
+- **No Game Over** - Tower automatically resets for uninterrupted learning
+- **Achievement System** - Long-term engagement through progress tracking
+- **Interactive Tutorials** - Comprehensive help system and guided learning
+- **Performance Monitoring** - Real-time FPS and memory usage display (dev mode)
 
 ## 🚀 **Getting Started**
 
@@ -96,42 +109,43 @@ npm run build
 
 ### **Frontend Stack**
 - **React 18** - Modern React with hooks and functional components
-- **TypeScript** - Type-safe development experience
+- **TypeScript** - Type-safe development with strict mode enabled
 - **Vite** - Fast build tool and development server
-- **Tailwind CSS** - Utility-first CSS framework
-- **Framer Motion** - Smooth animations and transitions
-- **Three.js + React Three Fiber** - 3D graphics and tower visualization
+- **Tailwind CSS** - Utility-first CSS framework with custom BITSACCO theme
+- **Three.js + React Three Fiber** - 3D graphics and realistic tower physics
+- **React Three Drei** - Additional 3D components and controls
 
 ### **Key Components**
-- **`GameTutorial`** - Interactive 6-step tutorial system
-- **`GameHelp`** - Comprehensive 4-tab help system
-- **`JengaTower`** - Enhanced 3D tower with visual feedback
-- **`GamePage`** - Main game interface with integrated features
-- **`HomePage`** - Landing page with feature showcase
+- **`JengaTowerRefactored`** - Enhanced 3D tower with physics and visual feedback
+- **`BlockComponent`** - Individual block with realistic falling animations
+- **`TowerControls`** - Real-time stability monitoring and game controls
+- **`useBlockSelection`** - Advanced block selection and keyboard navigation
+- **`useTowerStability`** - Synchronized stability calculation across UI
+- **`useKeyboardNavigation`** - Full accessibility support
+- **`GamePage`** - Main game interface with synchronized state management
+- **`HomePage`** - Landing page with feature showcase and creator credits
 
 ### **State Management**
-- **React Hooks** - Local component state management
-- **Mock Services** - In-memory game logic for frontend-only development
-- **Local Storage** - Game progress and achievement persistence
+- **React Hooks** - Modern state management with useCallback and useMemo
+- **Custom Hooks** - Specialized hooks for tower stability, block selection, and keyboard navigation
+- **Singleton Service** - MockGameService for consistent game state management
+- **Real-time Synchronization** - Unified stability calculation across all UI components
 
 ## 🎨 **UI/UX Features**
 
-### **BITSACCO Dark Theme**
-- **Professional dark color scheme** throughout the application
-- **Consistent visual language** with teal accents
-- **Accessibility-focused** design with high contrast
-
 ### **Visual Enhancements**
-- **Clear layer restrictions** with visual overlays
-- **Block type legend** for easy identification
-- **Tower stability indicator** with color-coded progress
-- **Interactive instructions** panel
-- **Enhanced 3D rendering** with better spacing
+- **Animated Dice Rolling** - 1.5-second spinning animation with glow effects
+- **Physics-based Block Falling** - Realistic gravity, tumbling, and fade animations
+- **Dynamic Tower Stability** - Real-time color-coded stability indicators
+- **Interactive 3D Controls** - Orbit controls for camera manipulation
+- **Tactile Feedback** - Immediate visual response to user interactions
+- **Synchronized UI Elements** - Consistent stability display across all panels
 
-### **Responsive Design**
-- **Mobile-first approach** for touch interactions
-- **Responsive grid layouts** for all screen sizes
-- **Touch-friendly controls** and navigation
+### **BITSACCO Design System**
+- **Professional Dark Theme** - Custom color palette with teal accents
+- **Consistent Visual Language** - Unified design across all components
+- **Accessibility First** - High contrast, keyboard navigation, screen reader support
+- **Responsive Layout** - Mobile-first design with touch-friendly controls
 
 ## 📱 **User Experience Features**
 
@@ -158,15 +172,24 @@ npm run build
 apps/web/
 ├── src/
 │   ├── components/          # Reusable UI components
-│   │   ├── GameTutorial.tsx # Interactive tutorial system
+│   │   ├── jenga/          # 3D tower components
+│   │   │   ├── JengaTowerRefactored.tsx  # Main 3D tower component
+│   │   │   ├── BlockComponent.tsx        # Individual block with physics
+│   │   │   ├── TowerControls.tsx         # Real-time controls panel
+│   │   │   └── hooks/                    # Specialized game hooks
+│   │   │       ├── useTowerStability.ts   # Stability calculation
+│   │   │       ├── useBlockSelection.ts   # Block selection logic
+│   │   │       └── useKeyboardNavigation.ts # Accessibility support
+│   │   ├── ContentModal.tsx # Educational content display
 │   │   ├── GameHelp.tsx     # Comprehensive help system
-│   │   ├── JengaTower.tsx   # 3D tower visualization
-│   │   ├── GameStats.tsx    # Game statistics display
 │   │   └── ...
 │   ├── pages/               # Page components
-│   ├── services/            # Game logic and mock services
+│   │   ├── GamePage.tsx     # Main game interface
+│   │   └── HomePage.tsx     # Landing page with credits
+│   ├── services/            # Game logic and services
+│   │   └── mockGameService.ts # Singleton game state management
 │   ├── types/               # TypeScript type definitions
-│   └── styles/              # Global styles and CSS
+│   └── index.css           # Enhanced animations and BITSACCO theme
 ├── public/                  # Static assets
 └── package.json            # Dependencies and scripts
 ```
@@ -225,18 +248,46 @@ We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) f
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## 🙏 **Acknowledgments**
+## 🙏 **Acknowledgments & Credits**
 
-- **Privacy Education Community** - For inspiration and feedback
-- **Open Source Contributors** - For the amazing tools and libraries
-- **Game Development Community** - For educational game design insights
+### **Original Creators**
+This project is inspired by and based on the educational content from:
+- **[bitcoinjenga.com](https://bitcoinjenga.com)** by **Amiti Uttarwar** & **D++**
+- Original concept of teaching Bitcoin privacy through interactive gameplay
+- Authentic Bitcoin privacy practices and educational framework
 
-## 📞 **Support & Contact**
+### **Educational Content**
+- **Authentic Privacy Practices** - All 54 privacy tips are based on real Bitcoin privacy principles from bitcoinjenga.com
+- **Risk Categorization** - "Never/Avoid/Consider" framework from the original educational content
+- **Community-Driven Learning** - Building upon the Bitcoin privacy education community's work
 
-- **Issues**: [GitHub Issues](https://github.com/MWANGAZA-LAB/privacy-jenga/issues)
+### **Technical Implementation**
+- **React Three Fiber Community** - For 3D web development resources and examples
+- **Three.js Contributors** - For the powerful 3D graphics library
+- **Tailwind CSS Team** - For the utility-first CSS framework
+- **Open Source Community** - For the incredible tools and libraries that make this possible
+
+### **Special Thanks**
+- **Bitcoin Privacy Advocates** - For their continued work in privacy education
+- **Educational Game Community** - For insights on effective learning through gameplay
+- **Web3 Developers** - For pushing the boundaries of interactive web experiences
+
+## � **License**
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+**Educational Content Attribution**: The privacy practices and educational framework are inspired by and based on [bitcoinjenga.com](https://bitcoinjenga.com) by Amiti Uttarwar & D++. This implementation serves as an interactive, web-based adaptation of their educational concepts.
+
+## �📞 **Support & Contact**
+
+- **Issues**: [GitHub Issues](https://github.com/MWANGAZA-LAB/Privacy-Jenga/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/MWANGAZA-LAB/Privacy-Jenga/discussions)
+- **Original Educational Content**: [bitcoinjenga.com](https://bitcoinjenga.com)
 
 ---
 
-**🧠 Ready to master online privacy through continuous learning? [Start your journey now!](https://MWANGAZA-LAB.github.io/privacy-jenga/)**
+**🧠 Ready to master Bitcoin privacy through interactive 3D learning?**  
+**🎮 [Start your privacy education journey now!](https://MWANGAZA-LAB.github.io/Privacy-Jenga/)**
 
-*Built with ❤️ for privacy education and continuous skill development!*
+*Built with ❤️ for Bitcoin privacy education and the open-source community*  
+*Inspired by the original educational work of Amiti Uttarwar & D++ at bitcoinjenga.com*
