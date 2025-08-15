@@ -1,8 +1,8 @@
 import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { JengaTowerRefactored } from '../JengaTowerRefactored';
-import { GameState, Block } from '../../../types';
+import { GameState } from '../../../types';
 
 // TEMPORARILY DISABLED: Tests that depend on Text component from @react-three/drei
 // These will be re-enabled once the mocking issue is resolved
@@ -34,49 +34,6 @@ describe.skip('JengaTowerRefactored - TEMPORARILY DISABLED DUE TO MOCKING ISSUES
     gamePhase: 'rolling',
     availableBlocks: []
   };
-
-  const mockBlocks: Block[] = [
-    {
-      id: '1',
-      layer: 1,
-      position: 1,
-      type: 'safe',
-      removed: false,
-      difficulty: 1,
-      stability: 85,
-      category: 'wallet-setup',
-      content: {
-        id: '1',
-        title: 'Safe Block',
-        text: 'Safe block content',
-        severity: 'tip',
-        points: 10,
-        category: 'wallet-setup',
-        fact: 'This is a safe privacy practice',
-        impact: 'positive'
-      },
-    },
-    {
-      id: '2',
-      layer: 1,
-      position: 2,
-      type: 'risky',
-      removed: false,
-      difficulty: 1,
-      stability: 75,
-      category: 'on-chain-privacy',
-      content: {
-        id: '2',
-        title: 'Risky Block',
-        text: 'Risky block content',
-        severity: 'warning',
-        points: 15,
-        category: 'on-chain-privacy',
-        fact: 'This is a risky privacy practice',
-        impact: 'negative'
-      },
-    }
-  ];
 
   beforeEach(() => {
     vi.clearAllMocks();

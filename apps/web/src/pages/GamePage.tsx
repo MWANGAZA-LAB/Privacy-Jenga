@@ -56,7 +56,7 @@ class GameErrorBoundary extends React.Component<
             <div className="text-6xl mb-4">💥</div>
             <h2 className="text-2xl font-bold text-white mb-4">Game Error Detected</h2>
             <p className="text-gray-300 mb-6">
-              Something went wrong with the game. Don't worry, your progress is safe!
+              Something went wrong with the game. Don&apos;t worry, your progress is safe!
             </p>
             <button
               onClick={() => window.location.reload()}
