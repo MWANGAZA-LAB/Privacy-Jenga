@@ -18,19 +18,19 @@ export default defineConfig({
         isolate: false,
         // Reduce memory pressure (CI-compatible)
         execArgv: [
-          '--max-old-space-size=512',
+          '--max-old-space-size=256', // CRITICAL: Reduced from 512MB to 256MB
           '--optimize-for-size',
-          '--gc-interval=100'
+          '--gc-interval=50' // CRITICAL: More aggressive garbage collection
         ]
       },
     },
     // Aggressive memory management
     maxConcurrency: 1,
     // Test timeout and retry settings
-    testTimeout: 15000,
-    hookTimeout: 15000,
+    testTimeout: 10000, // CRITICAL: Reduced from 15000 to 10000
+    hookTimeout: 10000, // CRITICAL: Reduced from 15000 to 10000
     // Prevent memory leaks
-    teardownTimeout: 5000,
+    teardownTimeout: 3000, // CRITICAL: Reduced from 5000 to 3000
     // Coverage settings (disabled to reduce memory usage)
     coverage: {
       provider: 'v8',
@@ -55,7 +55,7 @@ export default defineConfig({
     env: {
       NODE_ENV: 'test',
       // CI-compatible memory options (no --expose-gc)
-      NODE_OPTIONS: '--max-old-space-size=512'
+      NODE_OPTIONS: '--max-old-space-size=256' // CRITICAL: Reduced from 512MB to 256MB
     },
     // Prevent test file caching issues
     cache: false,

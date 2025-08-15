@@ -1,145 +1,130 @@
 import '@testing-library/jest-dom';
-import { beforeEach, afterEach, vi } from 'vitest';
-import React from 'react';
+import { vi, beforeEach, afterEach } from 'vitest';
 
-// CRITICAL: Memory-optimized mocks to prevent V8 crashes
-Object.defineProperty(window, 'ResizeObserver', {
-  writable: true,
-  value: class ResizeObserver {
-    observe() {}
-    unobserve() {}
-    disconnect() {}
-  },
-});
+// CRITICAL: Memory-optimized test setup to prevent V8 crashes
+// Simplified mocks to reduce memory footprint
 
-// Minimal WebGL mock (reduced memory footprint)
-Object.defineProperty(HTMLCanvasElement.prototype, 'getContext', {
-  writable: true,
-  value: () => ({
-    createShader: () => ({}),
-    createProgram: () => ({}),
-    createBuffer: () => ({}),
-    getParameter: () => 4096,
-  }),
-});
+// Mock ResizeObserver
+global.ResizeObserver = vi.fn().mockImplementation(() => ({
+  observe: vi.fn(),
+  unobserve: vi.fn(),
+  disconnect: vi.fn(),
+}));
 
-// Minimal matchMedia mock
+// Mock WebGL context
+global.WebGLRenderingContext = vi.fn() as any;
+global.WebGL2RenderingContext = vi.fn() as any;
+
+// Mock matchMedia
 Object.defineProperty(window, 'matchMedia', {
   writable: true,
-  value: () => ({
+  value: vi.fn().mockImplementation(query => ({
     matches: false,
-    addListener: () => {},
-    removeListener: () => {},
-  }),
+    media: query,
+    onchange: null,
+    addListener: vi.fn(),
+    removeListener: vi.fn(),
+    addEventListener: vi.fn(),
+    removeEventListener: vi.fn(),
+    dispatchEvent: vi.fn(),
+  })),
 });
 
-// Minimal performance mock
+// Mock performance API
 Object.defineProperty(window, 'performance', {
   writable: true,
   value: {
-    now: () => Date.now(),
-    memory: { usedJSHeapSize: 1000000, totalJSHeapSize: 2000000, jsHeapSizeLimit: 4000000 },
+    now: vi.fn(() => Date.now()),
+    mark: vi.fn(),
+    measure: vi.fn(),
+    getEntriesByType: vi.fn(() => []),
+    getEntriesByName: vi.fn(() => []),
+    clearMarks: vi.fn(),
+    clearMeasures: vi.fn(),
   },
 });
 
-// CRITICAL: Simplified React Three Fiber mocks (reduced memory)
-vi.mock('@react-three/fiber', () => ({
-  Canvas: vi.fn(({ children }) => React.createElement('div', { 'data-testid': 'three-canvas' }, children)),
+// CRITICAL: Simplified @react-three/fiber mocks to reduce memory usage
+vi.doMock('@react-three/fiber', () => ({
+  Canvas: vi.fn(({ children }) => children),
   useFrame: vi.fn(),
-  useThree: vi.fn(() => ({ scene: {}, camera: {}, gl: {} })),
+  useThree: vi.fn(() => ({
+    camera: { position: { set: vi.fn() } },
+    scene: { add: vi.fn(), remove: vi.fn() },
+    gl: { domElement: document.createElement('div') },
+    raycaster: { setFromCamera: vi.fn() },
+    mouse: { x: 0, y: 0 },
+    viewport: { width: 800, height: 600 },
+  })),
   extend: vi.fn(),
 }));
 
-// CRITICAL: Simplified Three.js mocks (reduced memory)
-vi.mock('three', () => ({
-  MeshStandardMaterial: vi.fn(() => ({ color: { set: vi.fn() } })),
-  MeshBasicMaterial: vi.fn(() => ({ color: { set: vi.fn() } })),
-  BoxGeometry: vi.fn(() => ({})),
+// CRITICAL: Simplified three.js mocks to reduce memory usage
+vi.doMock('three', () => ({
+  MeshStandardMaterial: vi.fn(() => ({
+    color: { set: vi.fn() },
+    needsUpdate: false,
+    dispose: vi.fn(),
+  })),
+  MeshBasicMaterial: vi.fn(() => ({
+    color: { set: vi.fn() },
+    needsUpdate: false,
+    dispose: vi.fn(),
+  })),
+  BoxGeometry: vi.fn(() => ({
+    dispose: vi.fn(),
+  })),
   Mesh: vi.fn(() => ({
-    position: { set: vi.fn(), setScalar: vi.fn() },
-    scale: { setScalar: vi.fn() },
+    position: { set: vi.fn() },
+    rotation: { set: vi.fn() },
+    scale: { set: vi.fn() },
+    add: vi.fn(),
+    remove: vi.fn(),
+    dispose: vi.fn(),
   })),
 }));
 
-// CRITICAL: Simplified @react-three/drei mocks (reduced memory)
-vi.mock('@react-three/drei', () => ({
-  OrbitControls: vi.fn(() => React.createElement('div', { 'data-testid': 'orbit-controls' })),
-  Box: vi.fn((props) => React.createElement('div', { 'data-testid': 'drei-box', ...props })),
-  Text: vi.fn((props) => React.createElement('div', { 'data-testid': 'drei-text', ...props }, props.children)),
-  ambientLight: vi.fn(() => React.createElement('div', { 'data-testid': 'drei-ambient-light' })),
-  directionalLight: vi.fn(() => React.createElement('div', { 'data-testid': 'drei-directional-light' })),
-  pointLight: vi.fn(() => React.createElement('div', { 'data-testid': 'drei-point-light' })),
-  planeGeometry: vi.fn(() => React.createElement('div', { 'data-testid': 'drei-plane-geometry' })),
-  ringGeometry: vi.fn(() => React.createElement('div', { 'data-testid': 'drei-ring-geometry' })),
-  sphereGeometry: vi.fn(() => React.createElement('div', { 'data-testid': 'drei-sphere-geometry' })),
+// CRITICAL: Simplified @react-three/drei mocks
+vi.doMock('@react-three/drei', () => ({
+  Text: vi.fn(() => null),
+  OrbitControls: vi.fn(() => null),
+  PerspectiveCamera: vi.fn(() => null),
+  Environment: vi.fn(() => null),
+  useGLTF: vi.fn(() => ({ scene: null })),
+  Html: vi.fn(() => null),
+  Float: vi.fn(({ children }) => children),
+  PresentationControls: vi.fn(({ children }) => children),
 }));
 
-// Minimal JSX declarations (reduced memory)
-declare global {
-  namespace JSX {
-    interface IntrinsicElements {
-      mesh: any;
-      boxGeometry: any;
-      meshStandardMaterial: any;
-      meshBasicMaterial: any;
-      ambientLight: any;
-      directionalLight: any;
-      pointLight: any;
-      planeGeometry: any;
-      ringGeometry: any;
-      sphereGeometry: any;
-    }
-  }
-}
-
-// CRITICAL: Memory-optimized test setup to prevent V8 crashes
+// CRITICAL: Memory cleanup hooks
 beforeEach(() => {
-  vi.clearAllMocks();
-  
-  // CRITICAL: Limit animation frames to prevent memory buildup
-  if (typeof window !== 'undefined') {
-    let frameCount = 0;
-    const originalRAF = window.requestAnimationFrame;
-    window.requestAnimationFrame = (callback) => {
-      frameCount++;
-      if (frameCount > 10) { // CRITICAL: Reduced limit to prevent memory issues
-        return -1;
-      }
+  // Limit requestAnimationFrame calls to prevent memory buildup
+  let rafCount = 0;
+  const originalRAF = global.requestAnimationFrame;
+  global.requestAnimationFrame = vi.fn((callback) => {
+    if (rafCount < 5) { // Limit to 5 RAF calls per test
+      rafCount++;
       return originalRAF(callback);
-    };
-  }
-  
-  // Clear any stored test data
-  if (typeof global !== 'undefined') {
-    (global as any).testData = undefined;
-  }
-  
-  // CRITICAL: Force garbage collection if available
-  if (global.gc) {
-    global.gc();
-  }
+    }
+    return 0;
+  });
 });
 
-// CRITICAL: Aggressive memory cleanup to prevent V8 crashes
 afterEach(() => {
-  // Clear all mocks to free memory
+  // Aggressive memory cleanup
   vi.clearAllMocks();
   
-  // CRITICAL: Force cleanup if available
+  // Force garbage collection if available
   if (global.gc) {
     global.gc();
   }
   
-  // Clear any stored references
-  if (typeof window !== 'undefined') {
-    window.requestAnimationFrame = window.requestAnimationFrame;
-  }
+  // Clear any test data
+  (global as any).testData = undefined;
   
-  // Clear test data
-  if (typeof global !== 'undefined') {
-    (global as any).testData = undefined;
-  }
+  // Reset RAF counter
+  (global as any).rafCount = 0;
   
-  // CRITICAL: Small delay to allow garbage collection
-  return new Promise(resolve => setTimeout(resolve, 5)); // Reduced delay
+  // Small delay to allow cleanup
+  return new Promise(resolve => setTimeout(resolve, 2));
 });
