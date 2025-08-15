@@ -257,12 +257,60 @@ class MockGameService {
   }
 
   private getQuizForBlock(): any {
-    return {
-      question: "What is the most important privacy consideration when using Bitcoin?",
-      choices: ["Speed of transactions", "Address reuse", "Transaction fees", "Network congestion"],
-      correctIndex: 1,
-      explanation: "Address reuse is one of the biggest privacy mistakes in Bitcoin, as it links all your transactions together."
-    };
+    // CRITICAL: Expanded quiz pool to prevent repetition
+    const quizPool = [
+      {
+        question: "What is the most important privacy consideration when using Bitcoin?",
+        choices: ["Speed of transactions", "Address reuse", "Transaction fees", "Network congestion"],
+        correctIndex: 1,
+        explanation: "Address reuse is one of the biggest privacy mistakes in Bitcoin, as it links all your transactions together."
+      },
+      {
+        question: "Which practice helps maintain Bitcoin privacy?",
+        choices: ["Using the same address repeatedly", "Creating new addresses for each transaction", "Sharing your wallet address publicly", "Using predictable transaction amounts"],
+        correctIndex: 1,
+        explanation: "Creating new addresses for each transaction prevents linking your transaction history together."
+      },
+      {
+        question: "What is CoinJoin used for in Bitcoin privacy?",
+        choices: ["Faster transactions", "Breaking transaction links", "Reducing fees", "Increasing block size"],
+        correctIndex: 1,
+        explanation: "CoinJoin combines multiple transactions to break the link between inputs and outputs, improving privacy."
+      },
+      {
+        question: "Why should you avoid using the same Bitcoin address multiple times?",
+        choices: ["It's more expensive", "It reduces privacy by linking transactions", "It's slower", "It uses more storage"],
+        correctIndex: 1,
+        explanation: "Reusing addresses allows anyone to see your entire transaction history and link your activities."
+      },
+      {
+        question: "What privacy risk exists when using centralized exchanges?",
+        choices: ["Higher fees", "KYC information can be subpoenaed", "Slower withdrawals", "Limited coin selection"],
+        correctIndex: 1,
+        explanation: "KYC information from exchanges can be legally compelled and linked to your Bitcoin transaction history."
+      },
+      {
+        question: "Which network provides better privacy than Bitcoin's main chain?",
+        choices: ["Lightning Network", "Ethereum", "Litecoin", "Bitcoin Cash"],
+        correctIndex: 0,
+        explanation: "Lightning Network transactions are not recorded on the main blockchain, providing better privacy for small payments."
+      },
+      {
+        question: "What is the purpose of running your own Bitcoin node?",
+        choices: ["Earning mining rewards", "Avoiding third-party surveillance", "Getting lower fees", "Faster transaction confirmation"],
+        correctIndex: 1,
+        explanation: "Running your own node prevents third parties from seeing your transaction queries and improves privacy."
+      },
+      {
+        question: "Why should you avoid predictable transaction amounts?",
+        choices: ["They cost more", "They're slower", "They create spending patterns", "They use more storage"],
+        correctIndex: 2,
+        explanation: "Predictable amounts create patterns that can be analyzed to link your transactions and spending habits."
+      }
+    ];
+
+    // CRITICAL: Return random quiz to prevent repetition
+    return quizPool[Math.floor(Math.random() * quizPool.length)];
   }
 
   private getPrivacyFact(category: string): string {

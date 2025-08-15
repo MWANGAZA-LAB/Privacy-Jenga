@@ -546,7 +546,6 @@ const GamePage: React.FC = () => {
               
               {/* Mobile Quick Stats */}
               <div className="flex justify-between items-center mt-2 text-sm">
-                <span className="text-gray-300">Blocks: {gameState.blocksRemoved}/54</span>
                 <span className="text-gray-300">Stability: {Math.round(towerStability)}%</span>
                 <button
                   onClick={handleDiceRoll}
@@ -1168,9 +1167,6 @@ const GamePage: React.FC = () => {
                     ? `Great job! +${lastQuizResult.pointsAwarded} points` 
                     : `Tower stability ${lastQuizResult.stabilityChange}%`
                   }
-                </p>
-                <p className="text-sm mb-6">
-                  Tower Stability: {gameState?.towerStability || 100}%
                 </p>
                 <button
                   onClick={() => setShowQuizResult(false)}

@@ -180,7 +180,7 @@ export const BlockComponent: React.FC<BlockComponentProps> = React.memo(({
         if (material && originalColor && originalColor.getHex() !== 0x000000) {
           material.color.setHex(0x00ff88); // Bright green flash for positive feedback
           
-          // Enhanced color restoration with safety checks
+          // CRITICAL: Enhanced color restoration with multiple safety checks
           setTimeout(() => {
             if (meshRef.current && meshRef.current.material && material) {
               material.color.copy(originalColor);
@@ -188,6 +188,14 @@ export const BlockComponent: React.FC<BlockComponentProps> = React.memo(({
               material.needsUpdate = true;
             }
           }, 200); // Extended flash duration for better feedback
+          
+          // CRITICAL: Additional color restoration as backup
+          setTimeout(() => {
+            if (meshRef.current && meshRef.current.material && material) {
+              material.color.copy(originalColor);
+              material.needsUpdate = true;
+            }
+          }, 400);
         }
         
         // Haptic-style bounce animation
@@ -203,11 +211,15 @@ export const BlockComponent: React.FC<BlockComponentProps> = React.memo(({
           }
         };
         bounceAnimation();
+        
+        // CRITICAL: Final color restoration to ensure blocks keep original colors
         setTimeout(() => {
           if (meshRef.current?.material) {
-            (meshRef.current.material as THREE.MeshStandardMaterial).color.copy(originalColor);
+            const currentMaterial = meshRef.current.material as THREE.MeshStandardMaterial;
+            currentMaterial.color.copy(originalColor);
+            currentMaterial.needsUpdate = true;
           }
-        }, 100);
+        }, 500);
       }
       
       // CRITICAL: Wrap onClick in error boundary

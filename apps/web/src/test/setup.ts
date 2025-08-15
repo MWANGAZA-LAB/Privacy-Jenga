@@ -2,7 +2,7 @@ import '@testing-library/jest-dom';
 import { beforeEach, afterEach, vi } from 'vitest';
 import React from 'react';
 
-// Simplified mocks to reduce memory usage
+// CRITICAL: Memory-optimized mocks to prevent V8 crashes
 Object.defineProperty(window, 'ResizeObserver', {
   writable: true,
   value: class ResizeObserver {
@@ -12,7 +12,7 @@ Object.defineProperty(window, 'ResizeObserver', {
   },
 });
 
-// Minimal WebGL mock
+// Minimal WebGL mock (reduced memory footprint)
 Object.defineProperty(HTMLCanvasElement.prototype, 'getContext', {
   writable: true,
   value: () => ({
@@ -42,7 +42,7 @@ Object.defineProperty(window, 'performance', {
   },
 });
 
-// Simplified React Three Fiber mocks
+// CRITICAL: Simplified React Three Fiber mocks (reduced memory)
 vi.mock('@react-three/fiber', () => ({
   Canvas: vi.fn(({ children }) => React.createElement('div', { 'data-testid': 'three-canvas' }, children)),
   useFrame: vi.fn(),
@@ -50,7 +50,7 @@ vi.mock('@react-three/fiber', () => ({
   extend: vi.fn(),
 }));
 
-// Simplified Three.js mocks
+// CRITICAL: Simplified Three.js mocks (reduced memory)
 vi.mock('three', () => ({
   MeshStandardMaterial: vi.fn(() => ({ color: { set: vi.fn() } })),
   MeshBasicMaterial: vi.fn(() => ({ color: { set: vi.fn() } })),
@@ -61,7 +61,7 @@ vi.mock('three', () => ({
   })),
 }));
 
-// Simplified @react-three/drei mocks
+// CRITICAL: Simplified @react-three/drei mocks (reduced memory)
 vi.mock('@react-three/drei', () => ({
   OrbitControls: vi.fn(() => React.createElement('div', { 'data-testid': 'orbit-controls' })),
   Box: vi.fn((props) => React.createElement('div', { 'data-testid': 'drei-box', ...props })),
@@ -74,7 +74,7 @@ vi.mock('@react-three/drei', () => ({
   sphereGeometry: vi.fn(() => React.createElement('div', { 'data-testid': 'drei-sphere-geometry' })),
 }));
 
-// Minimal JSX declarations
+// Minimal JSX declarations (reduced memory)
 declare global {
   namespace JSX {
     interface IntrinsicElements {
@@ -92,17 +92,17 @@ declare global {
   }
 }
 
-// Memory-optimized test setup
+// CRITICAL: Memory-optimized test setup to prevent V8 crashes
 beforeEach(() => {
   vi.clearAllMocks();
   
-  // Limit animation frames to prevent memory buildup
+  // CRITICAL: Limit animation frames to prevent memory buildup
   if (typeof window !== 'undefined') {
     let frameCount = 0;
     const originalRAF = window.requestAnimationFrame;
     window.requestAnimationFrame = (callback) => {
       frameCount++;
-      if (frameCount > 25) { // Further reduced limit for tests
+      if (frameCount > 10) { // CRITICAL: Reduced limit to prevent memory issues
         return -1;
       }
       return originalRAF(callback);
@@ -113,14 +113,19 @@ beforeEach(() => {
   if (typeof global !== 'undefined') {
     (global as any).testData = undefined;
   }
+  
+  // CRITICAL: Force garbage collection if available
+  if (global.gc) {
+    global.gc();
+  }
 });
 
-// Aggressive memory cleanup
+// CRITICAL: Aggressive memory cleanup to prevent V8 crashes
 afterEach(() => {
   // Clear all mocks to free memory
   vi.clearAllMocks();
   
-  // Force cleanup if available
+  // CRITICAL: Force cleanup if available
   if (global.gc) {
     global.gc();
   }
@@ -135,6 +140,6 @@ afterEach(() => {
     (global as any).testData = undefined;
   }
   
-  // Small delay to allow garbage collection
-  return new Promise(resolve => setTimeout(resolve, 10));
+  // CRITICAL: Small delay to allow garbage collection
+  return new Promise(resolve => setTimeout(resolve, 5)); // Reduced delay
 });
