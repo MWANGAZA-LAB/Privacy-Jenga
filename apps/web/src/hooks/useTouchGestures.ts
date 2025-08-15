@@ -40,7 +40,7 @@ export const useTouchGestures = ({
     currentY: number;
     isPressed: boolean;
     initialDistance?: number;
-    longPressTimer?: NodeJS.Timeout;
+    longPressTimer?: ReturnType<typeof setTimeout>;
   } | null>(null);
 
   const calculateDistance = (touch1: Touch, touch2: Touch): number => {

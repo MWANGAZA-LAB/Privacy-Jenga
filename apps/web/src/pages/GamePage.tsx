@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { Brain, ChevronUp, ChevronDown, Dice1, Trophy, BookOpen, HelpCircle, BarChart3, ArrowLeft, Gamepad2, Menu, X } from 'lucide-react';
 // Import refactored components
 import { JengaTowerRefactored } from '../components/jenga/JengaTowerRefactored';
-import { PerformanceMonitor } from '../components/jenga/hooks/usePerformanceMonitoring.tsx';
+import { PerformanceMonitor } from '../components/jenga/PerformanceMonitor';
 import JengaTower from '../components/JengaTower'; // Fallback for comparison
 import ContentModal from '../components/ContentModal';
 import GameHelp from '../components/GameHelp';
@@ -109,6 +109,7 @@ const GamePage: React.FC = () => {
       console.log('🎯 Component mounted, initializing game...');
       initializeGame();
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []); // Empty dependency array - only run once
 
   // Debug: Log current game state for troubleshooting
@@ -270,7 +271,7 @@ const GamePage: React.FC = () => {
       console.error('💥 Error picking block:', error);
       alert('Error removing block. Please try again.');
     }
-  }, [gameState, isInteractive, gameService, handleTowerReset]);
+  }, [gameState, isInteractive, gameService, handleTowerRegeneration]);
 
   // Enhanced handleDiceRoll with animation and block mixing feedback
   const handleDiceRoll = useCallback(async () => {

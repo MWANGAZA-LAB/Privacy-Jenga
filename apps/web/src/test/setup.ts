@@ -126,18 +126,26 @@ declare global {
 }
 
 // Set up global JSX components for React Three Fiber
-(global as any).mesh = React.forwardRef((props: any, ref: any) => 
+const MeshComponent = React.forwardRef<HTMLDivElement, any>((props: any, ref: any) => 
   React.createElement('div', { 'data-testid': 'three-mesh', ref, ...props })
 );
-(global as any).boxGeometry = React.forwardRef((props: any, ref: any) => 
+MeshComponent.displayName = 'mesh';
+(global as any).mesh = MeshComponent;
+const BoxGeometryComponent = React.forwardRef<HTMLDivElement, any>((props: any, ref: any) => 
   React.createElement('div', { 'data-testid': 'three-box-geometry', ref, ...props })
 );
-(global as any).meshStandardMaterial = React.forwardRef((props: any, ref: any) => 
+BoxGeometryComponent.displayName = 'boxGeometry';
+(global as any).boxGeometry = BoxGeometryComponent;
+const MeshStandardMaterialComponent = React.forwardRef<HTMLDivElement, any>((props: any, ref: any) => 
   React.createElement('div', { 'data-testid': 'three-mesh-standard-material', ref, ...props })
 );
-(global as any).meshBasicMaterial = React.forwardRef((props: any, ref: any) => 
+MeshStandardMaterialComponent.displayName = 'meshStandardMaterial';
+(global as any).meshStandardMaterial = MeshStandardMaterialComponent;
+const MeshBasicMaterialComponent = React.forwardRef<HTMLDivElement, any>((props: any, ref: any) => 
   React.createElement('div', { 'data-testid': 'three-mesh-basic-material', ref, ...props })
 );
+MeshBasicMaterialComponent.displayName = 'meshBasicMaterial';
+(global as any).meshBasicMaterial = MeshBasicMaterialComponent;
 
 // Mock @react-three/drei components
 vi.mock('@react-three/drei', () => ({

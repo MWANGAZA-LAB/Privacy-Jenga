@@ -429,7 +429,7 @@ class MockGameService {
 
     console.log('🧠 Quiz answered:', {
       isCorrect,
-      stabilityChange: stabilityChange,
+      stabilityChange,
       previousStability,
       newStability: this.gameState.towerStability,
       correctAnswers: this.gameState.correctAnswers,
@@ -446,7 +446,7 @@ class MockGameService {
       isCorrect,
       selectedAnswer,
       correctAnswer: block.content.quiz.correctIndex,
-      stabilityChange: stabilityChange,
+      stabilityChange,
       pointsAwarded,
       explanation: block.content.quiz.explanation
     };
@@ -483,7 +483,7 @@ class MockGameService {
     if (totalAnswers >= 10 && correctPercentage < 30) {
       this.gameState.gamePhase = 'collapsed';
       this.gameState.isGameComplete = true;
-      console.log('💥 Tower collapsed due to poor accuracy! Rate:', correctPercentage.toFixed(1) + '%');
+      console.log(`💥 Tower collapsed due to poor accuracy! Rate: ${correctPercentage.toFixed(1)}%`);
       return;
     }
 
@@ -495,7 +495,7 @@ class MockGameService {
     if (answeredBlocks >= allBlocks && correctPercentage >= 70) {
       this.gameState.gamePhase = 'complete';
       this.gameState.isGameComplete = true;
-      console.log('🎉 Knowledge mastery achieved! Accuracy:', correctPercentage.toFixed(1) + '%');
+      console.log(`🎉 Knowledge mastery achieved! Accuracy: ${correctPercentage.toFixed(1)}%`);
       return;
     }
     
@@ -503,7 +503,7 @@ class MockGameService {
     if (correctPercentage >= 90 && this.gameState.towerStability >= 80 && answeredBlocks >= 30) {
       this.gameState.gamePhase = 'complete';
       this.gameState.isGameComplete = true;
-      console.log('🏆 Efficiency expert victory! Accuracy:', correctPercentage.toFixed(1) + '%, Stability:', this.gameState.towerStability + '%');
+      console.log(`🏆 Efficiency expert victory! Accuracy: ${correctPercentage.toFixed(1)}%, Stability: ${this.gameState.towerStability}%`);
       return;
     }
 
@@ -564,10 +564,10 @@ class MockGameService {
     this.gameState.currentPlayer.incorrectAnswers = 0;
 
     console.log('🎮 Tower regenerated:', {
-      scoreRetained: Math.round(scoreRetention * 100) + '%',
+      scoreRetained: `${Math.round(scoreRetention * 100)}%`,
       newScore: this.gameState.currentScore,
       gamesPlayed: this.gameState.currentPlayer.gamesPlayed,
-      accuracy: accuracy.toFixed(1) + '%'
+      accuracy: `${accuracy.toFixed(1)}%`
     });
   }
 

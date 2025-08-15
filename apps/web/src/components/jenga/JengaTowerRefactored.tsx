@@ -42,7 +42,7 @@ export const JengaTowerRefactored: React.FC<JengaTowerProps> = ({
       const timer = setTimeout(() => setTowerShake(false), 500);
       return () => clearTimeout(timer);
     }
-  }, [gameState?.blocksRemoved]);
+  }, [gameState]);
   
   const {
     selectedBlockId,

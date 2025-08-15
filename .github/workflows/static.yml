@@ -35,15 +35,26 @@ jobs:
       - name: Install dependencies
         run: |
           cd apps/web
-          npm ci --only=production=false
+          npm ci
           
-      - name: Run build checks
+      - name: Run quality checks
         run: |
           cd apps/web
           # Verify all required dependencies are installed
           npm list --depth=0
+          
+      - name: Run tests
+        run: |
+          cd apps/web
+          npm run test:ci
+          
+      - name: Run linting and type checking
+        run: |
+          cd apps/web
+          # Run linting to catch code quality issues
+          npm run lint
           # Run type checking before build
-          npm run type-check || echo "⚠️  Type check failed, continuing with build"
+          npm run type-check
           
       - name: Build with Vite
         run: |
@@ -51,6 +62,7 @@ jobs:
           npm run build:pages
         env:
           NODE_ENV: production
+          VITE_APP_TITLE: "Privacy Jenga"
           
       - name: List build output
         run: |

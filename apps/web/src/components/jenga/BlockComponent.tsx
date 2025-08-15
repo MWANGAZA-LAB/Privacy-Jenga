@@ -31,14 +31,13 @@ export const BlockComponent: React.FC<BlockComponentProps> = React.memo(({
   const [isHovered, setIsHovered] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
 
-  // BULLETPROOF color system - ZERO WHITE tolerance 
-  const BLOCK_COLORS: Record<string, number> = {
-    safe: 0x059669,      // Emerald-600 - Never white
-    risky: 0xdc2626,     // Red-600 - Never white  
-    challenge: 0xd97706, // Amber-600 - Never white
-  };
-
   const getBlockColor = useCallback((block: Block): number => {
+    // BULLETPROOF color system - ZERO WHITE tolerance 
+    const BLOCK_COLORS: Record<string, number> = {
+      safe: 0x059669,      // Emerald-600 - Never white
+      risky: 0xdc2626,     // Red-600 - Never white  
+      challenge: 0xd97706, // Amber-600 - Never white
+    };
     if (block.removed) return 0x374151; // Gray-700 for removed blocks
 
     // CRITICAL: Validate block type exists and is valid
@@ -56,7 +55,7 @@ export const BlockComponent: React.FC<BlockComponentProps> = React.memo(({
     }
 
     return color;
-  }, [BLOCK_COLORS]);
+  }, []);
 
   const getBlockOpacity = useCallback((block: Block): number => {
     if (block.removed) return 0.3;
@@ -246,7 +245,7 @@ export const BlockComponent: React.FC<BlockComponentProps> = React.memo(({
       scale={getBlockScale()}
       castShadow
       receiveShadow
-      // CRITICAL: Ensure ray casting detection works properly
+      // eslint-disable-next-line react/no-unknown-property
       userData={{ blockId: block.id, clickable: canPullFromLayer }}
     >
       <boxGeometry args={[1, 0.3, 3]} />
@@ -256,6 +255,7 @@ export const BlockComponent: React.FC<BlockComponentProps> = React.memo(({
         opacity={getBlockOpacity(block)}
         metalness={0.1}
         roughness={0.8}
+        // eslint-disable-next-line react/no-unknown-property
         toneMapped={false}
       />
       

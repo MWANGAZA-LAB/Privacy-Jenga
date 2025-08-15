@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 
 interface OfflineStorage {
   saveGameState: (gameState: any) => Promise<void>;
@@ -206,15 +206,8 @@ export const useOfflineStorage = (): OfflineStorage => {
     };
   }, []);
 
-  // Sync analytics when online
-  useEffect(() => {
-    if (isOnline) {
-      syncPendingAnalytics();
-    }
-  }, [isOnline]);
-
   // Sync pending analytics data
-  const syncPendingAnalytics = async (): Promise<void> => {
+  const syncPendingAnalytics = useCallback(async (): Promise<void> => {
     try {
       const db = await initDB();
       const transaction = db.transaction(['analytics'], 'readwrite');
@@ -245,7 +238,14 @@ export const useOfflineStorage = (): OfflineStorage => {
     } catch (error) {
       console.error('Error syncing analytics:', error);
     }
-  };
+  }, []);
+
+  // Sync analytics when online
+  useEffect(() => {
+    if (isOnline) {
+      syncPendingAnalytics();
+    }
+  }, [isOnline, syncPendingAnalytics]);
 
   return {
     saveGameState,
