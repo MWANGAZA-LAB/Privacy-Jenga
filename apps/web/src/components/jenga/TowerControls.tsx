@@ -4,7 +4,6 @@ import { GameState } from '../../types';
 
 interface TowerControlsProps {
   gameState: GameState | null;
-  towerStability: number;
   maxAllowedLayer: number;
   onToggleHelp: () => void;
   onToggleGameInfo: () => void;
@@ -14,7 +13,6 @@ interface TowerControlsProps {
 
 export const TowerControls: React.FC<TowerControlsProps> = ({
   gameState,
-  towerStability,
   maxAllowedLayer,
   onToggleHelp,
   onToggleGameInfo,
@@ -25,19 +23,7 @@ export const TowerControls: React.FC<TowerControlsProps> = ({
 
   if (!gameState) return null;
 
-  const getStabilityColor = (stability: number) => {
-    if (stability > 70) return 'text-green-400';
-    if (stability > 40) return 'text-yellow-400';
-    return 'text-red-400';
-  };
-
-  const getStabilityLabel = (stability: number) => {
-    if (stability > 80) return 'Excellent';
-    if (stability > 60) return 'Good';
-    if (stability > 40) return 'Caution';
-    if (stability > 20) return 'Danger';
-    return 'Critical';
-  };
+  // REMOVED: Unused stability functions since we removed the stability display
 
   const getLayerDescription = (maxLayer: number) => {
     if (maxLayer <= 3) return '1-3 (Safe Zone)';
@@ -65,28 +51,6 @@ export const TowerControls: React.FC<TowerControlsProps> = ({
       {isVisible && (
         <div className="bg-black/80 backdrop-blur-sm rounded-lg p-4 border border-gray-600/50 space-y-3 min-w-64">
           
-          {/* Tower Stability */}
-          <div className="text-center p-3 bg-gray-800/60 rounded-lg border border-gray-600/30">
-            <div className="text-gray-300 text-sm font-semibold mb-1">Tower Stability</div>
-            <div className={`text-2xl font-bold ${getStabilityColor(towerStability)}`}>
-              {Math.round(towerStability)}%
-            </div>
-            <div className="text-gray-400 text-xs mt-1">
-              {getStabilityLabel(towerStability)}
-            </div>
-            
-            {/* Stability Bar */}
-            <div className="w-full bg-gray-700 rounded-full h-2 mt-2">
-              <div 
-                className={`h-2 rounded-full transition-all duration-300 ${
-                  towerStability > 70 ? 'bg-green-500' :
-                  towerStability > 40 ? 'bg-yellow-500' : 'bg-red-500'
-                }`}
-                style={{ width: `${Math.max(0, towerStability)}%` }}
-              />
-            </div>
-          </div>
-
           {/* Game Information Toggle */}
           <button
             onClick={onToggleGameInfo}
@@ -138,10 +102,6 @@ export const TowerControls: React.FC<TowerControlsProps> = ({
                 <div className="text-center p-2 bg-blue-500/10 border border-blue-400/30 rounded">
                   <div className="text-blue-300 font-semibold">Score</div>
                   <div className="text-white text-lg">{gameState.currentScore}</div>
-                </div>
-                <div className="text-center p-2 bg-purple-500/10 border border-purple-400/30 rounded">
-                  <div className="text-purple-300 font-semibold">Blocks</div>
-                  <div className="text-white text-lg">{gameState.blocksRemoved}/54</div>
                 </div>
               </div>
             </div>

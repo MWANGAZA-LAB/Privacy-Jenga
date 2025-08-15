@@ -172,7 +172,6 @@ export const JengaTowerRefactored: React.FC<JengaTowerProps> = ({
       {/* Tower Controls UI */}
       <TowerControls
         gameState={gameState}
-        towerStability={stability}
         maxAllowedLayer={maxAllowedLayer}
         onToggleHelp={toggleHelp}
         onToggleGameInfo={toggleGameInfo}

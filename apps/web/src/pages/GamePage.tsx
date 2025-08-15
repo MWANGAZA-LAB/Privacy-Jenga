@@ -897,14 +897,6 @@ const GamePage: React.FC = () => {
                   <span className="text-gray-400">Mode:</span>
                   <span className="text-teal-400 font-semibold">Learning</span>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-400">Blocks:</span>
-                  <span className="text-blue-400 font-semibold">{gameState?.blocksRemoved}/54</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-400">Layers:</span>
-                  <span className="text-yellow-400 font-semibold">{gameState?.towerHeight}/18</span>
-                </div>
               </div>
               
               {/* Category Progress (Compact) */}
