@@ -14,14 +14,11 @@ export default defineConfig({
         singleFork: true,
         maxForks: 1,
         minForks: 1,
-        // Memory limits for worker processes
-        memoryLimit: '512MB',
         // Prevent worker crashes
         isolate: false,
-        // Reduce memory pressure
+        // Reduce memory pressure (CI-compatible)
         execArgv: [
           '--max-old-space-size=512',
-          '--expose-gc',
           '--optimize-for-size',
           '--gc-interval=100'
         ]
@@ -54,17 +51,17 @@ export default defineConfig({
     },
     // Reporter settings
     reporters: ['verbose'],
-    // Environment variables
+    // Environment variables (CI-compatible)
     env: {
       NODE_ENV: 'test',
-      // Reduce memory usage
-      NODE_OPTIONS: '--max-old-space-size=512 --expose-gc'
+      // CI-compatible memory options (no --expose-gc)
+      NODE_OPTIONS: '--max-old-space-size=512'
     },
     // Prevent test file caching issues
     cache: false,
     // Reduce transform overhead
-    transformMode: {
-      web: [/\.[jt]sx?$/]
+    testTransformMode: {
+      web: ['.*\\.(js|ts|jsx|tsx)$']
     }
   },
   // Vite configuration for tests

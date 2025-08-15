@@ -411,6 +411,9 @@ class MockGameService {
       this.gameState.currentPlayer.totalBlocksRemoved++;
     }
 
+    // CRITICAL: Update layer accessibility after block removal
+    this.updateLayerAccessibility();
+
     return {
       blockId,
       playerId: this.gameState?.currentPlayer.nickname || 'Player',
@@ -486,6 +489,14 @@ class MockGameService {
     this.gameState.currentScore += pointsAwarded;
     this.gameState.currentPlayer.score += pointsAwarded;
 
+    // CRITICAL: Mark the quiz block as removed after answering
+    block.removed = true;
+    this.gameState.blocksRemoved++;
+    this.gameState.currentPlayer.totalBlocksRemoved++;
+
+    // CRITICAL: Update layer accessibility after block removal
+    this.updateLayerAccessibility();
+
     console.log('🧠 Quiz answered:', {
       isCorrect,
       stabilityChange,
@@ -494,7 +505,9 @@ class MockGameService {
       correctAnswers: this.gameState.correctAnswers,
       incorrectAnswers: this.gameState.incorrectAnswers,
       consecutiveCorrect: this.gameState.consecutiveCorrectAnswers,
-      consecutiveIncorrect: this.gameState.consecutiveIncorrectAnswers
+      consecutiveIncorrect: this.gameState.consecutiveIncorrectAnswers,
+      blocksRemoved: this.gameState.blocksRemoved,
+      accessibleLayers: this.gameState.canPullFromLayers
     });
 
     // 🏗️ CHECK GAME OVER CONDITIONS
@@ -511,6 +524,33 @@ class MockGameService {
     };
 
     return quizResult;
+  }
+
+  // CRITICAL: New method to update layer accessibility after block removal
+  private updateLayerAccessibility() {
+    if (!this.gameState || !this.gameState.canPullFromLayers) return;
+
+    // Check which layers still have accessible blocks
+    const updatedAccessibleLayers = this.gameState.canPullFromLayers.filter(layer => {
+      const blocksInLayer = this.blocks.filter(b => b.layer === layer && !b.removed);
+      return blocksInLayer.length > 0;
+    });
+
+    // Update the accessible layers
+    this.gameState.canPullFromLayers = updatedAccessibleLayers;
+
+    // If no layers are accessible, reset dice result
+    if (updatedAccessibleLayers.length === 0) {
+      this.gameState.diceResult = 0;
+      this.gameState.gamePhase = 'rolling';
+      console.log('🔄 No accessible layers remaining, dice roll re-enabled');
+    }
+
+    console.log('🔧 Layer accessibility updated:', {
+      previousLayers: this.gameState.canPullFromLayers,
+      updatedLayers: updatedAccessibleLayers,
+      diceResult: this.gameState.diceResult
+    });
   }
 
   // 🎯 ENHANCED: Sophisticated game over detection with multiple collapse triggers

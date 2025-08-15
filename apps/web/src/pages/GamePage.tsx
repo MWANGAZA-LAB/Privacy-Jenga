@@ -324,14 +324,26 @@ const GamePage: React.FC = () => {
       if (updatedGameState && updatedGameState.blocksRemoved > 0) {
         // Check if we should reset dice result to allow new roll
         const remainingBlocksInLayers = updatedBlocks.filter(b => 
-          !b.removed && updatedGameState.canPullFromLayers.includes(b.layer)
+          !b.removed && updatedGameState.canPullFromLayers?.includes(b.layer)
         );
         
         if (remainingBlocksInLayers.length === 0) {
           // All accessible blocks removed, reset dice to allow new roll
-          const resetState = { ...updatedGameState, diceResult: 0, canPullFromLayers: [] };
-          setGameState(resetState);
+          setGameState(prevState => {
+            if (!prevState) return prevState;
+            return {
+              ...prevState,
+              diceResult: 0,
+              canPullFromLayers: [],
+              gamePhase: 'rolling' as const
+            };
+          });
           console.log('✅ All accessible blocks removed, dice roll re-enabled');
+          
+          // Show feedback to user
+          setTimeout(() => {
+            alert('All accessible blocks in this layer have been explored! Roll the dice again to unlock new layers.');
+          }, 500);
         }
       }
       
