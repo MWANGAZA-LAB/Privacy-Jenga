@@ -16,6 +16,9 @@
     "test:watch": "vitest --watch",
     "test:coverage": "vitest --coverage",
     "test:e2e": "vitest run src/__tests__/e2e",
+    "test:memory": "vitest run --pool=forks --poolOptions.forks.singleFork=true --maxConcurrency=1 --poolOptions.forks.maxForks=1 --poolOptions.forks.minForks=1 --isolate=false",
+    "test:fast": "vitest run --pool=forks --poolOptions.forks.singleFork=true --maxConcurrency=1",
+    "test:optimized": "vitest run --pool=forks --poolOptions.forks.singleFork=true --maxConcurrency=1 --poolOptions.forks.maxForks=1 --poolOptions.forks.minForks=1 --isolate=false",
     "type-check": "tsc --noEmit"
   },
   "dependencies": {

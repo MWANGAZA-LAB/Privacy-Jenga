@@ -2,7 +2,7 @@ import '@testing-library/jest-dom';
 import { beforeEach, afterEach, vi } from 'vitest';
 import React from 'react';
 
-// Mock Three.js for testing
+// Simplified mocks to reduce memory usage
 Object.defineProperty(window, 'ResizeObserver', {
   writable: true,
   value: class ResizeObserver {
@@ -12,108 +12,69 @@ Object.defineProperty(window, 'ResizeObserver', {
   },
 });
 
-// Mock WebGL context
+// Minimal WebGL mock
 Object.defineProperty(HTMLCanvasElement.prototype, 'getContext', {
   writable: true,
-  value: (contextType: string) => {
-    if (contextType === 'webgl' || contextType === 'webgl2') {
-      return {
-        // Mock WebGL context
-        createShader: () => ({}),
-        shaderSource: () => {},
-        compileShader: () => {},
-        createProgram: () => ({}),
-        attachShader: () => {},
-        linkProgram: () => {},
-        useProgram: () => {},
-        createBuffer: () => ({}),
-        bindBuffer: () => {},
-        bufferData: () => {},
-        enableVertexAttribArray: () => {},
-        vertexAttribPointer: () => {},
-        drawArrays: () => {},
-        drawElements: () => {},
-        getExtension: () => null,
-        getParameter: () => 4096,
-        viewport: () => {},
-        clear: () => {},
-        clearColor: () => {},
-      };
-    }
-    return null;
-  },
-});
-
-// Mock matchMedia
-Object.defineProperty(window, 'matchMedia', {
-  writable: true,
-  value: (query: string) => ({
-    matches: false,
-    media: query,
-    onchange: null,
-    addListener: () => {},
-    removeListener: () => {},
-    addEventListener: () => {},
-    removeEventListener: () => {},
-    dispatchEvent: () => {},
+  value: () => ({
+    createShader: () => ({}),
+    createProgram: () => ({}),
+    createBuffer: () => ({}),
+    getParameter: () => 4096,
   }),
 });
 
-// Mock performance API
+// Minimal matchMedia mock
+Object.defineProperty(window, 'matchMedia', {
+  writable: true,
+  value: () => ({
+    matches: false,
+    addListener: () => {},
+    removeListener: () => {},
+  }),
+});
+
+// Minimal performance mock
 Object.defineProperty(window, 'performance', {
   writable: true,
   value: {
     now: () => Date.now(),
-    mark: () => {},
-    measure: () => {},
-    getEntriesByType: () => [],
-    memory: {
-      usedJSHeapSize: 1000000,
-      totalJSHeapSize: 2000000,
-      jsHeapSizeLimit: 4000000,
-    },
+    memory: { usedJSHeapSize: 1000000, totalJSHeapSize: 2000000, jsHeapSizeLimit: 4000000 },
   },
 });
 
-// Mock @react-three/fiber Canvas component
+// Simplified React Three Fiber mocks
 vi.mock('@react-three/fiber', () => ({
-  Canvas: vi.fn().mockImplementation(({ children }) => {
-    return React.createElement('div', { 'data-testid': 'three-canvas' }, children);
-  }),
+  Canvas: vi.fn(({ children }) => React.createElement('div', { 'data-testid': 'three-canvas' }, children)),
   useFrame: vi.fn(),
-  useThree: vi.fn(() => ({
-    scene: {},
-    camera: {},
-    gl: {}
-  })),
-  extend: vi.fn((objects) => {
-    // Mock the extend function that makes Three.js objects available as JSX
-    Object.assign(global, objects);
-  }),
+  useThree: vi.fn(() => ({ scene: {}, camera: {}, gl: {} })),
+  extend: vi.fn(),
 }));
 
-// Mock Three.js components for React Three Fiber  
+// Simplified Three.js mocks
 vi.mock('three', () => ({
-  MeshStandardMaterial: vi.fn().mockImplementation(() => ({
-    color: { set: vi.fn() },
-    transparent: false,
-    opacity: 1,
-  })),
-  MeshBasicMaterial: vi.fn().mockImplementation(() => ({
-    color: { set: vi.fn() },
-    transparent: false,
-    opacity: 1,
-  })),
-  BoxGeometry: vi.fn().mockImplementation(() => ({})),
-  Mesh: vi.fn().mockImplementation(() => ({
-    position: { x: 0, y: 0, z: 0, set: vi.fn(), setScalar: vi.fn() },
-    rotation: { x: 0, y: 0, z: 0 },
-    scale: { x: 1, y: 1, z: 1, setScalar: vi.fn() },
-    material: {},
+  MeshStandardMaterial: vi.fn(() => ({ color: { set: vi.fn() } })),
+  MeshBasicMaterial: vi.fn(() => ({ color: { set: vi.fn() } })),
+  BoxGeometry: vi.fn(() => ({})),
+  Mesh: vi.fn(() => ({
+    position: { set: vi.fn(), setScalar: vi.fn() },
+    scale: { setScalar: vi.fn() },
   })),
 }));
 
-// Add JSX component mocks for React Three Fiber components
+// Simplified @react-three/drei mocks
+vi.mock('@react-three/drei', () => ({
+  OrbitControls: vi.fn(() => React.createElement('div', { 'data-testid': 'orbit-controls' })),
+  Box: vi.fn((props) => React.createElement('div', { 'data-testid': 'drei-box', ...props })),
+  Text: vi.fn((props) => React.createElement('div', { 'data-testid': 'drei-text', ...props }, props.children)),
+  ambientLight: vi.fn(() => React.createElement('div', { 'data-testid': 'drei-ambient-light' })),
+  directionalLight: vi.fn(() => React.createElement('div', { 'data-testid': 'drei-directional-light' })),
+  pointLight: vi.fn(() => React.createElement('div', { 'data-testid': 'drei-point-light' })),
+  planeGeometry: vi.fn(() => React.createElement('div', { 'data-testid': 'drei-plane-geometry' })),
+  ringGeometry: vi.fn(() => React.createElement('div', { 'data-testid': 'drei-ring-geometry' })),
+  sphereGeometry: vi.fn(() => React.createElement('div', { 'data-testid': 'drei-sphere-geometry' })),
+}));
+
+// Minimal JSX declarations
 declare global {
   namespace JSX {
     interface IntrinsicElements {
@@ -131,65 +92,49 @@ declare global {
   }
 }
 
-// Set up global JSX components for React Three Fiber
-const MeshComponent = React.forwardRef<HTMLDivElement, any>((props: any, ref: any) => 
-  React.createElement('div', { 'data-testid': 'three-mesh', ref, ...props })
-);
-MeshComponent.displayName = 'mesh';
-(global as any).mesh = MeshComponent;
-const BoxGeometryComponent = React.forwardRef<HTMLDivElement, any>((props: any, ref: any) => 
-  React.createElement('div', { 'data-testid': 'three-box-geometry', ref, ...props })
-);
-BoxGeometryComponent.displayName = 'boxGeometry';
-(global as any).boxGeometry = BoxGeometryComponent;
-const MeshStandardMaterialComponent = React.forwardRef<HTMLDivElement, any>((props: any, ref: any) => 
-  React.createElement('div', { 'data-testid': 'three-mesh-standard-material', ref, ...props })
-);
-MeshStandardMaterialComponent.displayName = 'meshStandardMaterial';
-(global as any).meshStandardMaterial = MeshStandardMaterialComponent;
-const MeshBasicMaterialComponent = React.forwardRef<HTMLDivElement, any>((props: any, ref: any) => 
-  React.createElement('div', { 'data-testid': 'three-mesh-basic-material', ref, ...props })
-);
-MeshBasicMaterialComponent.displayName = 'meshBasicMaterial';
-(global as any).meshBasicMaterial = MeshBasicMaterialComponent;
-
-// Mock @react-three/drei components
-vi.mock('@react-three/drei', () => ({
-  OrbitControls: vi.fn(() => React.createElement('div', { 'data-testid': 'orbit-controls' })),
-  Box: vi.fn((props) => React.createElement('div', { 'data-testid': 'drei-box', ...props })),
-  Text: vi.fn((props) => React.createElement('div', { 'data-testid': 'drei-text', ...props }, props.children)),
-  // Add missing components that are used in tests
-  ambientLight: vi.fn(() => React.createElement('div', { 'data-testid': 'drei-ambient-light' })),
-  directionalLight: vi.fn(() => React.createElement('div', { 'data-testid': 'drei-directional-light' })),
-  pointLight: vi.fn(() => React.createElement('div', { 'data-testid': 'drei-point-light' })),
-  planeGeometry: vi.fn(() => React.createElement('div', { 'data-testid': 'drei-plane-geometry' })),
-  ringGeometry: vi.fn(() => React.createElement('div', { 'data-testid': 'drei-ring-geometry' })),
-  sphereGeometry: vi.fn(() => React.createElement('div', { 'data-testid': 'drei-sphere-geometry' })),
-}));
-
-// Global test setup
+// Memory-optimized test setup
 beforeEach(() => {
-  // Clear any mocks before each test
   vi.clearAllMocks();
   
-  // Prevent memory leaks by limiting animation frames
+  // Limit animation frames to prevent memory buildup
   if (typeof window !== 'undefined') {
     let frameCount = 0;
     const originalRAF = window.requestAnimationFrame;
     window.requestAnimationFrame = (callback) => {
       frameCount++;
-      if (frameCount > 100) { // Limit animation frames in tests
+      if (frameCount > 25) { // Further reduced limit for tests
         return -1;
       }
       return originalRAF(callback);
     };
   }
+  
+  // Clear any stored test data
+  if (typeof global !== 'undefined') {
+    (global as any).testData = undefined;
+  }
 });
 
-// Add memory management for test environment
+// Aggressive memory cleanup
 afterEach(() => {
-  // Force garbage collection if available (in Node.js with --expose-gc)
+  // Clear all mocks to free memory
+  vi.clearAllMocks();
+  
+  // Force cleanup if available
   if (global.gc) {
     global.gc();
   }
+  
+  // Clear any stored references
+  if (typeof window !== 'undefined') {
+    window.requestAnimationFrame = window.requestAnimationFrame;
+  }
+  
+  // Clear test data
+  if (typeof global !== 'undefined') {
+    (global as any).testData = undefined;
+  }
+  
+  // Small delay to allow garbage collection
+  return new Promise(resolve => setTimeout(resolve, 10));
 });
