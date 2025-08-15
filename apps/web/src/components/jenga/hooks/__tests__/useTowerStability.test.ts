@@ -114,11 +114,11 @@ describe('useTowerStability', () => {
     const { result } = renderHook(() =>
       useTowerStability({
         blocks: mockBlocks.filter(b => !b.removed), // Only non-removed blocks
-        gameState: { ...mockGameState, blocksRemoved: 0 }
+        gameState: { ...mockGameState, blocksRemoved: 0 } // Start with 0 removed blocks for 100% stability
       })
     );
 
-    expect(result.current.stability).toBeGreaterThan(80);
+    expect(result.current.stability).toBe(100); // Fresh tower should be 100%
     expect(result.current.isStable).toBe(true);
     expect(result.current.criticalBlocks).toHaveLength(0);
   });
@@ -157,32 +157,32 @@ describe('useTowerStability', () => {
       {
         initialProps: {
           blocks: mockBlocks,
-          gameState: mockGameState,
+          gameState: { ...mockGameState, blocksRemoved: 0 }, // Start with 0 removed
         },
       }
     );
 
-    const initialStability = result.current.stability;
+    const initialStability = result.current.stability; // Should be 100
 
     // Add more removed blocks
     rerender({
       blocks: mockBlocks,
-      gameState: { ...mockGameState, blocksRemoved: 5 },
+      gameState: { ...mockGameState, blocksRemoved: 5 }, // Now 5 removed blocks
     });
 
-    expect(result.current.stability).toBeLessThan(initialStability);
+    expect(result.current.stability).toBeLessThan(initialStability); // Should be less than 100
   });
 
   it('handles empty blocks array', () => {
     const { result } = renderHook(() =>
       useTowerStability({
         blocks: [],
-        gameState: mockGameState
+        gameState: { ...mockGameState, blocksRemoved: 0 } // No removed blocks
       })
     );
 
-    expect(result.current.stability).toBeDefined();
-    expect(result.current.isStable).toBeDefined();
+    expect(result.current.stability).toBe(100); // Empty blocks should return 100% stability
+    expect(result.current.isStable).toBe(true);
     expect(result.current.criticalBlocks).toEqual([]);
   });
 

@@ -142,83 +142,94 @@ export const BlockComponent: React.FC<BlockComponentProps> = React.memo(({
     return 1;
   }, [isSelected, isHovered, isRemovable, canPullFromLayer]);
 
-  const handleBlockClick = useCallback((event: any) => {
-    // CRITICAL: Stop event propagation to prevent conflicts
-    event.stopPropagation();
+  const handleBlockClick = useCallback((e: THREE.Event) => {
+    e.stopPropagation();
     
-    console.log(`🎯 BLOCK CLICK DEBUG:`, {
-      blockId: block.id,
-      blockType: block.type,
-      canPullFromLayer,
-      isAnimating,
-      blockRemoved: block.removed,
-      timestamp: new Date().toISOString()
-    });
-
-    if (!canPullFromLayer || isAnimating || block.removed) {
-      console.log(`❌ Block click blocked:`, {
+    // CRITICAL: Add error boundary to prevent crashes
+    try {
+      console.log(`🎯 Block ${block.id} clicked:`, {
+        blockId: block.id,
+        blockType: block.type,
         canPullFromLayer,
-        isAnimating, 
-        blockRemoved: block.removed
+        isAnimating,
+        blockRemoved: block.removed,
+        timestamp: new Date().toISOString()
       });
-      return;
-    }
-    
-    setIsAnimating(true);
-    
-    // IMMEDIATE TACTILE FEEDBACK - Visual response before onClick
-    if (meshRef.current && meshRef.current.material) {
-      // Instant scale feedback with spring animation
-      meshRef.current.scale.setScalar(1.2);
+
+      if (!canPullFromLayer || isAnimating || block.removed) {
+        console.log(`❌ Block click blocked:`, {
+          canPullFromLayer,
+          isAnimating, 
+          blockRemoved: block.removed
+        });
+        return;
+      }
       
-      // Enhanced color flash feedback with better visibility and safety checks
-      const material = meshRef.current.material as THREE.MeshStandardMaterial;
-      const originalColor = material.color.clone();
+      setIsAnimating(true);
       
-      // Safety check: Only flash if material and color are valid
-      if (material && originalColor && originalColor.getHex() !== 0x000000) {
-        material.color.setHex(0x00ff88); // Bright green flash for positive feedback
+      // IMMEDIATE TACTILE FEEDBACK - Visual response before onClick
+      if (meshRef.current && meshRef.current.material) {
+        // Instant scale feedback with spring animation
+        meshRef.current.scale.setScalar(1.2);
         
-        // Enhanced color restoration with safety checks
-        setTimeout(() => {
-          if (meshRef.current && meshRef.current.material && material) {
-            material.color.copy(originalColor);
-            // Force material update to prevent color corruption
-            material.needsUpdate = true;
+        // Enhanced color flash feedback with better visibility and safety checks
+        const material = meshRef.current.material as THREE.MeshStandardMaterial;
+        const originalColor = material.color.clone();
+        
+        // Safety check: Only flash if material and color are valid
+        if (material && originalColor && originalColor.getHex() !== 0x000000) {
+          material.color.setHex(0x00ff88); // Bright green flash for positive feedback
+          
+          // Enhanced color restoration with safety checks
+          setTimeout(() => {
+            if (meshRef.current && meshRef.current.material && material) {
+              material.color.copy(originalColor);
+              // Force material update to prevent color corruption
+              material.needsUpdate = true;
+            }
+          }, 200); // Extended flash duration for better feedback
+        }
+        
+        // Haptic-style bounce animation
+        const bounceAnimation = () => {
+          if (meshRef.current) {
+            meshRef.current.position.y += 0.1; // Quick bounce up
+            setTimeout(() => {
+              if (meshRef.current) {
+                meshRef.current.position.y = worldPosition[1]; // Return to position
+                meshRef.current.scale.setScalar(1.0); // Return to normal scale
+              }
+            }, 100);
           }
-        }, 200); // Extended flash duration for better feedback
+        };
+        bounceAnimation();
+        setTimeout(() => {
+          if (meshRef.current?.material) {
+            (meshRef.current.material as THREE.MeshStandardMaterial).color.copy(originalColor);
+          }
+        }, 100);
       }
       
-      // Haptic-style bounce animation
-      const bounceAnimation = () => {
-        if (meshRef.current) {
-          meshRef.current.position.y += 0.1; // Quick bounce up
-          setTimeout(() => {
-            if (meshRef.current) {
-              meshRef.current.position.y = worldPosition[1]; // Return to position
-              meshRef.current.scale.setScalar(1.0); // Return to normal scale
-            }
-          }, 100);
-        }
-      };
-      bounceAnimation();
-      setTimeout(() => {
-        if (meshRef.current?.material) {
-          (meshRef.current.material as THREE.MeshStandardMaterial).color.copy(originalColor);
-        }
-      }, 100);
-    }
-    
-    // Call parent onClick handler
-    onClick();
-    
-    // Reset animation state with longer duration for better feedback
-    setTimeout(() => {
-      setIsAnimating(false);
-      if (meshRef.current) {
-        meshRef.current.scale.setScalar(1);
+      // CRITICAL: Wrap onClick in error boundary
+      try {
+        onClick();
+      } catch (error) {
+        console.error('🚨 CRITICAL: Error in block onClick handler:', error);
+        // Don't crash the component, just log the error
       }
-    }, 800);
+      
+      // Reset animation state with longer duration for better feedback
+      setTimeout(() => {
+        setIsAnimating(false);
+        if (meshRef.current) {
+          meshRef.current.scale.setScalar(1);
+        }
+      }, 800);
+    } catch (error) {
+      console.error('🚨 CRITICAL: Error in handleBlockClick:', error);
+      // Reset animation state to prevent UI lock
+      setIsAnimating(false);
+    }
   }, [canPullFromLayer, isAnimating, onClick, block.removed, block.id, block.type, worldPosition]);
 
   // Don't render removed blocks or invalid blocks

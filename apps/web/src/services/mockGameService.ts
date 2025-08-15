@@ -532,7 +532,7 @@ class MockGameService {
     });
 
     // Mix blocks immediately for fresh start
-    this.mixBlockTypes();
+    // this.mixBlockTypes(); // REMOVED: No more block mixing
 
     // Reset game state but preserve learning progress
     const previousScore = this.gameState.currentScore;
@@ -575,8 +575,8 @@ class MockGameService {
     const diceRoll = Math.floor(Math.random() * 6) + 1;
     const availableLayers = this.getAvailableLayersFromDiceRoll(diceRoll);
     
-    // 🎲 ENHANCED: Mix block colors/types on every dice roll
-    this.mixBlockTypes();
+    // SIMPLIFIED: No more block mixing - just determine accessible layers
+    // Blocks keep their original types and colors throughout the game
     
     const availableBlocks = this.getAvailableBlocksAfterDiceRoll(availableLayers);
 
@@ -587,80 +587,40 @@ class MockGameService {
       this.gameState.gamePhase = 'selecting';
     }
 
-    console.log('🎲 Dice rolled - blocks mixed:', {
+    console.log('🎲 Dice rolled - layers unlocked:', {
       roll: diceRoll,
       availableLayers,
       availableBlocks: availableBlocks.length,
-      blockDistribution: this.getBlockTypeDistribution()
+      totalBlocks: this.blocks.filter(b => !b.removed).length
     });
 
     return {
       value: diceRoll,
       availableLayers,
       availableBlocks,
-      specialEffect: 'blocks_mixed'
+      specialEffect: 'layers_unlocked' // Changed from 'blocks_mixed'
     };
   }
 
-  // 🌈 NEW: Mix block types/colors dynamically on dice roll
-  private mixBlockTypes(): void {
-    console.log('🌈 Mixing block types for dynamic gameplay...');
-    
-    const blockTypes: ('safe' | 'risky' | 'challenge')[] = ['safe', 'risky', 'challenge'];
-    const nonRemovedBlocks = this.blocks.filter(b => !b.removed);
-    
-    // Shuffle block types among remaining blocks
-    nonRemovedBlocks.forEach(block => {
-      const randomType = blockTypes[Math.floor(Math.random() * blockTypes.length)];
-      block.type = randomType;
-      
-      // Update content category based on new type for consistency
-      if (randomType === 'safe') {
-        block.content.severity = 'tip';
-        block.content.impact = 'positive';
-      } else if (randomType === 'risky') {
-        block.content.severity = 'warning';
-        block.content.impact = 'negative';
-      } else if (randomType === 'challenge') {
-        block.content.severity = 'critical';
-        block.content.impact = 'neutral';
-        // Ensure challenge blocks have quizzes
-        if (!block.content.quiz) {
-          block.content.quiz = this.getQuizForBlock();
-        }
-      }
-    });
-  }
-
-  // 📊 Get current block type distribution for debugging
-  private getBlockTypeDistribution(): Record<string, number> {
-    const distribution = { safe: 0, risky: 0, challenge: 0 };
-    this.blocks.filter(b => !b.removed).forEach(block => {
-      distribution[block.type]++;
-    });
-    return distribution;
-  }
+  // REMOVED: The complex mixBlockTypes method that was causing corruption
+  // Blocks now maintain their original types throughout the game
 
   private getAvailableBlocksAfterDiceRoll(availableLayers: number[]): string[] {
-    // NEW: Mix up and randomize available blocks based on dice roll
+    // SIMPLIFIED: Just return blocks in accessible layers, no mixing
     const blocksInLayers = this.blocks.filter(block => 
       !block.removed && availableLayers.includes(block.layer)
     );
     
-    // Shuffle and return a subset of blocks for strategic gameplay
-    const shuffled = this.shuffleArray([...blocksInLayers]);
-    const maxBlocks = Math.min(6, shuffled.length); // Limit to 6 blocks per roll
-    
-    return shuffled.slice(0, maxBlocks).map(block => block.id);
+    // Return all accessible blocks (no artificial limiting)
+    return blocksInLayers.map(block => block.id);
   }
 
   private getAvailableLayersFromDiceRoll(diceRoll: number): number[] {
-    // Calculate available layers based on dice roll and tower state
-    const maxLayer = Math.max(...this.blocks.filter(b => !b.removed).map(b => b.layer));
+    // SIMPLIFIED: Only unlock the exact number of layers from dice roll
     const availableLayers: number[] = [];
     
-    // Lower layers are always available
-    for (let layer = 1; layer <= Math.min(diceRoll + 2, maxLayer); layer++) {
+    // Only unlock layers 1 through diceRoll (e.g., roll 4 = layers 1,2,3,4)
+    for (let layer = 1; layer <= diceRoll; layer++) {
       const layerHasBlocks = this.blocks.some(b => b.layer === layer && !b.removed);
       if (layerHasBlocks) {
         availableLayers.push(layer);
@@ -670,19 +630,33 @@ class MockGameService {
     return availableLayers;
   }
 
-  private shuffleArray<T>(array: T[]): T[] {
-    const shuffled = [...array];
-    for (let i = shuffled.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  async resetGame(): Promise<GameState> {
+    console.log('🔄 Resetting game to fresh state...');
+    
+    // Reset all blocks to original state (no mixing)
+    this.blocks.forEach(block => {
+      block.removed = false;
+      // Keep original block type and content - no corruption
+    });
+    
+    // Reset game state but preserve learning progress
+    if (this.gameState) {
+      this.gameState.blocksRemoved = 0;
+      this.gameState.currentScore = 0;
+      this.gameState.diceResult = 0;
+      this.gameState.canPullFromLayers = [];
+      this.gameState.availableBlocks = [];
+      this.gameState.gamePhase = 'rolling';
+      this.gameState.towerStability = 100;
+      this.gameState.isGameComplete = false;
+      
+      // Preserve player learning progress
+      // this.gameState.correctAnswers = 0; // Keep for learning continuity
+      // this.gameState.incorrectAnswers = 0; // Keep for learning continuity
     }
-    return shuffled;
-  }
-
-  async resetGame(): Promise<void> {
-    console.log('🔄 Resetting game to initial state...');
-    this.initializeMockData();
-    console.log('✅ Game reset complete');
+    
+    console.log('✅ Game reset complete - blocks restored to original state');
+    return this.gameState!;
   }
 
   async getAchievements(): Promise<Achievement[]> {

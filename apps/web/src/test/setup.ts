@@ -121,6 +121,12 @@ declare global {
       boxGeometry: any;
       meshStandardMaterial: any;
       meshBasicMaterial: any;
+      ambientLight: any;
+      directionalLight: any;
+      pointLight: any;
+      planeGeometry: any;
+      ringGeometry: any;
+      sphereGeometry: any;
     }
   }
 }
@@ -152,6 +158,13 @@ vi.mock('@react-three/drei', () => ({
   OrbitControls: vi.fn(() => React.createElement('div', { 'data-testid': 'orbit-controls' })),
   Box: vi.fn((props) => React.createElement('div', { 'data-testid': 'drei-box', ...props })),
   Text: vi.fn((props) => React.createElement('div', { 'data-testid': 'drei-text', ...props }, props.children)),
+  // Add missing components that are used in tests
+  ambientLight: vi.fn(() => React.createElement('div', { 'data-testid': 'drei-ambient-light' })),
+  directionalLight: vi.fn(() => React.createElement('div', { 'data-testid': 'drei-directional-light' })),
+  pointLight: vi.fn(() => React.createElement('div', { 'data-testid': 'drei-point-light' })),
+  planeGeometry: vi.fn(() => React.createElement('div', { 'data-testid': 'drei-plane-geometry' })),
+  ringGeometry: vi.fn(() => React.createElement('div', { 'data-testid': 'drei-ring-geometry' })),
+  sphereGeometry: vi.fn(() => React.createElement('div', { 'data-testid': 'drei-sphere-geometry' })),
 }));
 
 // Global test setup
