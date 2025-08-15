@@ -56,7 +56,14 @@ const ContentModal: React.FC<ContentModalProps> = ({
     }
   }, [isOpen, playSound]);
 
-  if (!content) return null;
+  // Safety check - don't render if no content
+  if (!content || !isOpen) return null;
+
+  // Validate content structure
+  if (!content.title || !content.text) {
+    console.error('🚨 CRITICAL: Invalid content structure:', content);
+    return null;
+  }
 
   const handleAnswerSubmit = async () => {
     if (selectedAnswer === null || !onQuizAnswer || !blockId) return;
@@ -170,7 +177,7 @@ const ContentModal: React.FC<ContentModalProps> = ({
                 {/* Main Content */}
                 <div className="bitsacco-card p-4 sm:p-6">
                   <h3 className="text-lg font-semibold text-white mb-3">Privacy Tip</h3>
-                  <p className="text-gray-300 leading-relaxed text-sm sm:text-base">{content.text}</p>
+                  <p className="text-gray-300 leading-relaxed text-sm sm:text-base">{content.text || 'Content not available'}</p>
                 </div>
 
                 {/* Educational Fact */}
@@ -179,7 +186,7 @@ const ContentModal: React.FC<ContentModalProps> = ({
                     <Star className="w-5 h-5" />
                     Did You Know?
                   </h3>
-                  <p className="text-blue-200 text-sm sm:text-base">{content.fact}</p>
+                  <p className="text-blue-200 text-sm sm:text-base">{content.fact || 'Fact not available'}</p>
                 </div>
 
                 {/* Quiz Section */}
@@ -202,20 +209,26 @@ const ContentModal: React.FC<ContentModalProps> = ({
                       <p className="text-yellow-200 font-medium">{content.quiz.question}</p>
                       
                       <div className="space-y-3">
-                        {content.quiz.choices.map((choice, index) => (
-                          <button
-                            key={index}
-                            onClick={() => setSelectedAnswer(index)}
-                            disabled={!onQuizAnswer}
-                            className={`w-full p-3 text-left rounded-lg border transition-all duration-200 ${
-                              selectedAnswer === index
-                                ? 'border-yellow-400 bg-yellow-500/20 text-yellow-200'
-                                : 'border-yellow-400/30 hover:border-yellow-400/60 text-yellow-100 hover:bg-yellow-500/10'
-                            } disabled:opacity-50 disabled:cursor-not-allowed`}
-                          >
-                            <span className="font-medium">{String.fromCharCode(65 + index)}.</span> {choice}
-                          </button>
-                        ))}
+                        {content.quiz.choices && content.quiz.choices.length > 0 ? (
+                          content.quiz.choices.map((choice, index) => (
+                            <button
+                              key={index}
+                              onClick={() => setSelectedAnswer(index)}
+                              disabled={!onQuizAnswer}
+                              className={`w-full p-3 text-left rounded-lg border transition-all duration-200 ${
+                                selectedAnswer === index
+                                  ? 'border-yellow-400 bg-yellow-500/20 text-yellow-200'
+                                  : 'border-yellow-400/30 hover:border-yellow-400/60 text-yellow-100 hover:bg-yellow-500/10'
+                              } disabled:opacity-50 disabled:cursor-not-allowed`}
+                            >
+                              <span className="font-medium">{String.fromCharCode(65 + index)}.</span> {choice}
+                            </button>
+                          ))
+                        ) : (
+                          <div className="text-yellow-200 text-center py-4">
+                            Quiz content not available
+                          </div>
+                        )}
                       </div>
 
                       {selectedAnswer !== null && (
@@ -230,7 +243,7 @@ const ContentModal: React.FC<ContentModalProps> = ({
                         </div>
                       )}
 
-                      {showExplanation && (
+                      {showExplanation && content.quiz.explanation && (
                         <div className="mt-4 p-3 bg-yellow-500/20 border border-yellow-400/30 rounded-lg">
                           <h4 className="font-semibold text-yellow-300 mb-2">Explanation:</h4>
                           <p className="text-yellow-200 text-sm">{content.quiz.explanation}</p>

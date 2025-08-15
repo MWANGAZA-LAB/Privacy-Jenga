@@ -259,7 +259,7 @@ class MockGameService {
   private getQuizForBlock(): any {
     return {
       question: "What is the most important privacy consideration when using Bitcoin?",
-      options: ["Speed of transactions", "Address reuse", "Transaction fees", "Network congestion"],
+      choices: ["Speed of transactions", "Address reuse", "Transaction fees", "Network congestion"],
       correctIndex: 1,
       explanation: "Address reuse is one of the biggest privacy mistakes in Bitcoin, as it links all your transactions together."
     };
