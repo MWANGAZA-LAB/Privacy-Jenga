@@ -324,6 +324,11 @@ class MockGameService {
   // PUBLIC API METHODS
 
   async getBlocks(): Promise<Block[]> {
+    // DEFENSIVE: Ensure blocks are initialized
+    if (!this.blocks || this.blocks.length === 0) {
+      console.error('🚨 CRITICAL: Blocks not initialized in getBlocks, reinitializing...');
+      this.initializeMockData();
+    }
     return Promise.resolve([...this.blocks]);
   }
 
@@ -332,6 +337,12 @@ class MockGameService {
   }
 
   async removeBlock(blockId: string): Promise<GameMove> {
+    // DEFENSIVE: Ensure blocks are initialized
+    if (!this.blocks || this.blocks.length === 0) {
+      console.error('🚨 CRITICAL: Blocks not initialized in removeBlock, reinitializing...');
+      this.initializeMockData();
+    }
+    
     const block = this.blocks.find(b => b.id === blockId);
     if (!block) {
       throw new Error(`Block ${blockId} not found`);
@@ -572,6 +583,12 @@ class MockGameService {
   }
 
   async rollDice(): Promise<DiceResult> {
+    // DEFENSIVE: Ensure blocks are initialized
+    if (!this.blocks || this.blocks.length === 0) {
+      console.error('🚨 CRITICAL: Blocks not initialized, reinitializing...');
+      this.initializeMockData();
+    }
+    
     const diceRoll = Math.floor(Math.random() * 6) + 1;
     const availableLayers = this.getAvailableLayersFromDiceRoll(diceRoll);
     
@@ -606,6 +623,12 @@ class MockGameService {
   // Blocks now maintain their original types throughout the game
 
   private getAvailableBlocksAfterDiceRoll(availableLayers: number[]): string[] {
+    // DEFENSIVE: Ensure blocks are initialized
+    if (!this.blocks || this.blocks.length === 0) {
+      console.error('🚨 CRITICAL: Blocks not initialized in getAvailableBlocksAfterDiceRoll');
+      return [];
+    }
+    
     // SIMPLIFIED: Just return blocks in accessible layers, no mixing
     const blocksInLayers = this.blocks.filter(block => 
       !block.removed && availableLayers.includes(block.layer)
@@ -616,6 +639,12 @@ class MockGameService {
   }
 
   private getAvailableLayersFromDiceRoll(diceRoll: number): number[] {
+    // DEFENSIVE: Ensure blocks are initialized
+    if (!this.blocks || this.blocks.length === 0) {
+      console.error('🚨 CRITICAL: Blocks not initialized in getAvailableLayersFromDiceRoll');
+      return [];
+    }
+    
     // SIMPLIFIED: Only unlock the exact number of layers from dice roll
     const availableLayers: number[] = [];
     

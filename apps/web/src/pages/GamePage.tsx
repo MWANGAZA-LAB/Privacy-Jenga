@@ -284,12 +284,12 @@ const GamePage: React.FC = () => {
       });
 
       // Check if block is in an accessible layer
-      if (!gameState.canPullFromLayers.includes(block.layer)) {
+      if (!gameState.canPullFromLayers?.includes(block.layer)) {
         console.log('❌ Block not accessible:', {
           blockLayer: block.layer,
-          accessibleLayers: gameState.canPullFromLayers
+          accessibleLayers: gameState.canPullFromLayers || []
         });
-        alert(`Cannot remove this block from layer ${block.layer}. Available layers: ${gameState.canPullFromLayers.join(', ')}`);
+        alert(`Cannot remove this block from layer ${block.layer}. Available layers: ${gameState.canPullFromLayers?.join(', ') || 'none'}`);
         return;
       }
 
@@ -369,7 +369,7 @@ const GamePage: React.FC = () => {
         
         console.log('✅ Game state updated after dice roll');
         console.log('🔍 New state details:', {
-          canPullFromLayers: updatedState.canPullFromLayers,
+          canPullFromLayers: updatedState.canPullFromLayers || [],
           diceResult: updatedState.diceResult,
           blocksRemoved: updatedState.blocksRemoved
         });
@@ -650,7 +650,7 @@ const GamePage: React.FC = () => {
                         <Dice1 className="w-8 h-8 mx-auto mb-1 text-blue-400" />
                         {gameState.diceResult}
                       </div>
-                      <p className="text-gray-400 text-xs mt-1">Layers: {gameState.canPullFromLayers.join(', ')}</p>
+                      <p className="text-gray-400 text-xs mt-1">Layers: {gameState.canPullFromLayers?.join(', ') || 'none'}</p>
                     </div>
                   ) : (
                     <div className="text-center p-2 rounded-lg border bg-gray-500/10 border-gray-400/30">
@@ -718,14 +718,14 @@ const GamePage: React.FC = () => {
                       <div className="space-y-2">
                         <div className="text-center">
                           <div className="text-green-400 text-sm font-semibold mb-2">
-                            Available: {gameState.canPullFromLayers.length} layers
+                            Available: {gameState.canPullFromLayers?.length || 0} layers
                           </div>
                           <div className="flex flex-wrap gap-1 justify-center">
-                            {gameState.canPullFromLayers.map((layer) => (
+                            {gameState.canPullFromLayers?.map((layer) => (
                               <div key={layer} className="w-6 h-6 bg-green-500/20 border border-green-400/40 rounded text-xs text-green-300 flex items-center justify-center">
                                 {layer}
                               </div>
-                            ))}
+                            )) || null}
                           </div>
                         </div>
                         <div className="text-xs text-gray-400 text-center mt-2">
@@ -811,7 +811,7 @@ const GamePage: React.FC = () => {
                       <div className="text-sm text-gray-300">
                         Can pull from layers 1-{gameState.diceResult}
                       </div>
-                      {gameState.canPullFromLayers.length > 0 && (
+                      {gameState.canPullFromLayers && gameState.canPullFromLayers.length > 0 && (
                         <div className="text-xs text-green-400 mt-1">
                           Available layers: {gameState.canPullFromLayers.join(', ')}
                         </div>
