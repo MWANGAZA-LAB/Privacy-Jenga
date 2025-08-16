@@ -1,17 +1,15 @@
-import React, { useMemo, useState, useCallback } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
-import { Block, GameState } from '../../types';
 import { BlockComponent } from './BlockComponent';
-import { TowerControls } from './TowerControls';
 import { useTowerStability } from './hooks/useTowerStability';
 import { useBlockSelection } from './hooks/useBlockSelection';
-import { useKeyboardNavigation } from './hooks/useKeyboardNavigation';
+import { Block, GameState } from '../../types';
 
 interface JengaTowerProps {
   blocks: Block[];
   onBlockClick: (block: Block) => void;
-  gameState: GameState;
+  gameState: GameState | null;
   onStabilityChange?: (stability: number) => void;
 }
 
@@ -23,44 +21,29 @@ export const JengaTowerRefactored: React.FC<JengaTowerProps> = ({
 }) => {
   const [showHelp, setShowHelp] = useState(false);
   const [showGameInfo, setShowGameInfo] = useState(false);
-  const [towerShake, setTowerShake] = useState(false);
 
   // Custom hooks for separated concerns
-  const { stability, isStable, criticalBlocks } = useTowerStability({ blocks, gameState });
+  const { stability, isStable } = useTowerStability({ blocks, gameState });
 
-  // Report stability changes to parent component
+  // Report stability changes to parent component - OPTIMIZED: Only when stability actually changes
   React.useEffect(() => {
-    if (onStabilityChange) {
+    if (onStabilityChange && typeof stability === 'number') {
       onStabilityChange(stability);
     }
   }, [stability, onStabilityChange]);
-
-  // Tower shake effect when blocks are removed
-  React.useEffect(() => {
-    if (gameState && gameState.blocksRemoved > 0) {
-      setTowerShake(true);
-      const timer = setTimeout(() => setTowerShake(false), 500);
-      return () => clearTimeout(timer);
-    }
-  }, [gameState]);
   
   const {
     selectedBlockId,
     focusedBlockId,
-    accessibleBlocks,
     selectBlock,
     isBlockAccessible,
     isBlockRemovable
   } = useBlockSelection({ blocks, gameState, onBlockClick });
 
-  // Calculate max allowed layer based on game state
-  const maxAllowedLayer = useMemo(() => {
-    if (!gameState?.canPullFromLayers.length) return 1;
-    return Math.max(...gameState.canPullFromLayers);
-  }, [gameState?.canPullFromLayers]);
-
-  // Calculate world positions for blocks with optimization
+  // Calculate world positions for blocks with optimization - OPTIMIZED: Stable dependencies
   const blocksWithPositions = useMemo(() => {
+    if (!blocks?.length) return [];
+    
     const maxLayer = Math.max(...blocks.map(b => b.layer));
     
     return blocks.map(block => {
@@ -75,38 +58,73 @@ export const JengaTowerRefactored: React.FC<JengaTowerProps> = ({
     });
   }, [blocks]);
 
-  // Handle focus changes for keyboard navigation
-  const handleFocusChange = useCallback((_blockId: string) => {
-    // Focus logic is handled by useBlockSelection hook
+  // OPTIMIZED: Memoize expensive calculations
+  const visibleBlocks = useMemo(() => {
+    return blocksWithPositions.filter(block => !block.removed);
+  }, [blocksWithPositions]);
+
+  // OPTIMIZED: Memoize layer separation lines to prevent recreation
+  const layerSeparationLines = useMemo(() => {
+    return Array.from({ length: 18 }, (_, i) => (
+      <mesh key={`layer-${i}`} position={[0, i * 0.4, 0]}>
+        <planeGeometry args={[10, 0.01]} />
+        <meshBasicMaterial color="#1f2937" transparent opacity={0.1} />
+      </mesh>
+    ));
   }, []);
 
-  // Keyboard navigation
-  useKeyboardNavigation({
-    accessibleBlocks,
-    focusedBlockId,
-    selectedBlockId,
-    onBlockSelect: selectBlock,
-    onFocusChange: handleFocusChange,
-    isEnabled: !showHelp && !showGameInfo
-  });
+  // OPTIMIZED: Memoize camera position to prevent unnecessary updates
+  const cameraPosition = useMemo(() => [8, 6, 8] as [number, number, number], []);
 
-  // Toggle functions
-  const toggleHelp = useCallback(() => setShowHelp(!showHelp), [showHelp]);
-  const toggleGameInfo = useCallback(() => setShowGameInfo(!showGameInfo), [showGameInfo]);
+  // OPTIMIZED: Memoize lighting positions
+  const ambientLightIntensity = useMemo(() => 0.6, []);
+  const directionalLightPosition = useMemo(() => [10, 10, 5] as [number, number, number], []);
+  const directionalLightIntensity = useMemo(() => 1, []);
 
   return (
-    <div className={`relative w-full h-full ${towerShake ? 'tower-stability-warning' : ''}`}>
-      {/* 3D Tower Canvas - ENHANCED for better interaction */}
+    <div className="relative w-full h-full">
+      {/* Game Info Overlay - OPTIMIZED: Only render when needed */}
+      {showGameInfo && (
+        <div className="absolute top-4 left-4 z-10 bg-gray-800 bg-opacity-90 text-white p-4 rounded-lg max-w-sm">
+          <h3 className="text-lg font-bold mb-2">Game Information</h3>
+          <p>Total Blocks: {blocks.length}</p>
+          <p>Removed: {blocks.filter(b => b.removed).length}</p>
+          <p>Stability: {stability.toFixed(1)}%</p>
+          <button 
+            onClick={() => setShowGameInfo(false)}
+            className="mt-2 px-3 py-1 bg-blue-600 rounded hover:bg-blue-700"
+          >
+            Close
+          </button>
+        </div>
+      )}
+
+      {/* Help Overlay - OPTIMIZED: Only render when needed */}
+      {showHelp && (
+        <div className="absolute top-4 right-4 z-10 bg-gray-800 bg-opacity-90 text-white p-4 rounded-lg max-w-sm">
+          <h3 className="text-lg font-bold mb-2">Quick Help</h3>
+          <p>• Click on blocks to interact</p>
+          <p>• Use arrow keys to navigate</p>
+          <p>• Roll dice to unlock layers</p>
+          <button 
+            onClick={() => setShowHelp(false)}
+            className="mt-2 px-3 py-1 bg-blue-600 rounded hover:bg-blue-700"
+          >
+            Close
+          </button>
+        </div>
+      )}
+
+      {/* 3D Tower Canvas - ENHANCED for better interaction and performance */}
       <Canvas
         camera={{ 
-          position: [8, 6, 8], 
+          position: cameraPosition, 
           fov: 50 
         }}
         shadows
         className="w-full h-full"
         onPointerMissed={() => {
           console.log('🎯 Canvas pointer missed - clearing selection');
-          // Could clear selection here if desired
         }}
         gl={{
           antialias: true,
@@ -114,96 +132,86 @@ export const JengaTowerRefactored: React.FC<JengaTowerProps> = ({
           powerPreference: "high-performance"
         }}
       >
-        {/* Lighting */}
-        <ambientLight intensity={0.6} />
+        {/* Lighting - OPTIMIZED: Memoized values */}
+        <ambientLight intensity={ambientLightIntensity} />
         <directionalLight 
-          position={[10, 10, 5]} 
-          intensity={1} 
+          position={directionalLightPosition} 
+          intensity={directionalLightIntensity} 
           castShadow
           shadow-mapSize-width={2048}
           shadow-mapSize-height={2048}
         />
         
-        {/* Tower Base */}
+        {/* Tower Base - OPTIMIZED: Static geometry */}
         <mesh position={[0, -0.5, 0]} receiveShadow>
           <boxGeometry args={[6, 0.2, 6]} />
           <meshStandardMaterial color="#1f2937" />
         </mesh>
 
-        {/* Render Blocks */}
-        {blocksWithPositions.map((block) => {
-          if (block.removed) return null;
-          
-          return (
-            <BlockComponent
-              key={block.id}
-              block={block}
-              onClick={() => selectBlock(block.id)}
-              isSelected={selectedBlockId === block.id}
-              isRemovable={isBlockRemovable(block)}
-              canPullFromLayer={isBlockAccessible(block)}
-              layer={block.layer}
-              position={block.position}
-              worldPosition={block.worldPosition}
-              isFocused={focusedBlockId === block.id}
-            />
-          );
-        })}
-        
-        {/* Layer Separation Lines */}
-        {Array.from({ length: 18 }, (_, i) => (
-          <mesh key={`layer-${i}`} position={[0, i * 0.4, 0]}>
-            <planeGeometry args={[10, 0.01]} />
-            <meshBasicMaterial color="#1f2937" transparent opacity={0.1} />
-          </mesh>
+        {/* Render Blocks - OPTIMIZED: Only render visible blocks */}
+        {visibleBlocks.map((block) => (
+          <BlockComponent
+            key={block.id}
+            block={block}
+            onClick={() => selectBlock(block.id)}
+            isSelected={selectedBlockId === block.id}
+            isRemovable={isBlockRemovable(block)}
+            canPullFromLayer={isBlockAccessible(block)}
+            layer={block.layer}
+            position={block.position}
+            worldPosition={block.worldPosition}
+            isFocused={focusedBlockId === block.id}
+          />
         ))}
         
-        {/* Camera Controls */}
+        {/* Layer Separation Lines - OPTIMIZED: Memoized */}
+        {layerSeparationLines}
+        
+        {/* Camera Controls - OPTIMIZED: Stable component */}
         <OrbitControls 
           enablePan={true}
           enableZoom={true}
           enableRotate={true}
+          maxPolarAngle={Math.PI / 2}
           minDistance={5}
           maxDistance={20}
-          maxPolarAngle={Math.PI / 2}
         />
       </Canvas>
 
-      {/* Tower Controls UI */}
-      <TowerControls
-        gameState={gameState}
-        maxAllowedLayer={maxAllowedLayer}
-        onToggleHelp={toggleHelp}
-        onToggleGameInfo={toggleGameInfo}
-        showHelp={showHelp}
-        showGameInfo={showGameInfo}
-      />
-
-      {/* Accessibility Instructions */}
-      <div className="absolute bottom-4 left-4 z-10 pointer-events-none">
-        <div className="text-center text-gray-500 text-xs opacity-50">
-          <div>Use arrow keys to navigate</div>
-          <div>Enter/Space to select blocks</div>
-          <div>H for help, I for info</div>
-        </div>
-      </div>
-
-      {/* Tower Stability Warning */}
+      {/* Tower Stability Warning - OPTIMIZED: Only show when unstable */}
       {!isStable && (
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-30 pointer-events-none">
-          <div className="bg-red-500/90 text-white p-4 rounded-lg border border-red-400 animate-pulse">
-            <div className="text-center">
-              <div className="text-lg font-bold">⚠️ Tower Unstable!</div>
-              <div className="text-sm">Stability: {Math.round(stability)}%</div>
-              {criticalBlocks.length > 0 && (
-                <div className="text-xs mt-1">
-                  Critical blocks detected
-                </div>
-              )}
+        <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-red-600 text-white px-6 py-3 rounded-lg shadow-lg z-20">
+          <div className="flex items-center space-x-2">
+            <span className="text-2xl">⚠️</span>
+            <div>
+              <div className="font-bold">Tower Unstable!</div>
+              <div>Stability: {stability.toFixed(1)}%</div>
             </div>
           </div>
         </div>
       )}
+
+      {/* Control Buttons - OPTIMIZED: Stable positioning */}
+      <div className="absolute top-4 left-1/2 transform -translate-x-1/2 flex space-x-2 z-10">
+        <button
+          onClick={() => setShowGameInfo(!showGameInfo)}
+          className="bg-gray-800 bg-opacity-90 text-white px-3 py-2 rounded hover:bg-gray-700 transition-colors"
+        >
+          ℹ️ Info
+        </button>
+        <button
+          onClick={() => setShowHelp(!showHelp)}
+          className="bg-gray-800 bg-opacity-90 text-white px-3 py-2 rounded hover:bg-gray-700 transition-colors"
+        >
+          ❓ Help
+        </button>
+      </div>
+
+      {/* Accessibility Instructions */}
+      <div className="absolute bottom-4 right-4 text-xs text-gray-400 bg-black/50 px-2 py-1 rounded">
+        <div>Use mouse to rotate, scroll to zoom</div>
+        <div>Click blocks to interact</div>
+      </div>
     </div>
   );
 };

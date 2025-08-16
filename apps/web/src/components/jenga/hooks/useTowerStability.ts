@@ -19,48 +19,45 @@ export const useTowerStability = ({ blocks, gameState }: UseTowerStabilityProps)
   const [criticalBlocks, setCriticalBlocks] = useState<string[]>([]);
 
   const calculateStability = useCallback(() => {
-    if (!gameState || !blocks) return 100;
+    if (!gameState) return 100;
 
+    // CRITICAL FIX: Use the gameState.towerStability directly instead of recalculating
+    // This eliminates the conflict between hook calculation and service calculation
+    if (gameState.towerStability !== undefined) {
+      return gameState.towerStability;
+    }
+
+    // Fallback calculation only if gameState.towerStability is not available
     const remainingBlocks = blocks.filter(b => !b.removed);
     if (remainingBlocks.length === 0) return 0;
 
-    // CRITICAL FIX: Fresh tower should ALWAYS start at 100%
+    // Fresh tower should start at 100%
     if (gameState.blocksRemoved === 0) {
       return 100;
     }
 
-    // Start with base stability - fresh tower should be 100%
-    const baseStability = 100;
+    // Simplified calculation: 100% - (blocks removed * 2.5%)
+    // This aligns better with the service's stability changes
+    const removalPenalty = gameState.blocksRemoved * 2.5;
+    const finalStability = Math.max(0, 100 - removalPenalty);
 
-    // Apply penalty for removed blocks (each removed block reduces stability)
-    const removalPenalty = gameState.blocksRemoved * 3; // 3% per removed block
-    
-    // Apply penalty for risky block distribution
-    const riskyBlocks = remainingBlocks.filter(b => b.type === 'risky').length;
-    const challengeBlocks = remainingBlocks.filter(b => b.type === 'challenge').length;
-    const safeBlocks = remainingBlocks.filter(b => b.type === 'safe').length;
-    const riskyPenalty = riskyBlocks * 0.5; // 0.5% per risky block
-    const challengePenalty = challengeBlocks * 1; // 1% per challenge block
+    return finalStability;
+  }, [gameState, blocks]);
 
-    // Calculate final stability
-    const finalStability = baseStability - removalPenalty - riskyPenalty - challengePenalty;
+  // CRITICAL: Only recalculate when gameState.towerStability changes
+  useEffect(() => {
+    const newStability = calculateStability();
+    setPreviousStability(stability);
+    setStability(newStability);
+  }, [gameState?.towerStability, gameState?.blocksRemoved, calculateStability]);
 
-    // Debug logging for initial game state
-    if (gameState.blocksRemoved === 0) {
-      console.log('🎯 Tower Stability Debug:', {
-        totalBlocks: remainingBlocks.length,
-        safeBlocks,
-        riskyBlocks,
-        challengeBlocks,
-        removalPenalty,
-        riskyPenalty,
-        challengePenalty,
-        finalStability: Math.max(0, Math.min(100, finalStability))
-      });
-    }
+  // Identify critical blocks (blocks in high layers that are risky/challenge)
+  useEffect(() => {
+    if (!blocks || !gameState) return;
 
-    // Identify critical blocks (blocks in high layers that are risky/challenge)
+    const remainingBlocks = blocks.filter(b => !b.removed);
     const criticalBlockIds: string[] = [];
+    
     remainingBlocks.forEach(block => {
       if (block.layer > 15 && (block.type === 'risky' || block.type === 'challenge')) {
         criticalBlockIds.push(block.id);
@@ -68,14 +65,7 @@ export const useTowerStability = ({ blocks, gameState }: UseTowerStabilityProps)
     });
 
     setCriticalBlocks(criticalBlockIds);
-    return Math.max(0, Math.min(100, finalStability));
-  }, [blocks, gameState]);
-
-  useEffect(() => {
-    const newStability = calculateStability();
-    setPreviousStability(stability);
-    setStability(newStability);
-  }, [calculateStability, stability]);
+  }, [blocks, gameState?.blocksRemoved]);
 
   const stabilityTrend = 
     stability > previousStability ? 'improving' : 

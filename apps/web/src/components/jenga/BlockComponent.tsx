@@ -1,4 +1,4 @@
-import React, { useRef, useState, useCallback } from 'react';
+import React, { useRef, useState, useCallback, useMemo } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { Text, Box } from '@react-three/drei';
 import * as THREE from 'three';
@@ -31,13 +31,8 @@ export const BlockComponent: React.FC<BlockComponentProps> = React.memo(({
   const [isHovered, setIsHovered] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
 
-  const getBlockColor = useCallback((block: Block): number => {
-    // BULLETPROOF color system - ZERO WHITE tolerance 
-    const BLOCK_COLORS: Record<string, number> = {
-      safe: 0x059669,      // Emerald-600 - Never white
-      risky: 0xdc2626,     // Red-600 - Never white  
-      challenge: 0xd97706, // Amber-600 - Never white
-    };
+  // OPTIMIZED: Memoized color system with stable references
+  const blockColor = useMemo(() => {
     if (block.removed) return 0x374151; // Gray-700 for removed blocks
 
     // CRITICAL: Validate block type exists and is valid
@@ -45,6 +40,12 @@ export const BlockComponent: React.FC<BlockComponentProps> = React.memo(({
       console.error(`🚨 CRITICAL: Invalid block type "${block.type}" for block ${block.id}, forcing safe color`);
       return 0x059669; // Force safe green - never white
     }
+
+    const BLOCK_COLORS: Record<string, number> = {
+      safe: 0x059669,      // Emerald-600 - Never white
+      risky: 0xdc2626,     // Red-600 - Never white  
+      challenge: 0xd97706, // Amber-600 - Never white
+    };
 
     const color = BLOCK_COLORS[block.type];
     
@@ -55,12 +56,29 @@ export const BlockComponent: React.FC<BlockComponentProps> = React.memo(({
     }
 
     return color;
-  }, []);
+  }, [block.type, block.removed, block.id]);
 
-  const getBlockOpacity = useCallback((block: Block): number => {
-    if (block.removed) return 0.3;
+  // OPTIMIZED: Memoized opacity calculation
+  const blockOpacity = useMemo(() => {
+    return block.removed ? 0.3 : 1.0;
+  }, [block.removed]);
+
+  // OPTIMIZED: Memoized scale calculation
+  const blockScale = useMemo(() => {
+    if (isSelected) return 1.1;
+    if (isHovered && canPullFromLayer) return 1.05;
     return 1.0;
-  }, []);
+  }, [isSelected, isHovered, canPullFromLayer]);
+
+  // OPTIMIZED: Memoized material properties
+  const materialProps = useMemo(() => ({
+    color: blockColor,
+    transparent: true,
+    opacity: blockOpacity,
+    metalness: 0.1,
+    roughness: 0.8,
+    toneMapped: false
+  }), [blockColor, blockOpacity]);
 
   // Enhanced animation frame for better feedback and performance
   useFrame((state) => {
@@ -78,7 +96,7 @@ export const BlockComponent: React.FC<BlockComponentProps> = React.memo(({
     // ENHANCED: Warning pulse for risky blocks with better visual feedback
     if (block.type === 'risky' && canPullFromLayer && !isAnimating && meshRef.current.material) {
       const material = meshRef.current.material as THREE.MeshStandardMaterial;
-      const baseOpacity = getBlockOpacity(block);
+      const baseOpacity = blockOpacity;
       material.opacity = baseOpacity + Math.sin(state.clock.elapsedTime * 3) * 0.15;
     }
 
@@ -135,114 +153,81 @@ export const BlockComponent: React.FC<BlockComponentProps> = React.memo(({
     }
   });
 
-  const getBlockScale = useCallback(() => {
-    if (isSelected) return 1.1;
-    if (isHovered && canPullFromLayer) return 1.08;
-    if (isRemovable && canPullFromLayer) return 1.05;
-    return 1;
-  }, [isSelected, isHovered, isRemovable, canPullFromLayer]);
-
+  // OPTIMIZED: Stable callback for block click
   const handleBlockClick = useCallback((e: THREE.Event) => {
     e.stopPropagation();
     
-    // CRITICAL: Add error boundary to prevent crashes
-    try {
-      console.log(`🎯 Block ${block.id} clicked:`, {
-        blockId: block.id,
-        blockType: block.type,
-        canPullFromLayer,
-        isAnimating,
-        blockRemoved: block.removed,
-        timestamp: new Date().toISOString()
-      });
+    if (!canPullFromLayer || block.removed || isAnimating) {
+      console.log(`🚫 Block ${block.id} not clickable:`, { canPullFromLayer, removed: block.removed, isAnimating });
+      return;
+    }
 
-      if (!canPullFromLayer || isAnimating || block.removed) {
-        console.log(`❌ Block click blocked:`, {
-          canPullFromLayer,
-          isAnimating, 
-          blockRemoved: block.removed
-        });
-        return;
-      }
-      
+    try {
       setIsAnimating(true);
-      
-      // IMMEDIATE TACTILE FEEDBACK - Visual response before onClick
-      if (meshRef.current && meshRef.current.material) {
-        // Instant scale feedback with spring animation
+      console.log(`🎯 Block ${block.id} clicked:`, { type: block.type, layer, position, worldPosition });
+
+      // Call the onClick handler
+      onClick();
+
+      // Enhanced animation with better performance
+      if (meshRef.current) {
+        // Scale animation
         meshRef.current.scale.setScalar(1.2);
         
-        // Enhanced color flash feedback with better visibility and safety checks
+        // Color flash effect (optional - can be disabled for performance)
         const material = meshRef.current.material as THREE.MeshStandardMaterial;
-        const originalColor = material.color.clone();
-        
-        // Safety check: Only flash if material and color are valid
-        if (material && originalColor && originalColor.getHex() !== 0x000000) {
-          material.color.setHex(0x00ff88); // Bright green flash for positive feedback
+        if (material && material.color) {
+          const originalColor = material.color.getHex();
+          material.color.setHex(0xffffff); // Flash white
+          material.needsUpdate = true;
           
-          // CRITICAL: Enhanced color restoration with multiple safety checks
+          // Restore original color
           setTimeout(() => {
-            if (meshRef.current && meshRef.current.material && material) {
-              material.color.copy(originalColor);
-              // Force material update to prevent color corruption
+            if (material && material.color) {
+              material.color.setHex(originalColor);
               material.needsUpdate = true;
             }
-          }, 200); // Extended flash duration for better feedback
-          
-          // CRITICAL: Additional color restoration as backup
-          setTimeout(() => {
-            if (meshRef.current && meshRef.current.material && material) {
-              material.color.copy(originalColor);
-              material.needsUpdate = true;
-            }
-          }, 400);
+          }, 150);
         }
         
-        // Haptic-style bounce animation
-        const bounceAnimation = () => {
-          if (meshRef.current) {
-            meshRef.current.position.y += 0.1; // Quick bounce up
-            setTimeout(() => {
-              if (meshRef.current) {
-                meshRef.current.position.y = worldPosition[1]; // Return to position
-                meshRef.current.scale.setScalar(1.0); // Return to normal scale
-              }
-            }, 100);
-          }
-        };
-        bounceAnimation();
-        
-        // CRITICAL: Final color restoration to ensure blocks keep original colors
+        // Restore scale
         setTimeout(() => {
-          if (meshRef.current?.material) {
-            const currentMaterial = meshRef.current.material as THREE.MeshStandardMaterial;
-            currentMaterial.color.copy(originalColor);
-            currentMaterial.needsUpdate = true;
+          if (meshRef.current) {
+            meshRef.current.scale.setScalar(1);
           }
-        }, 500);
+        }, 300);
       }
-      
-      // CRITICAL: Wrap onClick in error boundary
-      try {
-        onClick();
-      } catch (error) {
-        console.error('🚨 CRITICAL: Error in block onClick handler:', error);
-        // Don't crash the component, just log the error
-      }
-      
-      // Reset animation state with longer duration for better feedback
+
+      // Reset animation state
       setTimeout(() => {
         setIsAnimating(false);
-        if (meshRef.current) {
-          meshRef.current.scale.setScalar(1);
-        }
-      }, 800);
+      }, 400);
     } catch (error) {
       console.error('🚨 CRITICAL: Error in handleBlockClick:', error);
-      // Reset animation state to prevent UI lock
       setIsAnimating(false);
     }
-  }, [canPullFromLayer, isAnimating, onClick, block.removed, block.id, block.type, worldPosition]);
+  }, [canPullFromLayer, block.removed, isAnimating, onClick, block.id, block.type, layer, position, worldPosition]);
+
+  // OPTIMIZED: Stable pointer event handlers
+  const handlePointerEnter = useCallback((e: THREE.Event) => {
+    e.stopPropagation();
+    if (canPullFromLayer && !block.removed) {
+      document.body.style.cursor = 'pointer';
+      setIsHovered(true);
+    }
+  }, [canPullFromLayer, block.removed]);
+
+  const handlePointerLeave = useCallback((e: THREE.Event) => {
+    e.stopPropagation();
+    document.body.style.cursor = 'default';
+    setIsHovered(false);
+  }, []);
+
+  // OPTIMIZED: Stable userData
+  const userData = useMemo(() => ({
+    blockId: block.id,
+    clickable: canPullFromLayer
+  }), [block.id, canPullFromLayer]);
 
   // Don't render removed blocks or invalid blocks
   if (block.removed || !block.type) {
@@ -254,33 +239,15 @@ export const BlockComponent: React.FC<BlockComponentProps> = React.memo(({
       ref={meshRef}
       position={worldPosition}
       onClick={handleBlockClick}
-      onPointerEnter={(e: THREE.Event) => {
-        e.stopPropagation();
-        document.body.style.cursor = canPullFromLayer ? 'pointer' : 'not-allowed';
-        setIsHovered(true);
-        console.log(`🎯 Block ${block.id} hovered, canPull:`, canPullFromLayer);
-      }}
-      onPointerLeave={(e: THREE.Event) => {
-        e.stopPropagation();
-        document.body.style.cursor = 'default';
-        setIsHovered(false);
-      }}
-      scale={getBlockScale()}
+      onPointerEnter={handlePointerEnter}
+      onPointerLeave={handlePointerLeave}
+      scale={blockScale}
       castShadow
       receiveShadow
-      // eslint-disable-next-line react/no-unknown-property
-      userData={{ blockId: block.id, clickable: canPullFromLayer }}
+      userData={userData}
     >
       <boxGeometry args={[1, 0.3, 3]} />
-      <meshStandardMaterial 
-        color={getBlockColor(block)}
-        transparent={true}
-        opacity={getBlockOpacity(block)}
-        metalness={0.1}
-        roughness={0.8}
-        // eslint-disable-next-line react/no-unknown-property
-        toneMapped={false}
-      />
+      <meshStandardMaterial {...materialProps} />
       
       {/* ENHANCED Block Type Indicator with better visibility */}
       <Text
@@ -309,17 +276,17 @@ export const BlockComponent: React.FC<BlockComponentProps> = React.memo(({
         {layer}
       </Text>
       
-      {/* ENHANCED Position indicator */}
+      {/* Position indicator */}
       <Text
-        position={[0, -0.2, 0]}
-        fontSize={0.14}
-        color={canPullFromLayer ? '#d1fae5' : '#6b7280'}
+        position={[0, 0, 0]}
+        fontSize={0.15}
+        color={canPullFromLayer ? '#ffffff' : '#6b7280'}
         anchorX="center"
         anchorY="middle"
-        outlineWidth={0.01}
+        outlineWidth={0.02}
         outlineColor="#000000"
       >
-        {position + 1}
+        {position}
       </Text>
 
       {/* ENHANCED Selection highlight with animation */}
@@ -400,17 +367,6 @@ export const BlockComponent: React.FC<BlockComponentProps> = React.memo(({
         </>
       )}
     </mesh>
-  );
-}, (prevProps, nextProps) => {
-  // Custom comparison function for React.memo optimization
-  return (
-    prevProps.block.id === nextProps.block.id &&
-    prevProps.block.removed === nextProps.block.removed &&
-    prevProps.isSelected === nextProps.isSelected &&
-    prevProps.isRemovable === nextProps.isRemovable &&
-    prevProps.canPullFromLayer === nextProps.canPullFromLayer &&
-    prevProps.isFocused === nextProps.isFocused &&
-    JSON.stringify(prevProps.worldPosition) === JSON.stringify(nextProps.worldPosition)
   );
 });
 

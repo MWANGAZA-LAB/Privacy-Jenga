@@ -92,9 +92,6 @@ const GamePage: React.FC = () => {
   // Enhanced dice rolling state
   const [isDiceRolling, setIsDiceRolling] = useState(false);
   
-  // Tower stability synchronization
-  const [towerStability, setTowerStability] = useState(100);
-  
   // Quiz system state
   const [showQuizResult, setShowQuizResult] = useState(false);
   const [lastQuizResult, setLastQuizResult] = useState<any>(null);
@@ -220,7 +217,6 @@ const GamePage: React.FC = () => {
       const updatedBlocks = await gameService.getBlocks();
       setGameState(updatedGameState);
       setBlocks(updatedBlocks);
-      setTowerStability(100);
       
       console.log('🔄 Tower regenerated successfully');
     } catch (error) {
@@ -238,7 +234,6 @@ const GamePage: React.FC = () => {
       // Update game state and tower stability
       const updatedGameState = await gameService.getGameState();
       setGameState(updatedGameState);
-      setTowerStability(updatedGameState?.towerStability || 100);
       
       // Check for game over conditions
       if (updatedGameState?.gamePhase === 'collapsed') {
@@ -558,7 +553,7 @@ const GamePage: React.FC = () => {
               
               {/* Mobile Quick Stats */}
               <div className="flex justify-between items-center mt-2 text-sm">
-                <span className="text-gray-300">Stability: {Math.round(towerStability)}%</span>
+                <span className="text-gray-300">Stability: {Math.round(gameState.towerStability)}%</span>
                 <button
                   onClick={handleDiceRoll}
                   disabled={isDiceRolling || !isInteractive}
@@ -677,36 +672,36 @@ const GamePage: React.FC = () => {
 
                   {/* Enhanced Tower Stability with Synchronized Calculation */}
                   <div className={`text-center p-3 rounded-lg border transition-all duration-300 ${
-                    towerStability >= 100 
+                    gameState.towerStability >= 100 
                       ? 'bg-green-500/10 border-green-400/30' // Perfect condition
-                      : towerStability >= 70 
+                      : gameState.towerStability >= 70 
                         ? 'bg-yellow-500/10 border-yellow-400/30' // Good
-                        : towerStability >= 40 
+                        : gameState.towerStability >= 40 
                           ? 'bg-orange-500/10 border-orange-400/30 tower-stability-warning' // Warning with animation
                           : 'bg-red-500/10 border-red-400/30 tower-stability-warning' // Critical with animation
                   }`}>
                     <div className="text-sm font-semibold mb-1">
                       <span className={`${
-                        towerStability >= 100 ? 'text-green-300' :
-                        towerStability >= 70 ? 'text-yellow-300' :
-                        towerStability >= 40 ? 'text-orange-300' : 'text-red-300'
+                        gameState.towerStability >= 100 ? 'text-green-300' :
+                        gameState.towerStability >= 70 ? 'text-yellow-300' :
+                        gameState.towerStability >= 40 ? 'text-orange-300' : 'text-red-300'
                       }`}>
                         Tower Stability
                       </span>
                     </div>
                     <div className={`text-2xl font-bold ${
-                      towerStability >= 100 ? 'text-green-400' :
-                      towerStability >= 70 ? 'text-yellow-400' :
-                      towerStability >= 40 ? 'text-orange-400' : 'text-red-400'
+                      gameState.towerStability >= 100 ? 'text-green-400' :
+                      gameState.towerStability >= 70 ? 'text-yellow-400' :
+                      gameState.towerStability >= 40 ? 'text-orange-400' : 'text-red-400'
                     }`}>
-                      {Math.round(towerStability)}%
+                      {Math.round(gameState.towerStability)}%
                     </div>
                     <p className="text-gray-400 text-xs mt-2 flex items-center justify-center gap-1">
-                      {towerStability >= 100 ? (
+                      {gameState.towerStability >= 100 ? (
                         <><span className="text-green-400">●</span> Perfect</>
-                      ) : towerStability >= 70 ? (
+                      ) : gameState.towerStability >= 70 ? (
                         <><span className="text-yellow-400">●</span> Good</>
-                      ) : towerStability >= 40 ? (
+                      ) : gameState.towerStability >= 40 ? (
                         <><span className="text-orange-400">⚠</span> Warning</>
                       ) : (
                         <><span className="text-red-400">⚠</span> Critical</>
@@ -872,7 +867,7 @@ const GamePage: React.FC = () => {
                     blocks={blocks}
                     onBlockClick={handleBlockClick}
                     gameState={gameState}
-                    onStabilityChange={setTowerStability}
+                    onStabilityChange={() => {}} // No longer needed here
                   />
                 ) : (
                   <JengaTower
