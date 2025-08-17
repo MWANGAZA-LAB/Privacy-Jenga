@@ -347,41 +347,21 @@ const GamePage: React.FC = () => {
                    <Brain className={isSmallMobile ? "w-4 h-4" : "w-5 h-5"} />
                  </motion.button>
                  
-                                   <motion.button
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    onClick={() => setShowSoundSettings(true)}
-                    className={`text-white hover:text-blue-300 transition-colors ${
-                      isSmallMobile ? 'p-1' : 'p-2'
-                    }`}
-                    title="Sound Settings"
-                  >
-                    {soundEnabled ? (
-                      <Volume2 className={isSmallMobile ? "w-4 h-4" : "w-5 h-5"} />
-                    ) : (
-                      <VolumeX className={isSmallMobile ? "w-4 h-4" : "w-5 h-5"} />
-                    )}
-                  </motion.button>
-                  
-                  {/* Audio Debug Button */}
-                  <motion.button
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    onClick={() => {
-                      console.log('🔊 Audio Debug Info:');
-                      console.log('Audio supported:', soundManager.isAudioSupported());
-                      console.log('Audio status:', soundManager.getAudioStatus());
-                      console.log('Sound settings:', soundManager.getSettings());
-                      console.log('Loaded sounds:', Array.from(soundManager['sounds'].keys()));
-                      soundManager.playSound('button-click');
-                    }}
-                    className={`text-white hover:text-blue-300 transition-colors ${
-                      isSmallMobile ? 'p-1' : 'p-2'
-                    }`}
-                    title="Audio Debug"
-                  >
-                    🔧
-                  </motion.button>
+                                                      <motion.button
+                     whileHover={{ scale: 1.05 }}
+                     whileTap={{ scale: 0.95 }}
+                     onClick={() => setShowSoundSettings(true)}
+                     className={`text-white hover:text-blue-300 transition-colors ${
+                       isSmallMobile ? 'p-1' : 'p-2'
+                     }`}
+                     title="Sound Settings"
+                   >
+                     {soundEnabled ? (
+                       <Volume2 className={isSmallMobile ? "w-4 h-4" : "w-5 h-5"} />
+                     ) : (
+                       <VolumeX className={isSmallMobile ? "w-4 h-4" : "w-5 h-5"} />
+                     )}
+                   </motion.button>
                  
 
               </div>
@@ -449,47 +429,87 @@ const GamePage: React.FC = () => {
           </div>
         </div>
 
-        {/* Main Game Area */}
-        <main className="flex-1 relative">
-          {/* Simplified Jenga Tower */}
-          <SimplifiedJengaTower
-            blocks={blocks}
-            onBlockClick={handleBlockClick}
-            gameState={gameState}
-            selectedBlockId={selectedBlockId}
-            onGameRestart={handleGameRestart}
-          />
+                 {/* Main Game Area */}
+         <main className="flex-1 relative">
+           {/* Simplified Jenga Tower */}
+           <SimplifiedJengaTower
+             blocks={blocks}
+             onBlockClick={handleBlockClick}
+             gameState={gameState}
+             selectedBlockId={selectedBlockId}
+             onGameRestart={handleGameRestart}
+           />
 
-          {/* Quick Help Button */}
-          <div className="absolute bottom-4 left-4 z-20">
-            <button
-              onClick={() => setShowQuickHelp(!showQuickHelp)}
-              className="bg-black/80 backdrop-blur-sm rounded-lg p-3 border border-gray-600/50 hover:bg-gray-700/80 transition-colors"
-              title="Quick Help"
-            >
-              <div className="text-center">
-                <div className="text-gray-300 text-sm font-semibold">?</div>
-                <div className="text-gray-400 text-xs">Help</div>
-              </div>
-            </button>
-            
-                    {/* Quick help tooltip */}
-        {showQuickHelp && (
-          <div className="absolute bottom-full left-0 mb-2 bg-black/90 backdrop-blur-sm rounded-lg p-3 border border-gray-600/50 max-w-xs z-30">
-            <div className="text-gray-300 text-xs space-y-1">
-              <div className="font-semibold text-white mb-2">Quick Tips:</div>
-              <div>• Click on any block to reveal content</div>
-              <div>• Answer questions correctly to maintain stability</div>
-              <div>• Learn all 54 Bitcoin privacy concepts</div>
-              <div>• Difficulty adapts to your performance</div>
-              <div>• Green = Safe, Orange = Medium, Red = Risky</div>
-            </div>
-          </div>
-        )}
-          </div>
+           {/* Tower Collapse Button removed - now handled by popup */}
+         </main>
 
-          {/* Tower Collapse Button removed - now handled by popup */}
-        </main>
+         {/* Game Footer */}
+         <footer className="relative z-20 bg-black/20 backdrop-blur-sm border-t border-white/10 px-4 py-3">
+           <div className="container mx-auto">
+             <div className={`flex items-center justify-between ${
+               isSmallMobile ? 'flex-col gap-3' : 'flex-row'
+             }`}>
+               {/* Help Button */}
+               <div className="relative">
+                 <button
+                   onClick={() => setShowQuickHelp(!showQuickHelp)}
+                   className="bg-black/60 backdrop-blur-sm rounded-lg p-2 border border-gray-600/50 hover:bg-gray-700/80 transition-colors"
+                   title="Quick Help"
+                 >
+                   <div className="text-center">
+                     <div className="text-gray-300 text-sm font-semibold">?</div>
+                     <div className="text-gray-400 text-xs">Help</div>
+                   </div>
+                 </button>
+                 
+                 {/* Quick help tooltip */}
+                 {showQuickHelp && (
+                   <div className={`absolute bg-black/90 backdrop-blur-sm rounded-lg p-3 border border-gray-600/50 max-w-xs z-30 ${
+                     isSmallMobile ? 'bottom-full left-0 mb-2' : 'bottom-full left-0 mb-2'
+                   }`}>
+                     <div className="text-gray-300 text-xs space-y-1">
+                       <div className="font-semibold text-white mb-2">Quick Tips:</div>
+                       <div>• Click on any block to reveal content</div>
+                       <div>• Answer questions correctly to maintain stability</div>
+                       <div>• Learn all 54 Bitcoin privacy concepts</div>
+                       <div>• Difficulty adapts to your performance</div>
+                       <div>• Green = Safe, Orange = Medium, Red = Risky</div>
+                     </div>
+                   </div>
+                 )}
+               </div>
+
+               {/* Footer Info */}
+               <div className={`text-center text-gray-400 text-xs ${
+                 isSmallMobile ? 'order-3 w-full' : ''
+               }`}>
+                 <div>Privacy Jenga - Learn Bitcoin Privacy Through Play</div>
+                 <div>Click blocks to learn, answer questions to progress</div>
+               </div>
+
+               {/* Audio Debug Button */}
+               <div className="relative">
+                 <button
+                   onClick={() => {
+                     console.log('🔊 Audio Debug Info:');
+                     console.log('Audio supported:', soundManager.isAudioSupported());
+                     console.log('Audio status:', soundManager.getAudioStatus());
+                     console.log('Sound settings:', soundManager.getSettings());
+                     console.log('Loaded sounds:', Array.from(soundManager['sounds'].keys()));
+                     soundManager.playSound('button-click');
+                   }}
+                   className="bg-black/60 backdrop-blur-sm rounded-lg p-2 border border-gray-600/50 hover:bg-gray-700/80 transition-colors"
+                   title="Audio Debug"
+                 >
+                   <div className="text-center">
+                     <div className="text-gray-300 text-sm">🔧</div>
+                     <div className="text-gray-400 text-xs">Debug</div>
+                   </div>
+                 </button>
+               </div>
+             </div>
+           </div>
+         </footer>
 
         {/* Achievement Notification */}
         {showAchievementNotification && lastAchievement && (
