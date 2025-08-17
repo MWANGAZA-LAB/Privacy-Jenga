@@ -329,7 +329,7 @@ export interface BitsaccoLogoProps {
 }
 
 export interface GameErrorBoundaryProps {
-  children: React.ReactNode;
+  children: any;
 }
 
 export interface GameErrorBoundaryState {

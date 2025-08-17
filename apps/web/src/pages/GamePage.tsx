@@ -142,31 +142,7 @@ const GamePage: React.FC = () => {
     }
   }, [gameState]);
 
-  // Handle tower collapse
-  const handleTowerCollapse = useCallback(() => {
-    if (!gameState) return;
 
-    try {
-      console.log('💥 Tower collapsed, rebuilding...');
-      
-      // Rebuild tower
-      const updatedGameState = enhancedGameService.rebuildTower();
-      const updatedBlocks = enhancedGameService.getBlocks();
-      
-      setGameState(updatedGameState);
-      setBlocks(updatedBlocks);
-      
-      // Check if all content is completed
-      if (updatedGameState.gamePhase === 'completed') {
-        setShowEndgameSummary(true);
-      }
-      
-      console.log('🏗️ Tower rebuilt successfully');
-      
-    } catch (error) {
-      console.error('🚨 Error rebuilding tower:', error);
-    }
-  }, [gameState]);
 
   // Handle quiz answer
   const handleQuizAnswer = useCallback(async (blockId: string, selectedAnswer: number) => {
@@ -213,7 +189,7 @@ const GamePage: React.FC = () => {
     } catch (error) {
       console.error('🚨 Error handling quiz answer:', error);
     }
-  }, [gameState, handleTowerCollapse]);
+  }, [gameState]);
 
   // Close content modal
   const handleCloseContentModal = useCallback(() => {

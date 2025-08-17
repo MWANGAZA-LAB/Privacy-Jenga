@@ -190,7 +190,7 @@ const ContentModal: React.FC<ContentModalProps> = ({
                     <span className="text-green-300 font-semibold">Great Learning!</span>
                   </div>
                   <p className="text-gray-300">
-                    You've learned an important privacy concept. Keep building your knowledge!
+                    You&apos;ve learned an important privacy concept. Keep building your knowledge!
                   </p>
                 </div>
               )}

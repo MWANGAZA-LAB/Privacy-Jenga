@@ -255,8 +255,8 @@ const EndgameSummary: React.FC<EndgameSummaryProps> = ({
                       <div className="text-4xl mb-2">🏆</div>
                       <h3 className="text-xl font-bold text-white mb-2">Privacy Master</h3>
                       <p className="text-gray-300 text-sm">
-                        You've successfully learned all 54 Bitcoin privacy concepts! 
-                        You're now equipped with comprehensive knowledge about Bitcoin privacy.
+                        You&apos;ve successfully learned all 54 Bitcoin privacy concepts! 
+                        You&apos;re now equipped with comprehensive knowledge about Bitcoin privacy.
                       </p>
                     </div>
                   </motion.div>

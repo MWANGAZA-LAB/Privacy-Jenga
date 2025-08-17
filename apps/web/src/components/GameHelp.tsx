@@ -152,7 +152,7 @@ const GameHelp: React.FC<GameHelpProps> = ({ isOpen, onClose }) => {
             </h3>
             <div className="bg-gray-700/50 rounded-lg p-4 space-y-3">
               <p className="text-gray-300">
-                By playing Privacy Jenga, you'll learn about:
+                By playing Privacy Jenga, you&apos;ll learn about:
               </p>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
                 <div className="space-y-2">

@@ -15,7 +15,7 @@ const SimplifiedJengaTower: React.FC<SimplifiedJengaTowerProps> = ({
   const { isMobile, isSmallMobile } = useResponsiveDesign();
   const [showStabilityWarning, setShowStabilityWarning] = useState(false);
   const [lastStabilityLevel, setLastStabilityLevel] = useState<'stable' | 'unstable' | 'critical'>('stable');
-  const [warningTimer, setWarningTimer] = useState<NodeJS.Timeout | null>(null);
+  const [warningTimer, setWarningTimer] = useState<ReturnType<typeof setTimeout> | null>(null);
 
   // Filter visible blocks
   const visibleBlocks = useMemo(() => {
@@ -255,13 +255,15 @@ const SimplifiedJengaTower: React.FC<SimplifiedJengaTowerProps> = ({
                  receiveShadow
                >
                  <boxGeometry args={[1, 0.3, 1]} />
-                 <meshStandardMaterial
-                   color={isCritical ? 0xff4444 : blockColor}
-                   metalness={0.2}
-                   roughness={0.6}
-                   emissive={isCritical ? 0xff0000 : (glowColor || 0x000000)}
-                   emissiveIntensity={isSelected ? 0.4 : (isCritical ? 0.3 : 0)}
-                 />
+                                   <meshStandardMaterial
+                    color={isCritical ? 0xff4444 : blockColor}
+                    metalness={0.2}
+                    roughness={0.6}
+                    // eslint-disable-next-line react/no-unknown-property
+                    emissive={isCritical ? 0xff0000 : (glowColor || 0x000000)}
+                    // eslint-disable-next-line react/no-unknown-property
+                    emissiveIntensity={isSelected ? 0.4 : (isCritical ? 0.3 : 0)}
+                  />
                </mesh>
                
                {/* Block edge highlights for better definition */}
@@ -278,13 +280,15 @@ const SimplifiedJengaTower: React.FC<SimplifiedJengaTowerProps> = ({
               {/* Block type indicator */}
               <mesh position={[block.worldPosition[0], block.worldPosition[1] + 0.2, block.worldPosition[2]]}>
                 <boxGeometry args={[0.8, 0.05, 0.8]} />
-                <meshStandardMaterial 
-                  color="#ffffff" 
-                  transparent 
-                  opacity={0.2}
-                  emissive={0xffffff}
-                  emissiveIntensity={0.1}
-                />
+                                 <meshStandardMaterial 
+                   color="#ffffff" 
+                   transparent 
+                   opacity={0.2}
+                   // eslint-disable-next-line react/no-unknown-property
+                   emissive={0xffffff}
+                   // eslint-disable-next-line react/no-unknown-property
+                   emissiveIntensity={0.1}
+                 />
               </mesh>
               
               {/* Selection highlight */}
@@ -376,9 +380,9 @@ const SimplifiedJengaTower: React.FC<SimplifiedJengaTowerProps> = ({
              <p className="text-gray-300 mb-6">
                Concepts learned: {gameState.totalContentShown}/54
              </p>
-             <p className="text-orange-200 mb-6 italic">
-               "Oops! The tower got a bit too wobbly! 🎲 Better luck next time, privacy warrior!"
-             </p>
+                           <p className="text-orange-200 mb-6 italic">
+                &quot;Oops! The tower got a bit too wobbly! 🎲 Better luck next time, privacy warrior!&quot;
+              </p>
              <div className="space-y-3">
                                <button
                   onClick={onGameRestart || (() => window.location.reload())}
@@ -402,9 +406,9 @@ const SimplifiedJengaTower: React.FC<SimplifiedJengaTowerProps> = ({
           <div className="bg-green-900/90 border border-green-600 rounded-2xl p-8 max-w-md text-center">
             <div className="text-6xl mb-4">🏆</div>
             <h2 className="text-3xl font-bold text-white mb-4">Privacy Master!</h2>
-            <p className="text-green-200 mb-6">
-              Congratulations! You've learned all 54 Bitcoin privacy concepts!
-            </p>
+                         <p className="text-green-200 mb-6">
+               Congratulations! You&apos;ve learned all 54 Bitcoin privacy concepts!
+             </p>
             <p className="text-gray-300 mb-6">
               Your final score: {gameState.currentScore} points
             </p>

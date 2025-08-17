@@ -228,7 +228,7 @@ class EnhancedContentTrackerImpl implements ContentTracker {
       category: question.category,
       title: `Question: ${question.question.substring(0, 50)}...`,
       content: question.explanation,
-      question: question,
+      question,
     };
   }
 
