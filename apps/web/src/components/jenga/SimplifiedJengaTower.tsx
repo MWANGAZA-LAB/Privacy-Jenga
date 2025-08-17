@@ -3,6 +3,7 @@ import { Canvas } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
 import { Block, SimplifiedJengaTowerProps } from '../../types';
 import { useResponsiveDesign } from '../../hooks/useResponsiveDesign';
+import soundManager from '../../services/soundManager';
 
 const SimplifiedJengaTower: React.FC<SimplifiedJengaTowerProps> = ({
   blocks,
@@ -42,6 +43,9 @@ const SimplifiedJengaTower: React.FC<SimplifiedJengaTowerProps> = ({
     // Show warning if stability level changed
     if (currentStabilityLevel !== lastStabilityLevel && currentStabilityLevel !== 'stable') {
       console.log(`🚨 Stability warning triggered: ${lastStabilityLevel} → ${currentStabilityLevel}`);
+      
+      // Play stability warning sound
+      soundManager.playStabilityWarning();
       
       // Clear any existing timer
       if (warningTimer) {

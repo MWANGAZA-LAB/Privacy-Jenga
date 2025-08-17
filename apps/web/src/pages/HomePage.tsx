@@ -4,6 +4,7 @@ import { Brain, Target, Zap, Play, HelpCircle, BookOpen, Trophy, Shield, AlertTr
 import GameTutorial from '../components/GameTutorial';
 import BitsaccoLogo from '../components/BitsaccoLogo';
 import { motion } from 'framer-motion';
+import soundManager from '../services/soundManager';
 
 const HomePage: React.FC = () => {
   const navigate = useNavigate();
@@ -16,6 +17,7 @@ const HomePage: React.FC = () => {
   }, []);
 
   const handleStartGame = () => {
+    soundManager.playGameStart();
     navigate('/game');
   };
 
@@ -116,6 +118,7 @@ const HomePage: React.FC = () => {
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
             <button
               onClick={() => handleStartGame()}
+              onMouseEnter={() => soundManager.playButtonHover()}
               className="bitsacco-btn bitsacco-btn-primary text-lg px-8 py-4 flex items-center gap-3"
             >
               <Play className="w-6 h-6" />
@@ -124,6 +127,7 @@ const HomePage: React.FC = () => {
             
             <button
               onClick={() => setShowTutorial(true)}
+              onMouseEnter={() => soundManager.playButtonHover()}
               className="bitsacco-btn bitsacco-btn-outline text-lg px-8 py-4 flex items-center gap-3"
             >
               <BookOpen className="w-6 h-6" />

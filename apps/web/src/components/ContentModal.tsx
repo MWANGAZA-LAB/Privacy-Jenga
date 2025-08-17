@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, CheckCircle, XCircle, Lightbulb, BookOpen, Star, Target } from 'lucide-react';
 import { BlockContent, GameState } from '../types';
+import soundManager from '../services/soundManager';
 
 interface ContentModalProps {
   content: BlockContent | null;
@@ -44,9 +45,17 @@ const ContentModal: React.FC<ContentModalProps> = ({
         // Check if the answer is correct by comparing with the correct index
         const isAnswerCorrect = selectedAnswer === content.question.correctIndex;
         setIsCorrect(isAnswerCorrect);
+        
+        // Play appropriate sound based on answer
+        if (isAnswerCorrect) {
+          soundManager.playCorrectAnswer();
+        } else {
+          soundManager.playWrongAnswer();
+        }
       } catch (error) {
         console.error('Error submitting quiz answer:', error);
         setIsCorrect(false);
+        soundManager.playWrongAnswer();
       }
     }
   };

@@ -23,6 +23,7 @@ This implementation focuses on **continuous learning** and eliminates traditiona
 - **Interactive 3D Environment** - Rotate, zoom, and explore the tower
 - **Question-Based Learning** - Answer privacy questions to maintain tower stability
 - **Real-time Tower Stability** - Dynamic stability calculation with visual feedback
+- **Immersive Sound System** - Background music, sound effects, and audio feedback
 
 ### 🎯 **Bitcoin Privacy Education**
 - **Authentic Privacy Practices** - Based on real Bitcoin privacy principles
@@ -146,6 +147,7 @@ npm run build
 - **Interactive 3D Controls** - Touch and mouse-friendly camera controls
 - **Smooth Animations** - Framer Motion powered transitions
 - **Mobile-Optimized UI** - Touch-friendly buttons and controls
+- **Immersive Audio** - Background music, sound effects, and audio feedback
 
 ### **Responsive Design System**
 - **Mobile-First Approach** - Designed for mobile devices first
@@ -168,6 +170,13 @@ npm run build
 - **Optimized 3D Performance** - Efficient rendering for mobile GPUs
 - **Mobile Navigation** - Dedicated mobile control panel
 - **Responsive Typography** - Readable text at all screen sizes
+
+### **Audio System**
+- **Background Music** - Ambient and engaging background tracks
+- **Sound Effects** - Block interactions, quiz feedback, and game events
+- **Audio Settings** - Customizable volume controls for music and SFX
+- **Audio Feedback** - Immediate response to user actions
+- **Cross-Platform Support** - Works on desktop and mobile devices
 
 ## 🔧 **Development**
 
@@ -205,6 +214,7 @@ npm run preview      # Preview production build
 npm run lint         # Run ESLint
 npm run type-check   # Run TypeScript compiler
 npm run test:ci      # Run tests in CI mode
+npm run generate-audio # Generate placeholder audio files
 ```
 
 ## 🧪 **Testing & Quality**

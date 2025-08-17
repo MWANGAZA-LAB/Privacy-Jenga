@@ -4,7 +4,9 @@ import {
   ArrowLeft, 
   BarChart3, 
   HelpCircle, 
-  Brain
+  Brain,
+  Volume2,
+  VolumeX
 } from 'lucide-react';
 import SimplifiedJengaTower from '../components/jenga/SimplifiedJengaTower';
 import ContentModal from '../components/ContentModal';
@@ -13,12 +15,14 @@ import GameTutorial from '../components/GameTutorial';
 import GameStats from '../components/GameStats';
 import EndgameSummary from '../components/EndgameSummary';
 import { MobileControls } from '../components/mobile/MobileControls';
+import SoundSettings from '../components/SoundSettings';
 
 // Import responsive design hooks
 import { useResponsiveDesign } from '../hooks/useResponsiveDesign';
 
-// Import enhanced game service
+// Import enhanced game service and sound manager
 import enhancedGameService from '../services/simplifiedGameService';
+import soundManager from '../services/soundManager';
 import { Block, BlockContent, GameState, Achievement } from '../types';
 
 // Error Boundary Component to prevent crashes
@@ -86,6 +90,10 @@ const GamePage: React.FC = () => {
   const [showAchievementNotification, setShowAchievementNotification] = useState(false);
   const [lastAchievement, setLastAchievement] = useState<Achievement | null>(null);
   
+  // Sound settings state
+  const [showSoundSettings, setShowSoundSettings] = useState(false);
+  const [soundEnabled] = useState(soundManager.getSettings().enabled);
+  
   // Mobile responsiveness
   const { isMobile, isSmallMobile } = useResponsiveDesign();
 
@@ -100,6 +108,9 @@ const GamePage: React.FC = () => {
         setBlocks(newBlocks);
         
         console.log('🎮 Game initialized:', { gameState: newGameState, blocks: newBlocks.length });
+        
+        // Start background music
+        soundManager.startBackgroundMusic();
       } catch (error) {
         console.error('🚨 Error initializing game:', error);
       }
@@ -114,6 +125,9 @@ const GamePage: React.FC = () => {
 
     try {
       console.log('🎯 Block clicked:', block.id, block.type);
+      
+      // Play block click sound
+      soundManager.playBlockClick();
       
       // Get block content
       const content = enhancedGameService.handleBlockClick(block.id);
@@ -177,12 +191,14 @@ const GamePage: React.FC = () => {
       if (newAchievement) {
         setLastAchievement(newAchievement);
         setShowAchievementNotification(true);
+        soundManager.playAchievementUnlock();
         setTimeout(() => setShowAchievementNotification(false), 4000);
       }
       
       // Check if tower collapsed - don't auto-rebuild, let the popup show
       if (updatedGameState.gamePhase === 'collapsed') {
         console.log('💥 Tower collapsed! Game end popup should show now.');
+        soundManager.playTowerCollapse();
         // Don't auto-rebuild - let the user see the game end popup first
       }
       
@@ -212,6 +228,9 @@ const GamePage: React.FC = () => {
       setShowEndgameSummary(false);
       setSelectedBlockId(undefined);
       setCurrentContent(null);
+      
+      // Play game start sound
+      soundManager.playGameStart();
       
       console.log('🔄 Game reset successfully');
     } catch (error) {
@@ -316,17 +335,33 @@ const GamePage: React.FC = () => {
                   <HelpCircle className={isSmallMobile ? "w-4 h-4" : "w-5 h-5"} />
                 </motion.button>
                 
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  onClick={() => setShowTutorial(true)}
-                  className={`text-white hover:text-green-300 transition-colors ${
-                    isSmallMobile ? 'p-1' : 'p-2'
-                  }`}
-                  title="Game Tutorial"
-                >
-                  <Brain className={isSmallMobile ? "w-4 h-4" : "w-5 h-5"} />
-                </motion.button>
+                                 <motion.button
+                   whileHover={{ scale: 1.05 }}
+                   whileTap={{ scale: 0.95 }}
+                   onClick={() => setShowTutorial(true)}
+                   className={`text-white hover:text-green-300 transition-colors ${
+                     isSmallMobile ? 'p-1' : 'p-2'
+                   }`}
+                   title="Game Tutorial"
+                 >
+                   <Brain className={isSmallMobile ? "w-4 h-4" : "w-5 h-5"} />
+                 </motion.button>
+                 
+                 <motion.button
+                   whileHover={{ scale: 1.05 }}
+                   whileTap={{ scale: 0.95 }}
+                   onClick={() => setShowSoundSettings(true)}
+                   className={`text-white hover:text-blue-300 transition-colors ${
+                     isSmallMobile ? 'p-1' : 'p-2'
+                   }`}
+                   title="Sound Settings"
+                 >
+                   {soundEnabled ? (
+                     <Volume2 className={isSmallMobile ? "w-4 h-4" : "w-5 h-5"} />
+                   ) : (
+                     <VolumeX className={isSmallMobile ? "w-4 h-4" : "w-5 h-5"} />
+                   )}
+                 </motion.button>
               </div>
             </div>
           </div>
@@ -495,14 +530,20 @@ const GamePage: React.FC = () => {
           />
         )}
 
-        {/* Mobile Controls */}
-        {isMobile && (
-          <MobileControls
-            onReset={handleResetGame}
-            onHelp={() => setShowHelp(true)}
-            onTutorial={() => setShowTutorial(true)}
-          />
-        )}
+                 {/* Mobile Controls */}
+         {isMobile && (
+           <MobileControls
+             onReset={handleResetGame}
+             onHelp={() => setShowHelp(true)}
+             onTutorial={() => setShowTutorial(true)}
+           />
+         )}
+
+         {/* Sound Settings Modal */}
+         <SoundSettings
+           isOpen={showSoundSettings}
+           onClose={() => setShowSoundSettings(false)}
+         />
       </div>
     </GameErrorBoundary>
   );

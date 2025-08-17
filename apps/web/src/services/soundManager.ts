@@ -1,0 +1,374 @@
+// Sound Manager for Privacy Jenga Game
+// Handles all audio effects, background music, and sound settings
+
+export interface SoundSettings {
+  masterVolume: number;
+  musicVolume: number;
+  sfxVolume: number;
+  enabled: boolean;
+}
+
+export interface AudioTrack {
+  id: string;
+  src: string;
+  volume: number;
+  loop: boolean;
+  type: 'music' | 'sfx';
+}
+
+class SoundManager {
+  private audioContext: AudioContext | null = null;
+  private sounds: Map<string, HTMLAudioElement> = new Map();
+  private music: HTMLAudioElement | null = null;
+  private settings: SoundSettings = {
+    masterVolume: 0.7,
+    musicVolume: 0.5,
+    sfxVolume: 0.8,
+    enabled: true
+  };
+
+  // Audio tracks configuration
+  private readonly audioTracks: AudioTrack[] = [
+    // Background Music
+    {
+      id: 'background-music',
+      src: '/audio/background-music.mp3',
+      volume: 0.4,
+      loop: true,
+      type: 'music'
+    },
+    {
+      id: 'ambient-music',
+      src: '/audio/ambient-music.mp3',
+      volume: 0.3,
+      loop: true,
+      type: 'music'
+    },
+    
+    // Game Sound Effects
+    {
+      id: 'block-click',
+      src: '/audio/block-click.mp3',
+      volume: 0.6,
+      loop: false,
+      type: 'sfx'
+    },
+    {
+      id: 'block-remove',
+      src: '/audio/block-remove.mp3',
+      volume: 0.7,
+      loop: false,
+      type: 'sfx'
+    },
+    {
+      id: 'correct-answer',
+      src: '/audio/correct-answer.mp3',
+      volume: 0.8,
+      loop: false,
+      type: 'sfx'
+    },
+    {
+      id: 'wrong-answer',
+      src: '/audio/wrong-answer.mp3',
+      volume: 0.6,
+      loop: false,
+      type: 'sfx'
+    },
+    {
+      id: 'tower-shake',
+      src: '/audio/tower-shake.mp3',
+      volume: 0.5,
+      loop: false,
+      type: 'sfx'
+    },
+    {
+      id: 'tower-collapse',
+      src: '/audio/tower-collapse.mp3',
+      volume: 0.9,
+      loop: false,
+      type: 'sfx'
+    },
+    {
+      id: 'achievement-unlock',
+      src: '/audio/achievement-unlock.mp3',
+      volume: 0.8,
+      loop: false,
+      type: 'sfx'
+    },
+    {
+      id: 'stability-warning',
+      src: '/audio/stability-warning.mp3',
+      volume: 0.6,
+      loop: false,
+      type: 'sfx'
+    },
+    {
+      id: 'button-hover',
+      src: '/audio/button-hover.mp3',
+      volume: 0.3,
+      loop: false,
+      type: 'sfx'
+    },
+    {
+      id: 'button-click',
+      src: '/audio/button-click.mp3',
+      volume: 0.5,
+      loop: false,
+      type: 'sfx'
+    },
+    {
+      id: 'game-start',
+      src: '/audio/game-start.mp3',
+      volume: 0.7,
+      loop: false,
+      type: 'sfx'
+    },
+    {
+      id: 'game-complete',
+      src: '/audio/game-complete.mp3',
+      volume: 0.8,
+      loop: false,
+      type: 'sfx'
+    }
+  ];
+
+  constructor() {
+    this.initializeAudioContext();
+    this.loadSettings();
+    this.preloadSounds();
+  }
+
+  private initializeAudioContext(): void {
+    try {
+      // Initialize Web Audio API context
+      this.audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+      console.log('🎵 Audio context initialized');
+    } catch (error) {
+      console.warn('⚠️ Audio context initialization failed:', error);
+    }
+  }
+
+  private loadSettings(): void {
+    try {
+      const savedSettings = localStorage.getItem('privacy-jenga-sound-settings');
+      if (savedSettings) {
+        this.settings = { ...this.settings, ...JSON.parse(savedSettings) };
+      }
+    } catch (error) {
+      console.warn('⚠️ Failed to load sound settings:', error);
+    }
+  }
+
+  private saveSettings(): void {
+    try {
+      localStorage.setItem('privacy-jenga-sound-settings', JSON.stringify(this.settings));
+    } catch (error) {
+      console.warn('⚠️ Failed to save sound settings:', error);
+    }
+  }
+
+  private preloadSounds(): void {
+    this.audioTracks.forEach(track => {
+      this.loadSound(track);
+    });
+  }
+
+  private loadSound(track: AudioTrack): void {
+    const audio = new Audio(track.src);
+    audio.preload = 'auto';
+    audio.volume = this.getAdjustedVolume(track.volume, track.type);
+    
+    // Handle loading errors gracefully
+    audio.addEventListener('error', (e) => {
+      console.warn(`⚠️ Failed to load audio: ${track.src}`, e);
+    });
+
+    audio.addEventListener('canplaythrough', () => {
+      console.log(`✅ Audio loaded: ${track.id}`);
+    });
+
+    this.sounds.set(track.id, audio);
+  }
+
+  private getAdjustedVolume(baseVolume: number, type: 'music' | 'sfx'): number {
+    if (!this.settings.enabled) return 0;
+    
+    const typeVolume = type === 'music' ? this.settings.musicVolume : this.settings.sfxVolume;
+    return (baseVolume * typeVolume * this.settings.masterVolume);
+  }
+
+  // Public API Methods
+
+  public playSound(soundId: string): void {
+    if (!this.settings.enabled) return;
+
+    const sound = this.sounds.get(soundId);
+    if (sound) {
+      try {
+        // Reset audio to beginning if it's already playing
+        sound.currentTime = 0;
+        sound.volume = this.getAdjustedVolume(
+          this.audioTracks.find(t => t.id === soundId)?.volume || 0.5,
+          this.audioTracks.find(t => t.id === soundId)?.type || 'sfx'
+        );
+        
+        // Resume audio context if suspended
+        if (this.audioContext?.state === 'suspended') {
+          this.audioContext.resume();
+        }
+        
+        sound.play().catch(error => {
+          console.warn(`⚠️ Failed to play sound ${soundId}:`, error);
+        });
+      } catch (error) {
+        console.warn(`⚠️ Error playing sound ${soundId}:`, error);
+      }
+    } else {
+      console.warn(`⚠️ Sound not found: ${soundId}`);
+    }
+  }
+
+  public playMusic(musicId: string): void {
+    if (!this.settings.enabled || this.settings.musicVolume === 0) return;
+
+    // Stop current music
+    this.stopMusic();
+
+    const music = this.sounds.get(musicId);
+    if (music) {
+      try {
+        music.volume = this.getAdjustedVolume(
+          this.audioTracks.find(t => t.id === musicId)?.volume || 0.4,
+          'music'
+        );
+        music.loop = true;
+        music.play().catch(error => {
+          console.warn(`⚠️ Failed to play music ${musicId}:`, error);
+        });
+        this.music = music;
+      } catch (error) {
+        console.warn(`⚠️ Error playing music ${musicId}:`, error);
+      }
+    }
+  }
+
+  public stopMusic(): void {
+    if (this.music) {
+      this.music.pause();
+      this.music.currentTime = 0;
+      this.music = null;
+    }
+  }
+
+  public pauseMusic(): void {
+    if (this.music) {
+      this.music.pause();
+    }
+  }
+
+  public resumeMusic(): void {
+    if (this.music && this.settings.enabled) {
+      this.music.play().catch(error => {
+        console.warn('⚠️ Failed to resume music:', error);
+      });
+    }
+  }
+
+  public updateSettings(newSettings: Partial<SoundSettings>): void {
+    this.settings = { ...this.settings, ...newSettings };
+    this.saveSettings();
+    
+    // Update volumes for all loaded sounds
+    this.sounds.forEach((sound, soundId) => {
+      const track = this.audioTracks.find(t => t.id === soundId);
+      if (track) {
+        sound.volume = this.getAdjustedVolume(track.volume, track.type);
+      }
+    });
+  }
+
+  public getSettings(): SoundSettings {
+    return { ...this.settings };
+  }
+
+  public toggleSound(): void {
+    this.settings.enabled = !this.settings.enabled;
+    this.saveSettings();
+    
+    if (!this.settings.enabled) {
+      this.stopMusic();
+    } else if (this.music) {
+      this.resumeMusic();
+    }
+  }
+
+  // Game-specific sound methods
+  public playBlockClick(): void {
+    this.playSound('block-click');
+  }
+
+  public playBlockRemove(): void {
+    this.playSound('block-remove');
+  }
+
+  public playCorrectAnswer(): void {
+    this.playSound('correct-answer');
+  }
+
+  public playWrongAnswer(): void {
+    this.playSound('wrong-answer');
+  }
+
+  public playTowerShake(): void {
+    this.playSound('tower-shake');
+  }
+
+  public playTowerCollapse(): void {
+    this.playSound('tower-collapse');
+  }
+
+  public playAchievementUnlock(): void {
+    this.playSound('achievement-unlock');
+  }
+
+  public playStabilityWarning(): void {
+    this.playSound('stability-warning');
+  }
+
+  public playButtonHover(): void {
+    this.playSound('button-hover');
+  }
+
+  public playButtonClick(): void {
+    this.playSound('button-click');
+  }
+
+  public playGameStart(): void {
+    this.playSound('game-start');
+  }
+
+  public playGameComplete(): void {
+    this.playSound('game-complete');
+  }
+
+  public startBackgroundMusic(): void {
+    this.playMusic('background-music');
+  }
+
+  public startAmbientMusic(): void {
+    this.playMusic('ambient-music');
+  }
+
+  // Cleanup
+  public destroy(): void {
+    this.stopMusic();
+    this.sounds.clear();
+    if (this.audioContext) {
+      this.audioContext.close();
+    }
+  }
+}
+
+// Create singleton instance
+export const soundManager = new SoundManager();
+export default soundManager;
