@@ -110,6 +110,13 @@ jobs:
           # Ensure index.html is the main entry point
           echo "✅ Cleaned deployment artifacts"
           
+      - name: Create .nojekyll file
+        run: |
+          cd apps/web/dist
+          # Create .nojekyll file to prevent GitHub Pages from using Jekyll processing
+          touch .nojekyll
+          echo "✅ Created .nojekyll file to ensure proper GitHub Pages serving"
+          
       - name: Setup artifact context
         uses: actions/upload-pages-artifact@v3
         with:
