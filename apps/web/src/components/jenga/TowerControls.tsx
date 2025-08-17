@@ -72,7 +72,7 @@ export const TowerControls: React.FC<TowerControlsProps> = ({
                 <div className="text-white text-lg font-bold">
                   {getLayerDescription(maxAllowedLayer)}
                 </div>
-                <div className="text-teal-200 text-xs mt-1">Roll dice to change access</div>
+                <div className="text-teal-200 text-xs mt-1">Select category to change access</div>
               </div>
 
               {/* Block Types Legend */}

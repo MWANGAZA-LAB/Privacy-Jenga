@@ -1,357 +1,282 @@
-import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { X, HelpCircle, BookOpen, Target, Trophy, Zap, Shield, AlertTriangle, Dice1, Info, Star, Brain } from 'lucide-react';
-
-interface GameHelpProps {
-  isOpen: boolean;
-  onClose: () => void;
-}
+import React from 'react';
+import { X, HelpCircle, BookOpen, Target, Zap, Shield, AlertTriangle, Star, Brain, Gamepad2 } from 'lucide-react';
+import { GameHelpProps } from '../types';
 
 const GameHelp: React.FC<GameHelpProps> = ({ isOpen, onClose }) => {
-  const [activeTab, setActiveTab] = useState('rules');
-
-  const tabs = [
-    { id: 'rules', label: 'Game Rules', icon: <BookOpen className="w-5 h-5" /> },
-    { id: 'scoring', label: 'Scoring', icon: <Trophy className="w-5 h-5" /> },
-    { id: 'strategy', label: 'Strategy', icon: <Target className="w-5 h-5" /> },
-    { id: 'tips', label: 'Tips & Tricks', icon: <Star className="w-5 h-5" /> }
-  ];
-
-  const renderContent = () => {
-    switch (activeTab) {
-      case 'rules':
-        return (
-          <div className="space-y-6">
-            <div className="bitsacco-card p-4">
-              <h3 className="text-lg font-semibold text-teal-300 mb-3 flex items-center gap-2">
-                <Shield className="w-5 h-5" />
-                Basic Rules
-              </h3>
-              <ul className="space-y-2 text-gray-300 text-sm">
-                <li>• <strong>Objective:</strong> Remove blocks while learning about privacy</li>
-                <li>• <strong>Game End:</strong> Tower collapses when unstable</li>
-                <li>• <strong>Turn Order:</strong> Roll dice → Choose block → Learn → Continue</li>
-                <li>• <strong>Block Removal:</strong> Only from layers specified by dice</li>
-                <li>• <strong>Learning:</strong> Each block teaches privacy concepts</li>
-              </ul>
-            </div>
-
-            <div className="bitsacco-card p-4">
-              <h3 className="text-lg font-semibold text-teal-300 mb-3 flex items-center gap-2">
-                <Dice1 className="w-5 h-5" />
-                Dice Mechanics
-              </h3>
-              <div className="grid grid-cols-2 gap-3 text-sm">
-                <div className="space-y-2">
-                  <div className="flex items-center gap-2">
-                    <span className="w-6 h-6 bg-green-500 rounded text-white text-xs font-bold flex items-center justify-center">1</span>
-                    <span className="text-gray-300">Safe Zone (Layers 1-3)</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className="w-6 h-6 bg-blue-500 rounded text-white text-xs font-bold flex items-center justify-center">2</span>
-                    <span className="text-gray-300">Steady (Layers 1-6)</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className="w-6 h-6 bg-yellow-500 rounded text-white text-xs font-bold flex items-center justify-center">3</span>
-                    <span className="text-gray-300">Risky (Layers 1-9)</span>
-                  </div>
-                </div>
-                <div className="space-y-2">
-                  <div className="flex items-center gap-2">
-                    <span className="w-6 h-6 bg-orange-500 rounded text-white text-xs font-bold flex items-center justify-center">4</span>
-                    <span className="text-gray-300">Danger (Layers 1-12)</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className="w-6 h-6 bg-red-500 rounded text-white text-xs font-bold flex items-center justify-center">5</span>
-                    <span className="text-gray-300">Extreme (Layers 1-15)</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className="w-6 h-6 bg-purple-500 rounded text-white text-xs font-bold flex items-center justify-center">6</span>
-                    <span className="text-gray-300">Ultimate (All Layers)</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="bitsacco-card p-4">
-              <h3 className="text-lg font-semibold text-teal-300 mb-3 flex items-center gap-2">
-                <Info className="w-5 h-5" />
-                Block Types
-              </h3>
-              <div className="space-y-3 text-sm">
-                <div className="flex items-center gap-3 p-3 bg-green-500/10 border border-green-400/30 rounded-lg">
-                  <div className="w-4 h-4 bg-green-500 rounded"></div>
-                  <div>
-                    <div className="font-semibold text-green-300">Safe Blocks</div>
-                    <div className="text-green-200">Good privacy practices, earn points, stabilize tower</div>
-                  </div>
-                </div>
-                <div className="flex items-center gap-3 p-3 bg-red-500/10 border border-red-400/30 rounded-lg">
-                  <div className="w-4 h-4 bg-red-500 rounded"></div>
-                  <div>
-                    <div className="font-semibold text-red-300">Risky Blocks</div>
-                    <div className="text-red-200">Bad practices, cost points, destabilize tower</div>
-                  </div>
-                </div>
-                <div className="flex items-center gap-3 p-3 bg-yellow-500/10 border border-yellow-400/30 rounded-lg">
-                  <div className="w-4 h-4 bg-yellow-500 rounded"></div>
-                  <div>
-                    <div className="font-semibold text-yellow-300">Challenge Blocks</div>
-                    <div className="text-yellow-200">Quiz questions, correct = points, wrong = penalty</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        );
-
-      case 'scoring':
-        return (
-          <div className="space-y-6">
-            <div className="bitsacco-card p-4">
-              <h3 className="text-lg font-semibold text-teal-300 mb-3 flex items-center gap-2">
-                <Trophy className="w-5 h-5" />
-                Point System
-              </h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                <div className="space-y-3">
-                  <div className="p-3 bg-green-500/10 border border-green-400/30 rounded-lg">
-                    <div className="font-semibold text-green-300 mb-1">Safe Blocks</div>
-                    <div className="text-green-200">Base: 15-30 points</div>
-                    <div className="text-green-200">Effect: +stability</div>
-                  </div>
-                  <div className="p-3 bg-red-500/10 border border-red-400/30 rounded-lg">
-                    <div className="font-semibold text-red-300 mb-1">Risky Blocks</div>
-                    <div className="text-red-200">Base: 25-50 points</div>
-                    <div className="text-red-200">Effect: -stability</div>
-                  </div>
-                </div>
-                <div className="space-y-3">
-                  <div className="p-3 bg-yellow-500/10 border border-yellow-400/30 rounded-lg">
-                    <div className="font-semibold text-yellow-300 mb-1">Challenge Blocks</div>
-                    <div className="text-yellow-200">Base: 35-70 points</div>
-                    <div className="text-yellow-200">Correct: +bonus, +stability</div>
-                    <div className="text-yellow-200">Wrong: -penalty, -stability</div>
-                  </div>
-                  <div className="p-3 bg-blue-500/10 border border-blue-400/30 rounded-lg">
-                    <div className="font-semibold text-blue-300 mb-1">Layer Multiplier</div>
-                    <div className="text-blue-200">Higher layers = more points</div>
-                    <div className="text-blue-200">Risk vs. reward balance</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="bitsacco-card p-4">
-              <h3 className="text-lg font-semibold text-teal-300 mb-3 flex items-center gap-2">
-                <Star className="w-5 h-5" />
-                Achievements
-              </h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between p-2 bg-gray-700/50 rounded">
-                    <span className="text-gray-300">First Steps</span>
-                    <span className="text-teal-400">+10 pts</span>
-                  </div>
-                  <div className="flex items-center justify-between p-2 bg-gray-700/50 rounded">
-                    <span className="text-gray-300">Privacy Pro</span>
-                    <span className="text-teal-400">+50 pts</span>
-                  </div>
-                  <div className="flex items-center justify-between p-2 bg-gray-700/50 rounded">
-                    <span className="text-gray-300">Tower Master</span>
-                    <span className="text-teal-400">+100 pts</span>
-                  </div>
-                </div>
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between p-2 bg-gray-700/50 rounded">
-                    <span className="text-gray-300">High Scorer</span>
-                    <span className="text-teal-400">+200 pts</span>
-                  </div>
-                  <div className="flex items-center justify-between p-2 bg-gray-700/50 rounded">
-                    <span className="text-gray-300">Layer Explorer</span>
-                    <span className="text-teal-400">+150 pts</span>
-                  </div>
-                  <div className="flex items-center justify-between p-2 bg-gray-700/50 rounded">
-                    <span className="text-gray-300">Quiz Champion</span>
-                    <span className="text-teal-400">+300 pts</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        );
-
-      case 'strategy':
-        return (
-          <div className="space-y-6">
-            <div className="bitsacco-card p-4">
-              <h3 className="text-lg font-semibold text-teal-300 mb-3 flex items-center gap-2">
-                <Target className="w-5 h-5" />
-                Beginner Strategy
-              </h3>
-              <ul className="space-y-2 text-gray-300 text-sm">
-                <li>• <strong>Start Safe:</strong> Focus on layers 1-6 for stability</li>
-                <li>• <strong>Green First:</strong> Remove safe blocks to build foundation</li>
-                <li>• <strong>Learn Patterns:</strong> Understand block type distribution</li>
-                <li>• <strong>Quiz Carefully:</strong> Take time with challenge blocks</li>
-                <li>• <strong>Monitor Stability:</strong> Watch tower health indicators</li>
-              </ul>
-            </div>
-
-            <div className="bitsacco-card p-4">
-              <h3 className="text-lg font-semibold text-teal-300 mb-3 flex items-center gap-2">
-                <Zap className="w-5 h-5" />
-                Advanced Strategy
-              </h3>
-              <ul className="space-y-2 text-gray-300 text-sm">
-                <li>• <strong>Risk Management:</strong> Balance safe vs. risky for optimal scoring</li>
-                <li>• <strong>Dice Planning:</strong> Save high dice for difficult layers</li>
-                <li>• <strong>Streak Building:</strong> Chain correct answers for multipliers</li>
-                <li>• <strong>Layer Timing:</strong> Access higher layers when stable</li>
-                <li>• <strong>Endgame Planning:</strong> Prepare for tower instability</li>
-              </ul>
-            </div>
-
-            <div className="bitsacco-card p-4">
-              <h3 className="text-lg font-semibold text-teal-300 mb-3 flex items-center gap-2">
-                <AlertTriangle className="w-5 h-5" />
-                Common Mistakes
-              </h3>
-              <ul className="space-y-2 text-gray-300 text-sm">
-                <li>• <strong>Rushing:</strong> Don&apos;t remove blocks without reading content</li>
-                <li>• <strong>Ignoring Dice:</strong> Always check allowed layers</li>
-                <li>• <strong>Risk Overload:</strong> Too many red blocks too quickly</li>
-                <li>• <strong>Quiz Guessing:</strong> Take time to think through answers</li>
-                <li>• <strong>Stability Ignorance:</strong> Monitor tower health constantly</li>
-              </ul>
-            </div>
-          </div>
-        );
-
-      case 'tips':
-        return (
-          <div className="space-y-6">
-            <div className="bitsacco-card p-4">
-              <h3 className="text-lg font-semibold text-teal-300 mb-3 flex items-center gap-2">
-                <Star className="w-5 h-5" />
-                Pro Tips
-              </h3>
-              <div className="space-y-3 text-sm">
-                <div className="p-3 bg-teal-500/10 border border-teal-400/30 rounded-lg">
-                  <div className="font-semibold text-teal-300 mb-1">🎯 Perfect Start</div>
-                  <div className="text-teal-200">Begin with 3-4 safe blocks to build stability before taking risks</div>
-                </div>
-                <div className="p-3 bg-blue-500/10 border border-blue-400/30 rounded-lg">
-                  <div className="font-semibold text-blue-300 mb-1">🎲 Dice Strategy</div>
-                  <div className="text-blue-200">Save dice roll 6 for when you need access to all layers</div>
-                </div>
-                <div className="p-3 bg-purple-500/10 border border-purple-400/30 rounded-lg">
-                  <div className="font-semibold text-purple-300 mb-1">📚 Learning Focus</div>
-                  <div className="text-purple-200">Read every block&apos;s content - knowledge is more valuable than points</div>
-                </div>
-                <div className="p-3 bg-yellow-500/10 border border-yellow-400/30 rounded-lg">
-                  <div className="font-semibold text-yellow-300 mb-1">⚖️ Risk Balance</div>
-                  <div className="text-yellow-200">Mix 2 safe blocks for every 1 risky block to maintain stability</div>
-                </div>
-              </div>
-            </div>
-
-            <div className="bitsacco-card p-4">
-              <h3 className="text-lg font-semibold text-teal-300 mb-3 flex items-center gap-2">
-                <Info className="w-5 h-5" />
-                Game Mode
-              </h3>
-              <div className="space-y-3 text-sm">
-                <div className="p-3 bg-teal-500/10 border border-teal-400/30 rounded-lg">
-                  <div className="font-semibold text-teal-300 mb-1 flex items-center gap-2">
-                    <Brain className="w-4 h-4" />
-                    Learning Mode
-                  </div>
-                  <div className="text-teal-200">Continuous learning experience with automatic tower resets. Perfect for mastering all 54 privacy concepts without interruption.</div>
-                </div>
-              </div>
-            </div>
-
-            <div className="bitsacco-card p-4">
-              <h3 className="text-lg font-semibold text-teal-300 mb-3 flex items-center gap-2">
-                <Shield className="w-5 h-5" />
-                Privacy Learning
-              </h3>
-              <ul className="space-y-2 text-gray-300 text-sm">
-                <li>• <strong>Real Application:</strong> Apply concepts to your daily online activities</li>
-                <li>• <strong>Progressive Learning:</strong> Start with basics, advance to complex topics</li>
-                <li>• <strong>Practice Makes Perfect:</strong> Replay to reinforce knowledge</li>
-                <li>• <strong>Stay Updated:</strong> Privacy threats evolve - keep learning</li>
-                <li>• <strong>Share Knowledge:</strong> Teach others what you learn</li>
-              </ul>
-            </div>
-          </div>
-        );
-
-      default:
-        return null;
-    }
-  };
+  if (!isOpen) return null;
 
   return (
-    <AnimatePresence>
-      {isOpen && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
-          onClick={onClose}
-        >
-          <motion.div
-            initial={{ scale: 0.9, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            exit={{ scale: 0.9, opacity: 0 }}
-            className="bitsacco-modal w-full max-w-5xl max-h-[90vh] overflow-y-auto"
-            onClick={(e) => e.stopPropagation()}
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+      <div className="bg-gray-800 rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+        {/* Header */}
+        <div className="flex items-center justify-between p-6 border-b border-gray-700">
+          <div className="flex items-center gap-3">
+            <HelpCircle className="w-8 h-8 text-blue-400" />
+            <h2 className="text-2xl font-bold text-white">Privacy Jenga Help</h2>
+          </div>
+          <button
+            onClick={onClose}
+            className="p-2 hover:bg-gray-700 rounded-lg transition-colors"
           >
-            {/* Header */}
-            <div className="flex items-center justify-between p-6 border-b border-gray-700">
-              <div className="flex items-center gap-3">
-                <HelpCircle className="w-8 h-8 text-teal-400" />
-                <h2 className="text-2xl font-bold text-white">Game Help & Information</h2>
-              </div>
-              <button
-                onClick={onClose}
-                className="p-2 hover:bg-gray-700 rounded-lg transition-colors"
-              >
-                <X className="w-5 h-5 text-gray-400" />
-              </button>
-            </div>
+            <X className="w-6 h-6 text-gray-400" />
+          </button>
+        </div>
 
-            {/* Tab Navigation */}
-            <div className="border-b border-gray-700">
-              <div className="flex space-x-1 p-4">
-                {tabs.map((tab) => (
-                  <button
-                    key={tab.id}
-                    onClick={() => setActiveTab(tab.id)}
-                    className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all duration-200 ${
-                      activeTab === tab.id
-                        ? 'bg-teal-500 text-white'
-                        : 'text-gray-400 hover:text-white hover:bg-gray-700'
-                    }`}
-                  >
-                    {tab.icon}
-                    {tab.label}
-                  </button>
-                ))}
+        {/* Content */}
+        <div className="p-6 space-y-8">
+          {/* Game Overview */}
+          <section>
+            <h3 className="text-xl font-semibold text-white mb-4 flex items-center gap-2">
+              <BookOpen className="w-6 h-6 text-green-400" />
+              Game Overview
+            </h3>
+            <div className="bg-gray-700/50 rounded-lg p-4 space-y-3">
+              <p className="text-gray-300">
+                Privacy Jenga is an educational game that teaches Bitcoin privacy concepts through interactive block removal.
+                Learn about on-chain privacy, off-chain solutions, and best practices while maintaining tower stability.
+              </p>
+              <ul className="text-gray-300 space-y-1 ml-4">
+                <li>• <strong>Direct Interaction:</strong> Click on any block to reveal content</li>
+                <li>• <strong>Learning:</strong> Each block contains privacy tips or quiz questions</li>
+                <li>• <strong>Stability:</strong> Wrong answers decrease tower stability</li>
+                <li>• <strong>Continuous Learning:</strong> Tower rebuilds until all 54 concepts are learned</li>
+              </ul>
+            </div>
+          </section>
+
+          {/* Category System */}
+          <section>
+            <h3 className="text-xl font-semibold text-white mb-4 flex items-center gap-2">
+              <Target className="w-6 h-6 text-purple-400" />
+              Category System
+            </h3>
+            <div className="bg-gray-700/50 rounded-lg p-4 space-y-3">
+              <p className="text-gray-300">
+                The game uses a category-based system where different blocks represent different privacy concepts:
+              </p>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
+                    <span className="text-blue-300 font-semibold">On-Chain Privacy</span>
+                  </div>
+                  <p className="text-sm text-gray-400 ml-5">CoinJoin, Schnorr signatures, Taproot</p>
+                </div>
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                    <span className="text-green-300 font-semibold">Off-Chain Solutions</span>
+                  </div>
+                  <p className="text-sm text-gray-400 ml-5">Lightning Network, state channels</p>
+                </div>
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 bg-purple-500 rounded-full"></div>
+                    <span className="text-purple-300 font-semibold">Coin Mixing</span>
+                  </div>
+                  <p className="text-sm text-gray-400 ml-5">Privacy tools and techniques</p>
+                </div>
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
+                    <span className="text-yellow-300 font-semibold">Wallet Setup</span>
+                  </div>
+                  <p className="text-sm text-gray-400 ml-5">Security and privacy configuration</p>
+                </div>
               </div>
             </div>
+          </section>
 
-            {/* Content */}
-            <div className="p-6">
-              {renderContent()}
+          {/* Block Types */}
+          <section>
+            <h3 className="text-xl font-semibold text-white mb-4 flex items-center gap-2">
+              <Shield className="w-6 h-6 text-green-400" />
+              Block Types
+            </h3>
+            <div className="bg-gray-700/50 rounded-lg p-4 space-y-3">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="text-center p-3 bg-green-500/10 rounded-lg border border-green-400/30">
+                  <div className="text-2xl mb-2">🟢</div>
+                  <h4 className="font-semibold text-green-300 mb-1">Green Blocks</h4>
+                  <p className="text-xs text-gray-300">Bottom layers - Safe content</p>
+                </div>
+                <div className="text-center p-3 bg-orange-500/10 rounded-lg border border-orange-400/30">
+                  <div className="text-2xl mb-2">🟠</div>
+                  <h4 className="font-semibold text-orange-300 mb-1">Orange Blocks</h4>
+                  <p className="text-xs text-gray-300">Middle layers - Medium difficulty</p>
+                </div>
+                <div className="text-center p-3 bg-red-500/10 rounded-lg border border-red-400/30">
+                  <div className="text-2xl mb-2">🔴</div>
+                  <h4 className="font-semibold text-red-300 mb-1">Red Blocks</h4>
+                  <p className="text-xs text-gray-300">Top layers - Risky content</p>
+                </div>
+              </div>
             </div>
-          </motion.div>
-        </motion.div>
-      )}
-    </AnimatePresence>
+          </section>
+
+          {/* Strategy Tips */}
+          <section>
+            <h3 className="text-xl font-semibold text-white mb-4 flex items-center gap-2">
+              <Brain className="w-6 h-6 text-teal-400" />
+              Strategy Tips
+            </h3>
+            <div className="bg-gray-700/50 rounded-lg p-4 space-y-3">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <h4 className="font-semibold text-blue-300 mb-2">🎯 Category Strategy</h4>
+                  <ul className="text-sm text-gray-300 space-y-1">
+                    <li>• Start with beginner categories</li>
+                    <li>• Focus on one category at a time</li>
+                    <li>• Build knowledge systematically</li>
+                    <li>• Use category rotation for variety</li>
+                  </ul>
+                </div>
+                <div>
+                  <h4 className="font-semibold text-green-300 mb-2">🏗️ Tower Management</h4>
+                  <ul className="text-sm text-gray-300 space-y-1">
+                    <li>• Remove blocks evenly from all sides</li>
+                    <li>• Avoid creating unstable configurations</li>
+                    <li>• Monitor stability meter closely</li>
+                    <li>• Plan your moves ahead</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* Learning Objectives */}
+          <section>
+            <h3 className="text-xl font-semibold text-white mb-4 flex items-center gap-2">
+              <Star className="w-6 h-6 text-yellow-400" />
+              Learning Objectives
+            </h3>
+            <div className="bg-gray-700/50 rounded-lg p-4 space-y-3">
+              <p className="text-gray-300">
+                By playing Privacy Jenga, you'll learn about:
+              </p>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                <div className="space-y-2">
+                  <h4 className="font-semibold text-blue-300">Privacy Fundamentals</h4>
+                  <ul className="text-sm text-gray-400 space-y-1">
+                    <li>• Transaction privacy</li>
+                    <li>• Address reuse prevention</li>
+                    <li>• Network analysis resistance</li>
+                  </ul>
+                </div>
+                <div className="space-y-2">
+                  <h4 className="font-semibold text-green-300">Advanced Techniques</h4>
+                  <ul className="text-sm text-gray-400 space-y-1">
+                    <li>• CoinJoin implementation</li>
+                    <li>• Lightning privacy</li>
+                    <li>• Regulatory compliance</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* Common Mistakes */}
+          <section>
+            <h3 className="text-xl font-semibold text-white mb-4 flex items-center gap-2">
+              <AlertTriangle className="w-6 h-6 text-orange-400" />
+              Common Mistakes
+            </h3>
+            <div className="bg-gray-700/50 rounded-lg p-4 space-y-3">
+              <div className="space-y-3">
+                <div className="flex items-start gap-3">
+                  <div className="w-2 h-2 bg-red-500 rounded-full mt-2"></div>
+                  <div>
+                    <h4 className="font-semibold text-red-300">Ignoring Categories</h4>
+                    <p className="text-sm text-gray-400">Always check which category is currently highlighted</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3">
+                  <div className="w-2 h-2 bg-red-500 rounded-full mt-2"></div>
+                  <div>
+                    <h4 className="font-semibold text-red-300">Rushing Through</h4>
+                    <p className="text-sm text-gray-400">Take time to read and understand the content</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3">
+                  <div className="w-2 h-2 bg-red-500 rounded-full mt-2"></div>
+                  <div>
+                    <h4 className="font-semibold text-red-300">Ignoring Stability</h4>
+                    <p className="text-sm text-gray-400">Watch the stability meter and plan accordingly</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* Advanced Tips */}
+          <section>
+            <h3 className="text-xl font-semibold text-white mb-4 flex items-center gap-2">
+              <Zap className="w-6 h-6 text-yellow-400" />
+              Advanced Tips
+            </h3>
+            <div className="bg-gray-700/50 rounded-lg p-4 space-y-3">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <h4 className="font-semibold text-purple-300 mb-2">🎯 Category Mastery</h4>
+                  <div className="text-blue-200 text-sm">
+                    Master one category completely before moving to the next for better learning retention
+                  </div>
+                </div>
+                <div>
+                  <h4 className="font-semibold text-teal-300 mb-2">🏗️ Tower Balance</h4>
+                  <div className="text-green-200 text-sm">
+                    Maintain even weight distribution by removing blocks from opposite sides
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* Game Controls */}
+          <section>
+            <h3 className="text-xl font-semibold text-white mb-4 flex items-center gap-2">
+              <Gamepad2 className="w-6 h-6 text-blue-400" />
+              Game Controls
+            </h3>
+            <div className="bg-gray-700/50 rounded-lg p-4 space-y-3">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <h4 className="font-semibold text-blue-300 mb-2">Mouse Controls</h4>
+                  <ul className="text-sm text-gray-300 space-y-1">
+                    <li>• <strong>Click:</strong> Select and interact with blocks</li>
+                    <li>• <strong>Hover:</strong> Preview block information</li>
+                    <li>• <strong>Scroll:</strong> Zoom in/out of the tower</li>
+                  </ul>
+                </div>
+                <div>
+                  <h4 className="font-semibold text-green-300 mb-2">Keyboard Shortcuts</h4>
+                  <ul className="text-sm text-gray-300 space-y-1">
+                    <li>• <strong>R:</strong> Reset tower</li>
+                    <li>• <strong>H:</strong> Toggle help</li>
+                    <li>• <strong>ESC:</strong> Close modals</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+
+        {/* Footer */}
+        <div className="p-6 border-t border-gray-700 bg-gray-700/30">
+          <div className="text-center">
+            <p className="text-gray-400 text-sm">
+              Need more help? Check out the tutorial or contact support.
+            </p>
+            <button
+              onClick={onClose}
+              className="mt-4 bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-semibold transition-colors"
+            >
+              Got it!
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 };
 

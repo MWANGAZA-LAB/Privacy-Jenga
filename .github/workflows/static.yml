@@ -86,6 +86,22 @@ jobs:
           fi
           echo "✅ Build verification passed - game files are present"
           
+      - name: Verify mobile responsiveness
+        run: |
+          cd apps/web/dist
+          # Check for responsive design elements
+          if ! grep -q "viewport" index.html; then
+            echo "⚠️  Warning: No viewport meta tag found for mobile responsiveness"
+          else
+            echo "✅ Viewport meta tag found for mobile responsiveness"
+          fi
+          
+          # Check for CSS media queries
+          if [ -d "assets" ]; then
+            echo "✅ Assets directory found - checking for responsive CSS"
+            find assets -name "*.css" -exec grep -l "media" {} \; || echo "⚠️  No media queries found in CSS files"
+          fi
+          
       - name: Clean deployment artifacts
         run: |
           cd apps/web/dist

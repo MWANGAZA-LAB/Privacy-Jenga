@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { X, Brain, Trophy, BarChart3, Shield } from 'lucide-react';
 import { GameStatsProps } from '../types';
 
-const GameStats: React.FC<GameStatsProps> = ({ gameState, onNewGame, onClose }) => {
+const GameStats: React.FC<GameStatsProps> = ({ player, statistics, onClose }) => {
   const getGameModeInfo = () => {
     return {
       mode: 'Privacy Jenga Learning Mode',
@@ -63,21 +63,21 @@ const GameStats: React.FC<GameStatsProps> = ({ gameState, onNewGame, onClose }) 
               <h3 className="text-xl font-semibold text-white">Current Score</h3>
             </div>
             <div className="text-3xl font-bold mb-2 text-blue-300">
-              {gameState.currentScore}
+              {player.score}
             </div>
             <p className="text-gray-300">Points earned</p>
           </div>
 
-          {/* Tower Status */}
+          {/* Total Score */}
           <div className="bitsacco-card p-6 bg-yellow-500/10 border border-yellow-400/30">
             <div className="flex items-center gap-3 mb-4">
               <BarChart3 className="w-6 h-6 text-yellow-400" />
-              <h3 className="text-xl font-semibold text-white">Tower Status</h3>
+              <h3 className="text-xl font-semibold text-white">Total Score</h3>
             </div>
             <div className="text-3xl font-bold mb-2 text-yellow-300">
-              {gameState.towerHeight}/18
+              {player.totalScore}
             </div>
-            <p className="text-gray-300">Layers remaining</p>
+            <p className="text-gray-300">All time points</p>
           </div>
 
           {/* Blocks Removed */}
@@ -87,9 +87,33 @@ const GameStats: React.FC<GameStatsProps> = ({ gameState, onNewGame, onClose }) 
               <h3 className="text-xl font-semibold text-white">Blocks Removed</h3>
             </div>
             <div className="text-3xl font-bold mb-2 text-red-300">
-              {gameState.blocksRemoved}/54
+              {statistics.totalBlocksRemoved}
             </div>
             <p className="text-gray-300">Privacy concepts learned</p>
+          </div>
+
+          {/* Achievements */}
+          <div className="bitsacco-card p-6 bg-purple-500/10 border border-purple-400/30">
+            <div className="flex items-center gap-3 mb-4">
+              <Trophy className="w-6 h-6 text-purple-400" />
+              <h3 className="text-xl font-semibold text-white">Achievements</h3>
+            </div>
+            <div className="text-3xl font-bold mb-2 text-purple-300">
+              {statistics.totalAchievements}
+            </div>
+            <p className="text-gray-300">Unlocked badges</p>
+          </div>
+
+          {/* Completion Rate */}
+          <div className="bitsacco-card p-6 bg-green-500/10 border border-green-400/30">
+            <div className="flex items-center gap-3 mb-4">
+              <BarChart3 className="w-6 h-6 text-green-400" />
+              <h3 className="text-xl font-semibold text-white">Completion</h3>
+            </div>
+            <div className="text-3xl font-bold mb-2 text-green-300">
+              {Math.round(statistics.completionRate)}%
+            </div>
+            <p className="text-gray-300">Content learned</p>
           </div>
         </div>
 
@@ -122,14 +146,14 @@ const GameStats: React.FC<GameStatsProps> = ({ gameState, onNewGame, onClose }) 
         {/* Footer */}
         <div className="flex items-center justify-between mt-6 pt-6 border-t border-gray-700">
           <p className="text-gray-400 text-sm">
-            🧠 Continuous learning mode - your progress is preserved
+            🧠 Privacy Jenga - Learn Bitcoin privacy through play
           </p>
           <button
-            onClick={onNewGame}
+            onClick={onClose}
             className="bitsacco-btn-primary px-6 py-3"
           >
             <Trophy className="w-5 h-5 mr-2" />
-            New Learning Session
+            Close
           </button>
         </div>
       </motion.div>

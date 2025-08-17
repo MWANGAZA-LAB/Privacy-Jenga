@@ -6,13 +6,11 @@
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue.svg)](https://www.typescriptlang.org/)
 [![Three.js](https://img.shields.io/badge/Three.js-3D-green.svg)](https://threejs.org/)
 [![Vite](https://img.shields.io/badge/Vite-5.0-purple.svg)](https://vitejs.dev/)
+[![Mobile Responsive](https://img.shields.io/badge/Mobile-Responsive-green.svg)](https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps/Responsive/responsive_design_basics)
 
 ## 🌟 **What is Privacy Jenga?**
 
 Privacy Jenga is an **interactive educational game** that teaches Bitcoin privacy and security concepts through engaging 3D tower mechanics. Each of the 54 blocks contains authentic Bitcoin privacy practices, making learning both fun and memorable.
-
-<img width="1920" height="972" alt="image" src="https://github.com/user-attachments/assets/24fce154-2a7e-4343-bb16-fb645259275e" />
-
 
 ### 🧠 **Educational Philosophy**
 This implementation focuses on **continuous learning** and eliminates traditional "game over" mechanics. When the tower becomes unstable, it smoothly resets, allowing players to explore all 54 privacy concepts without interruption.
@@ -23,37 +21,44 @@ This implementation focuses on **continuous learning** and eliminates traditiona
 - **54-Block Educational System** - Complete Jenga tower with 18 layers
 - **Realistic Physics** - Beautiful block falling animations with gravity and tumbling
 - **Interactive 3D Environment** - Rotate, zoom, and explore the tower
-- **Dice-Based Layer Access** - Roll to determine which layers you can access
+- **Question-Based Learning** - Answer privacy questions to maintain tower stability
 - **Real-time Tower Stability** - Dynamic stability calculation with visual feedback
 
 ### 🎯 **Bitcoin Privacy Education**
 - **Authentic Privacy Practices** - Based on real Bitcoin privacy principles
-- **Three Risk Categories:**
-  - � **Red Blocks (1-18)** - "Never do these" - Severe privacy risks
-  - 🟠 **Orange Blocks (19-36)** - "Avoid these" - Moderate risks  
-  - � **Green Blocks (37-54)** - "Consider these" - Mild recommendations
+- **Three Difficulty Categories:**
+  - 🔴 **Red Blocks (Hard)** - High-risk privacy practices with severe penalties
+  - 🟠 **Orange Blocks (Medium)** - Moderate difficulty with balanced risk/reward
+  - 🟢 **Green Blocks (Easy)** - Safe practices with gentle learning curve
 
 ### 🎲 **Advanced Game Mechanics**
-- **Animated Dice Rolling** - 1.5-second rolling animation with visual feedback
-- **Layer Access Control** - Strategic gameplay based on dice results
-- **Progressive Difficulty** - Higher layers offer more points but increased risk
-- **Synchronized UI** - All stability indicators show consistent values
-- **Tactile Feedback** - Immediate visual response to block interactions
+- **Question-Driven Learning** - Every block contains a privacy question
+- **Adaptive Difficulty** - Game adjusts based on player performance
+- **Stability Impact System** - Correct answers improve stability, wrong answers reduce it
+- **Achievement System** - Unlock badges for learning milestones
+- **Continuous Play** - Tower rebuilds automatically for uninterrupted learning
 
 ### 📚 **Educational Content Categories**
-- **On-Chain Privacy** (15 blocks) - Address reuse, transaction amounts, change addresses
-- **Off-Chain Practices** (10 blocks) - VPNs, operational security, wallet management
-- **Coin Mixing** (10 blocks) - CoinJoin, traceability, privacy tools
-- **Wallet Setup** (5 blocks) - Hierarchical wallets, seed phrase security
-- **Lightning Network** (5 blocks) - Channel privacy, routing, unlinkability
-- **Regulatory** (5 blocks) - KYC risks, public records, compliance
-- **Best Practices** (4 blocks) - Tor usage, multisig, fund management
+- **On-Chain Privacy** - Address reuse, transaction amounts, change addresses
+- **Off-Chain Practices** - VPNs, operational security, wallet management
+- **Coin Mixing** - CoinJoin, traceability, privacy tools
+- **Wallet Setup** - Hierarchical wallets, seed phrase security
+- **Lightning Network** - Channel privacy, routing, unlinkability
+- **Regulatory** - KYC risks, public records, compliance
+- **Best Practices** - Tor usage, multisig, fund management
+
+### 📱 **Mobile Responsive Design**
+- **Cross-Platform Compatibility** - Works seamlessly on desktop, tablet, and mobile
+- **Touch-Friendly Controls** - Optimized for touch interactions
+- **Responsive UI Elements** - Adaptive layouts for all screen sizes
+- **Mobile-Specific Features** - Dedicated mobile controls and navigation
+- **Performance Optimized** - Smooth 3D rendering on mobile devices
 
 ### 🎯 **Continuous Learning Experience**
 - **No Game Over** - Tower automatically resets for uninterrupted learning
 - **Achievement System** - Long-term engagement through progress tracking
 - **Interactive Tutorials** - Comprehensive help system and guided learning
-- **Performance Monitoring** - Real-time FPS and memory usage display (dev mode)
+- **Progress Tracking** - Monitor learning progress across all 54 concepts
 
 ## 🚀 **Getting Started**
 
@@ -64,10 +69,11 @@ This implementation focuses on **continuous learning** and eliminates traditiona
 ### **Installation**
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/privacy-jenga.git
-cd privacy-jenga
+git clone https://github.com/MWANGAZA-LAB/Privacy-Jenga.git
+cd Privacy-Jenga
 
 # Install dependencies
+cd apps/web
 npm install
 
 # Start development server
@@ -86,27 +92,25 @@ npm run build
 - First-time users get an automatic tutorial
 - Access help anytime via the Help button
 
-### **2. Roll the Dice**
-- Click "Roll Dice" to determine layer access
-- Each roll shows which layers you can pull from
-- Plan your strategy based on available access
+### **2. Select Blocks**
+- Click on any block to reveal its privacy question
+- Each block contains a unique Bitcoin privacy concept
+- Plan your strategy based on block difficulty (Green = Easy, Orange = Medium, Red = Hard)
 
-### **3. Remove Blocks**
-- Click on highlighted blocks within allowed layers
-- Read the privacy lesson on each block
-- Answer quiz questions for bonus points
+### **3. Answer Questions**
+- Read the privacy question carefully
+- Select the correct answer from multiple choices
+- Learn from the detailed explanation provided
 
-### **4. Build Your Score**
-- Safe blocks earn points and stabilize the tower
-- Risky blocks earn points but destabilize
-- Challenge blocks offer bonus points for correct answers
-- Higher layers = more points (risk vs. reward)
+### **4. Manage Tower Stability**
+- Correct answers improve tower stability
+- Wrong answers reduce stability and can cause collapse
+- Watch the stability indicator (Green = Stable, Yellow = Warning, Red = Critical)
 
 ### **5. Continuous Learning**
-- Watch the tower stability indicator
-- Green = Stable, Yellow = Warning, Red = Danger
-- When tower becomes unstable, it automatically resets for continuous learning
-- Your score and progress are preserved across tower resets
+- When the tower collapses, it automatically rebuilds
+- Your progress and achievements are preserved
+- Continue learning until you've mastered all 54 concepts
 
 ## 🏗️ **Architecture & Technology**
 
@@ -114,59 +118,56 @@ npm run build
 - **React 18** - Modern React with hooks and functional components
 - **TypeScript** - Type-safe development with strict mode enabled
 - **Vite** - Fast build tool and development server
-- **Tailwind CSS** - Utility-first CSS framework with custom BITSACCO theme
+- **Tailwind CSS** - Utility-first CSS framework with responsive design
 - **Three.js + React Three Fiber** - 3D graphics and realistic tower physics
 - **React Three Drei** - Additional 3D components and controls
+- **Framer Motion** - Smooth animations and transitions
 
 ### **Key Components**
-- **`JengaTowerRefactored`** - Enhanced 3D tower with physics and visual feedback
-- **`BlockComponent`** - Individual block with realistic falling animations
-- **`TowerControls`** - Real-time stability monitoring and game controls
-- **`useBlockSelection`** - Advanced block selection and keyboard navigation
-- **`useTowerStability`** - Synchronized stability calculation across UI
-- **`useKeyboardNavigation`** - Full accessibility support
-- **`GamePage`** - Main game interface with synchronized state management
-- **`HomePage`** - Landing page with feature showcase and creator credits
+- **`SimplifiedJengaTower`** - Enhanced 3D tower with responsive design
+- **`ContentModal`** - Interactive question display and answer handling
+- **`MobileControls`** - Touch-friendly controls for mobile devices
+- **`useResponsiveDesign`** - Responsive design hook for cross-platform compatibility
+- **`enhancedGameService`** - Advanced game logic and state management
+- **`GamePage`** - Main game interface with mobile-responsive layout
 
 ### **State Management**
 - **React Hooks** - Modern state management with useCallback and useMemo
-- **Custom Hooks** - Specialized hooks for tower stability, block selection, and keyboard navigation
-- **Singleton Service** - MockGameService for consistent game state management
+- **Custom Hooks** - Specialized hooks for responsive design and game logic
+- **Enhanced Game Service** - Comprehensive game state management
 - **Real-time Synchronization** - Unified stability calculation across all UI components
 
 ## 🎨 **UI/UX Features**
 
 ### **Visual Enhancements**
-- **Animated Dice Rolling** - 1.5-second spinning animation with glow effects
-- **Physics-based Block Falling** - Realistic gravity, tumbling, and fade animations
-- **Dynamic Tower Stability** - Real-time color-coded stability indicators
-- **Interactive 3D Controls** - Orbit controls for camera manipulation
-- **Tactile Feedback** - Immediate visual response to user interactions
-- **Synchronized UI Elements** - Consistent stability display across all panels
+- **Responsive 3D Tower** - Adapts to different screen sizes
+- **Physics-based Block Interactions** - Realistic animations and effects
+- **Dynamic Stability Indicators** - Real-time color-coded stability feedback
+- **Interactive 3D Controls** - Touch and mouse-friendly camera controls
+- **Smooth Animations** - Framer Motion powered transitions
+- **Mobile-Optimized UI** - Touch-friendly buttons and controls
 
-### **BITSACCO Design System**
-- **Professional Dark Theme** - Custom color palette with teal accents
-- **Consistent Visual Language** - Unified design across all components
-- **Accessibility First** - High contrast, keyboard navigation, screen reader support
-- **Responsive Layout** - Mobile-first design with touch-friendly controls
+### **Responsive Design System**
+- **Mobile-First Approach** - Designed for mobile devices first
+- **Breakpoint System** - Small mobile, large mobile, tablet, desktop
+- **Adaptive Layouts** - UI elements adjust to screen size
+- **Touch Interactions** - Optimized for touch devices
+- **Performance Optimization** - Efficient rendering on all devices
 
-## 📱 **User Experience Features**
+## 📱 **Mobile Experience**
 
-### **First-Time User Experience**
-- **Automatic tutorial** for new players
-- **Welcome overlay** explaining the unified learning experience
-- **Progressive disclosure** of game mechanics and privacy concepts
+### **Responsive Breakpoints**
+- **Small Mobile** (< 480px) - iPhone SE, small Android devices
+- **Large Mobile** (480px - 767px) - iPhone 12/13/14, larger Android devices
+- **Tablet** (768px - 1023px) - iPad, small laptops
+- **Desktop** (≥ 1024px) - Laptops, desktops
 
-### **Help System**
-- **Contextual help** accessible during gameplay
-- **Comprehensive rules** and strategy guides
-- **Visual examples** and step-by-step instructions
-
-### **Accessibility**
-- **Keyboard navigation** support
-- **Screen reader** friendly content
-- **High contrast** color schemes
-- **Clear visual cues** for all interactions
+### **Mobile-Specific Features**
+- **Touch-Friendly Controls** - Larger touch targets and intuitive gestures
+- **Simplified UI** - Streamlined interface for smaller screens
+- **Optimized 3D Performance** - Efficient rendering for mobile GPUs
+- **Mobile Navigation** - Dedicated mobile control panel
+- **Responsive Typography** - Readable text at all screen sizes
 
 ## 🔧 **Development**
 
@@ -176,23 +177,21 @@ apps/web/
 ├── src/
 │   ├── components/          # Reusable UI components
 │   │   ├── jenga/          # 3D tower components
-│   │   │   ├── JengaTowerRefactored.tsx  # Main 3D tower component
-│   │   │   ├── BlockComponent.tsx        # Individual block with physics
-│   │   │   ├── TowerControls.tsx         # Real-time controls panel
-│   │   │   └── hooks/                    # Specialized game hooks
-│   │   │       ├── useTowerStability.ts   # Stability calculation
-│   │   │       ├── useBlockSelection.ts   # Block selection logic
-│   │   │       └── useKeyboardNavigation.ts # Accessibility support
+│   │   │   └── SimplifiedJengaTower.tsx  # Main 3D tower component
+│   │   ├── mobile/         # Mobile-specific components
+│   │   │   └── MobileControls.tsx        # Touch-friendly controls
 │   │   ├── ContentModal.tsx # Educational content display
 │   │   ├── GameHelp.tsx     # Comprehensive help system
 │   │   └── ...
+│   ├── hooks/               # Custom React hooks
+│   │   └── useResponsiveDesign.ts # Responsive design hook
 │   ├── pages/               # Page components
 │   │   ├── GamePage.tsx     # Main game interface
-│   │   └── HomePage.tsx     # Landing page with credits
+│   │   └── HomePage.tsx     # Landing page
 │   ├── services/            # Game logic and services
-│   │   └── mockGameService.ts # Singleton game state management
+│   │   └── simplifiedGameService.ts # Enhanced game state management
 │   ├── types/               # TypeScript type definitions
-│   └── index.css           # Enhanced animations and BITSACCO theme
+│   └── index.css           # Responsive styles and animations
 ├── public/                  # Static assets
 └── package.json            # Dependencies and scripts
 ```
@@ -201,9 +200,11 @@ apps/web/
 ```bash
 npm run dev          # Start development server
 npm run build        # Build for production
+npm run build:pages  # Build for GitHub Pages
 npm run preview      # Preview production build
 npm run lint         # Run ESLint
 npm run type-check   # Run TypeScript compiler
+npm run test:ci      # Run tests in CI mode
 ```
 
 ## 🧪 **Testing & Quality**
@@ -218,14 +219,20 @@ npm run type-check   # Run TypeScript compiler
 - **Vite** for fast development and optimized builds
 - **Tree shaking** for minimal bundle size
 - **Code splitting** for optimal performance
-- **GitHub Actions** for automated deployment
+- **GitHub Actions** for automated deployment with mobile responsiveness checks
+
+### **Mobile Testing**
+- **Responsive Design Verification** - Automated checks for viewport meta tags
+- **CSS Media Query Validation** - Ensures responsive styles are present
+- **Cross-Platform Compatibility** - Tested on various devices and browsers
 
 ## 🚀 **Deployment**
 
 ### **GitHub Pages**
 - **Automatic deployment** via GitHub Actions
-- **Subdirectory routing** support (`/Privacy-Jenga/`)
+- **Mobile responsiveness verification** in CI/CD pipeline
 - **Optimized builds** for production
+- **Subdirectory routing** support
 
 ### **Environment Variables**
 ```bash
@@ -244,8 +251,16 @@ We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) f
 1. Fork the repository
 2. Create a feature branch
 3. Make your changes
-4. Add tests if applicable
-5. Submit a pull request
+4. Test on multiple devices and screen sizes
+5. Add tests if applicable
+6. Submit a pull request
+
+### **Mobile Development Guidelines**
+- Test on actual mobile devices when possible
+- Use the responsive design hook for consistent breakpoints
+- Ensure touch targets are at least 44px × 44px
+- Optimize 3D performance for mobile GPUs
+- Test with different screen orientations
 
 ## 📄 **License**
 
@@ -260,8 +275,8 @@ This project is inspired by and based on the educational content from:
 - Authentic Bitcoin privacy practices and educational framework
 
 ### **Educational Content**
-- **Authentic Privacy Practices** - All 54 privacy tips are based on real Bitcoin privacy principles from bitcoinjenga.com
-- **Risk Categorization** - "Never/Avoid/Consider" framework from the original educational content
+- **Authentic Privacy Practices** - All 54 privacy questions are based on real Bitcoin privacy principles
+- **Risk Categorization** - Difficulty-based learning system for progressive education
 - **Community-Driven Learning** - Building upon the Bitcoin privacy education community's work
 
 ### **Technical Implementation**
@@ -270,18 +285,12 @@ This project is inspired by and based on the educational content from:
 - **Tailwind CSS Team** - For the utility-first CSS framework
 - **Open Source Community** - For the incredible tools and libraries that make this possible
 
-### **Special Thanks**
-- **Bitcoin Privacy Advocates** - For their continued work in privacy education
-- **Educational Game Community** - For insights on effective learning through gameplay
-- **Web3 Developers** - For pushing the boundaries of interactive web experiences
+### **Mobile Development**
+- **Responsive Design Community** - For mobile-first design principles
+- **Web Performance Community** - For optimization techniques
+- **Touch Interaction Experts** - For mobile UX best practices
 
-## � **License**
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-**Educational Content Attribution**: The privacy practices and educational framework are inspired by and based on [bitcoinjenga.com](https://bitcoinjenga.com) by Amiti Uttarwar & D++. This implementation serves as an interactive, web-based adaptation of their educational concepts.
-
-## �📞 **Support & Contact**
+## 📞 **Support & Contact**
 
 - **Issues**: [GitHub Issues](https://github.com/MWANGAZA-LAB/Privacy-Jenga/issues)
 - **Discussions**: [GitHub Discussions](https://github.com/MWANGAZA-LAB/Privacy-Jenga/discussions)

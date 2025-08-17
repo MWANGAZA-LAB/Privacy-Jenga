@@ -1,10 +1,6 @@
 import React from 'react';
 import bitsaccoLogo from '../assets/bitsacco-logo.png';
-
-interface BitsaccoLogoProps {
-  size?: number;
-  className?: string;
-}
+import { BitsaccoLogoProps } from '../types';
 
 const BitsaccoLogo: React.FC<BitsaccoLogoProps> = ({ size = 32, className = '' }) => {
   return (
