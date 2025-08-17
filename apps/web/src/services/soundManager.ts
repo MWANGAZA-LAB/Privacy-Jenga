@@ -21,9 +21,9 @@ class SoundManager {
   private sounds: Map<string, HTMLAudioElement> = new Map();
   private music: HTMLAudioElement | null = null;
   private settings: SoundSettings = {
-    masterVolume: 0.7,
-    musicVolume: 0.5,
-    sfxVolume: 0.8,
+    masterVolume: 0.3,
+    musicVolume: 0.2,
+    sfxVolume: 0.4,
     enabled: true
   };
 
@@ -33,14 +33,14 @@ class SoundManager {
     {
       id: 'background-music',
       src: '/audio/background-music.wav',
-      volume: 0.4,
+      volume: 0.2,
       loop: true,
       type: 'music'
     },
     {
       id: 'ambient-music',
       src: '/audio/ambient-music.wav',
-      volume: 0.3,
+      volume: 0.15,
       loop: true,
       type: 'music'
     },
@@ -49,84 +49,84 @@ class SoundManager {
     {
       id: 'block-click',
       src: '/audio/block-click.wav',
-      volume: 0.6,
+      volume: 0.3,
       loop: false,
       type: 'sfx'
     },
     {
       id: 'block-remove',
       src: '/audio/block-remove.wav',
-      volume: 0.7,
+      volume: 0.35,
       loop: false,
       type: 'sfx'
     },
     {
       id: 'correct-answer',
       src: '/audio/correct-answer.wav',
-      volume: 0.8,
+      volume: 0.4,
       loop: false,
       type: 'sfx'
     },
     {
       id: 'wrong-answer',
       src: '/audio/wrong-answer.wav',
-      volume: 0.6,
+      volume: 0.3,
       loop: false,
       type: 'sfx'
     },
     {
       id: 'tower-shake',
       src: '/audio/tower-shake.wav',
-      volume: 0.5,
+      volume: 0.25,
       loop: false,
       type: 'sfx'
     },
     {
       id: 'tower-collapse',
       src: '/audio/tower-collapse.wav',
-      volume: 0.9,
+      volume: 0.45,
       loop: false,
       type: 'sfx'
     },
     {
       id: 'achievement-unlock',
       src: '/audio/achievement-unlock.wav',
-      volume: 0.8,
+      volume: 0.4,
       loop: false,
       type: 'sfx'
     },
     {
       id: 'stability-warning',
       src: '/audio/stability-warning.wav',
-      volume: 0.6,
+      volume: 0.3,
       loop: false,
       type: 'sfx'
     },
     {
       id: 'button-hover',
       src: '/audio/button-hover.wav',
-      volume: 0.3,
+      volume: 0.15,
       loop: false,
       type: 'sfx'
     },
     {
       id: 'button-click',
       src: '/audio/button-click.wav',
-      volume: 0.5,
+      volume: 0.25,
       loop: false,
       type: 'sfx'
     },
     {
       id: 'game-start',
       src: '/audio/game-start.wav',
-      volume: 0.7,
+      volume: 0.35,
       loop: false,
       type: 'sfx'
     },
     {
       id: 'game-complete',
       src: '/audio/game-complete.wav',
-      volume: 0.8,
+      volume: 0.4,
       loop: false,
       type: 'sfx'
     }
