@@ -136,6 +136,9 @@ class SoundManager {
     this.initializeAudioContext();
     this.loadSettings();
     this.preloadSounds();
+    
+    // Add user interaction handler for autoplay policies
+    this.setupUserInteractionHandler();
   }
 
   private initializeAudioContext(): void {
@@ -197,6 +200,25 @@ class SoundManager {
     return (baseVolume * typeVolume * this.settings.masterVolume);
   }
 
+  private setupUserInteractionHandler(): void {
+    // Handle user interaction to enable audio on GitHub Pages
+    const enableAudio = () => {
+      if (this.audioContext?.state === 'suspended') {
+        this.audioContext.resume().then(() => {
+          console.log('🎵 Audio context resumed after user interaction');
+        }).catch(error => {
+          console.warn('⚠️ Failed to resume audio context:', error);
+        });
+      }
+    };
+
+    // Listen for user interactions
+    const events = ['click', 'touchstart', 'keydown'];
+    events.forEach(event => {
+      document.addEventListener(event, enableAudio, { once: true });
+    });
+  }
+
   // Public API Methods
 
   public playSound(soundId: string): void {
@@ -217,9 +239,18 @@ class SoundManager {
           this.audioContext.resume();
         }
         
-        sound.play().catch(error => {
-          console.warn(`⚠️ Failed to play sound ${soundId}:`, error);
-        });
+        // Add user interaction check for autoplay policies
+        if (document.visibilityState === 'visible') {
+          sound.play().catch(error => {
+            console.warn(`⚠️ Failed to play sound ${soundId}:`, error);
+            // Try to resume audio context if it failed
+            if (this.audioContext?.state === 'suspended') {
+              this.audioContext.resume().catch(e => {
+                console.warn('⚠️ Failed to resume audio context:', e);
+              });
+            }
+          });
+        }
       } catch (error) {
         console.warn(`⚠️ Error playing sound ${soundId}:`, error);
       }
@@ -242,10 +273,20 @@ class SoundManager {
           'music'
         );
         music.loop = true;
-        music.play().catch(error => {
-          console.warn(`⚠️ Failed to play music ${musicId}:`, error);
-        });
-        this.music = music;
+        
+        // Add user interaction check for autoplay policies
+        if (document.visibilityState === 'visible') {
+          music.play().catch(error => {
+            console.warn(`⚠️ Failed to play music ${musicId}:`, error);
+            // Try to resume audio context if it failed
+            if (this.audioContext?.state === 'suspended') {
+              this.audioContext.resume().catch(e => {
+                console.warn('⚠️ Failed to resume audio context:', e);
+              });
+            }
+          });
+          this.music = music;
+        }
       } catch (error) {
         console.warn(`⚠️ Error playing music ${musicId}:`, error);
       }
@@ -359,6 +400,20 @@ class SoundManager {
 
   public startAmbientMusic(): void {
     this.playMusic('ambient-music');
+  }
+
+  public isAudioSupported(): boolean {
+    return !!(window.AudioContext || (window as any).webkitAudioContext);
+  }
+
+  public getAudioStatus(): string {
+    if (!this.isAudioSupported()) {
+      return 'Audio not supported';
+    }
+    if (!this.audioContext) {
+      return 'Audio context not initialized';
+    }
+    return this.audioContext.state;
   }
 
 

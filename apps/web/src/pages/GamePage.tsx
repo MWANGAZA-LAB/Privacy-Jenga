@@ -347,21 +347,41 @@ const GamePage: React.FC = () => {
                    <Brain className={isSmallMobile ? "w-4 h-4" : "w-5 h-5"} />
                  </motion.button>
                  
-                 <motion.button
-                   whileHover={{ scale: 1.05 }}
-                   whileTap={{ scale: 0.95 }}
-                   onClick={() => setShowSoundSettings(true)}
-                   className={`text-white hover:text-blue-300 transition-colors ${
-                     isSmallMobile ? 'p-1' : 'p-2'
-                   }`}
-                   title="Sound Settings"
-                 >
-                   {soundEnabled ? (
-                     <Volume2 className={isSmallMobile ? "w-4 h-4" : "w-5 h-5"} />
-                   ) : (
-                     <VolumeX className={isSmallMobile ? "w-4 h-4" : "w-5 h-5"} />
-                   )}
-                 </motion.button>
+                                   <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => setShowSoundSettings(true)}
+                    className={`text-white hover:text-blue-300 transition-colors ${
+                      isSmallMobile ? 'p-1' : 'p-2'
+                    }`}
+                    title="Sound Settings"
+                  >
+                    {soundEnabled ? (
+                      <Volume2 className={isSmallMobile ? "w-4 h-4" : "w-5 h-5"} />
+                    ) : (
+                      <VolumeX className={isSmallMobile ? "w-4 h-4" : "w-5 h-5"} />
+                    )}
+                  </motion.button>
+                  
+                  {/* Audio Debug Button */}
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => {
+                      console.log('🔊 Audio Debug Info:');
+                      console.log('Audio supported:', soundManager.isAudioSupported());
+                      console.log('Audio status:', soundManager.getAudioStatus());
+                      console.log('Sound settings:', soundManager.getSettings());
+                      console.log('Loaded sounds:', Array.from(soundManager['sounds'].keys()));
+                      soundManager.playSound('button-click');
+                    }}
+                    className={`text-white hover:text-blue-300 transition-colors ${
+                      isSmallMobile ? 'p-1' : 'p-2'
+                    }`}
+                    title="Audio Debug"
+                  >
+                    🔧
+                  </motion.button>
                  
 
               </div>
