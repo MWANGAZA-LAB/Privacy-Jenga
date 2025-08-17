@@ -363,18 +363,7 @@ const GamePage: React.FC = () => {
                    )}
                  </motion.button>
                  
-                 {/* Debug Audio Button */}
-                 <motion.button
-                   whileHover={{ scale: 1.05 }}
-                   whileTap={{ scale: 0.95 }}
-                   onClick={() => soundManager.testAudio()}
-                   className={`text-white hover:text-blue-300 transition-colors ${
-                     isSmallMobile ? 'p-1' : 'p-2'
-                   }`}
-                   title="Test Audio"
-                 >
-                   🔊
-                 </motion.button>
+
               </div>
             </div>
           </div>

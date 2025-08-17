@@ -200,16 +200,11 @@ class SoundManager {
   // Public API Methods
 
   public playSound(soundId: string): void {
-    if (!this.settings.enabled) {
-      console.log(`🔇 Sound disabled, skipping: ${soundId}`);
-      return;
-    }
+    if (!this.settings.enabled) return;
 
     const sound = this.sounds.get(soundId);
     if (sound) {
       try {
-        console.log(`🎵 Playing sound: ${soundId}`);
-        
         // Reset audio to beginning if it's already playing
         sound.currentTime = 0;
         sound.volume = this.getAdjustedVolume(
@@ -219,13 +214,10 @@ class SoundManager {
         
         // Resume audio context if suspended
         if (this.audioContext?.state === 'suspended') {
-          console.log('🔄 Resuming suspended audio context');
           this.audioContext.resume();
         }
         
-        sound.play().then(() => {
-          console.log(`✅ Sound played successfully: ${soundId}`);
-        }).catch(error => {
+        sound.play().catch(error => {
           console.warn(`⚠️ Failed to play sound ${soundId}:`, error);
         });
       } catch (error) {
@@ -237,10 +229,7 @@ class SoundManager {
   }
 
   public playMusic(musicId: string): void {
-    if (!this.settings.enabled || this.settings.musicVolume === 0) {
-      console.log(`🔇 Music disabled or volume 0, skipping: ${musicId}`);
-      return;
-    }
+    if (!this.settings.enabled || this.settings.musicVolume === 0) return;
 
     // Stop current music
     this.stopMusic();
@@ -248,15 +237,12 @@ class SoundManager {
     const music = this.sounds.get(musicId);
     if (music) {
       try {
-        console.log(`🎵 Playing music: ${musicId}`);
         music.volume = this.getAdjustedVolume(
           this.audioTracks.find(t => t.id === musicId)?.volume || 0.4,
           'music'
         );
         music.loop = true;
-        music.play().then(() => {
-          console.log(`✅ Music started successfully: ${musicId}`);
-        }).catch(error => {
+        music.play().catch(error => {
           console.warn(`⚠️ Failed to play music ${musicId}:`, error);
         });
         this.music = music;
@@ -375,17 +361,7 @@ class SoundManager {
     this.playMusic('ambient-music');
   }
 
-  // Debug method to test audio functionality
-  public testAudio(): void {
-    console.log('🧪 Testing audio functionality...');
-    console.log('📊 Current settings:', this.settings);
-    console.log('🎵 Loaded sounds:', Array.from(this.sounds.keys()));
-    console.log('🎼 Current music:', this.music ? 'playing' : 'none');
-    console.log('🔊 Audio context state:', this.audioContext?.state);
-    
-    // Test a simple sound
-    this.playSound('button-click');
-  }
+
 
   // Cleanup
   public destroy(): void {
