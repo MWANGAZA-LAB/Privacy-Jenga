@@ -32,14 +32,14 @@ class SoundManager {
     // Background Music
     {
       id: 'background-music',
-      src: '/audio/background-music.mp3',
+      src: '/audio/background-music.wav',
       volume: 0.4,
       loop: true,
       type: 'music'
     },
     {
       id: 'ambient-music',
-      src: '/audio/ambient-music.mp3',
+      src: '/audio/ambient-music.wav',
       volume: 0.3,
       loop: true,
       type: 'music'
@@ -48,84 +48,84 @@ class SoundManager {
     // Game Sound Effects
     {
       id: 'block-click',
-      src: '/audio/block-click.mp3',
+      src: '/audio/block-click.wav',
       volume: 0.6,
       loop: false,
       type: 'sfx'
     },
     {
       id: 'block-remove',
-      src: '/audio/block-remove.mp3',
+      src: '/audio/block-remove.wav',
       volume: 0.7,
       loop: false,
       type: 'sfx'
     },
     {
       id: 'correct-answer',
-      src: '/audio/correct-answer.mp3',
+      src: '/audio/correct-answer.wav',
       volume: 0.8,
       loop: false,
       type: 'sfx'
     },
     {
       id: 'wrong-answer',
-      src: '/audio/wrong-answer.mp3',
+      src: '/audio/wrong-answer.wav',
       volume: 0.6,
       loop: false,
       type: 'sfx'
     },
     {
       id: 'tower-shake',
-      src: '/audio/tower-shake.mp3',
+      src: '/audio/tower-shake.wav',
       volume: 0.5,
       loop: false,
       type: 'sfx'
     },
     {
       id: 'tower-collapse',
-      src: '/audio/tower-collapse.mp3',
+      src: '/audio/tower-collapse.wav',
       volume: 0.9,
       loop: false,
       type: 'sfx'
     },
     {
       id: 'achievement-unlock',
-      src: '/audio/achievement-unlock.mp3',
+      src: '/audio/achievement-unlock.wav',
       volume: 0.8,
       loop: false,
       type: 'sfx'
     },
     {
       id: 'stability-warning',
-      src: '/audio/stability-warning.mp3',
+      src: '/audio/stability-warning.wav',
       volume: 0.6,
       loop: false,
       type: 'sfx'
     },
     {
       id: 'button-hover',
-      src: '/audio/button-hover.mp3',
+      src: '/audio/button-hover.wav',
       volume: 0.3,
       loop: false,
       type: 'sfx'
     },
     {
       id: 'button-click',
-      src: '/audio/button-click.mp3',
+      src: '/audio/button-click.wav',
       volume: 0.5,
       loop: false,
       type: 'sfx'
     },
     {
       id: 'game-start',
-      src: '/audio/game-start.mp3',
+      src: '/audio/game-start.wav',
       volume: 0.7,
       loop: false,
       type: 'sfx'
     },
     {
       id: 'game-complete',
-      src: '/audio/game-complete.mp3',
+      src: '/audio/game-complete.wav',
       volume: 0.8,
       loop: false,
       type: 'sfx'
@@ -200,11 +200,16 @@ class SoundManager {
   // Public API Methods
 
   public playSound(soundId: string): void {
-    if (!this.settings.enabled) return;
+    if (!this.settings.enabled) {
+      console.log(`🔇 Sound disabled, skipping: ${soundId}`);
+      return;
+    }
 
     const sound = this.sounds.get(soundId);
     if (sound) {
       try {
+        console.log(`🎵 Playing sound: ${soundId}`);
+        
         // Reset audio to beginning if it's already playing
         sound.currentTime = 0;
         sound.volume = this.getAdjustedVolume(
@@ -214,10 +219,13 @@ class SoundManager {
         
         // Resume audio context if suspended
         if (this.audioContext?.state === 'suspended') {
+          console.log('🔄 Resuming suspended audio context');
           this.audioContext.resume();
         }
         
-        sound.play().catch(error => {
+        sound.play().then(() => {
+          console.log(`✅ Sound played successfully: ${soundId}`);
+        }).catch(error => {
           console.warn(`⚠️ Failed to play sound ${soundId}:`, error);
         });
       } catch (error) {
@@ -229,7 +237,10 @@ class SoundManager {
   }
 
   public playMusic(musicId: string): void {
-    if (!this.settings.enabled || this.settings.musicVolume === 0) return;
+    if (!this.settings.enabled || this.settings.musicVolume === 0) {
+      console.log(`🔇 Music disabled or volume 0, skipping: ${musicId}`);
+      return;
+    }
 
     // Stop current music
     this.stopMusic();
@@ -237,18 +248,23 @@ class SoundManager {
     const music = this.sounds.get(musicId);
     if (music) {
       try {
+        console.log(`🎵 Playing music: ${musicId}`);
         music.volume = this.getAdjustedVolume(
           this.audioTracks.find(t => t.id === musicId)?.volume || 0.4,
           'music'
         );
         music.loop = true;
-        music.play().catch(error => {
+        music.play().then(() => {
+          console.log(`✅ Music started successfully: ${musicId}`);
+        }).catch(error => {
           console.warn(`⚠️ Failed to play music ${musicId}:`, error);
         });
         this.music = music;
       } catch (error) {
         console.warn(`⚠️ Error playing music ${musicId}:`, error);
       }
+    } else {
+      console.warn(`⚠️ Music not found: ${musicId}`);
     }
   }
 
@@ -357,6 +373,18 @@ class SoundManager {
 
   public startAmbientMusic(): void {
     this.playMusic('ambient-music');
+  }
+
+  // Debug method to test audio functionality
+  public testAudio(): void {
+    console.log('🧪 Testing audio functionality...');
+    console.log('📊 Current settings:', this.settings);
+    console.log('🎵 Loaded sounds:', Array.from(this.sounds.keys()));
+    console.log('🎼 Current music:', this.music ? 'playing' : 'none');
+    console.log('🔊 Audio context state:', this.audioContext?.state);
+    
+    // Test a simple sound
+    this.playSound('button-click');
   }
 
   // Cleanup

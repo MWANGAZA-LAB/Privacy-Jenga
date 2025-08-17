@@ -362,6 +362,19 @@ const GamePage: React.FC = () => {
                      <VolumeX className={isSmallMobile ? "w-4 h-4" : "w-5 h-5"} />
                    )}
                  </motion.button>
+                 
+                 {/* Debug Audio Button */}
+                 <motion.button
+                   whileHover={{ scale: 1.05 }}
+                   whileTap={{ scale: 0.95 }}
+                   onClick={() => soundManager.testAudio()}
+                   className={`text-white hover:text-blue-300 transition-colors ${
+                     isSmallMobile ? 'p-1' : 'p-2'
+                   }`}
+                   title="Test Audio"
+                 >
+                   🔊
+                 </motion.button>
               </div>
             </div>
           </div>
