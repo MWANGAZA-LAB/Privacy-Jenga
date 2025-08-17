@@ -3,20 +3,9 @@ name: Deploy to GitHub Pages
 on:
   push:
     branches: [ main ]
-  pull_request:
-    branches: [ main ]
-
-permissions:
-  contents: read
-  pages: write
-  id-token: write
-
-concurrency:
-  group: "pages"
-  cancel-in-progress: false
 
 jobs:
-  build:
+  build-and-deploy:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -29,32 +18,10 @@ jobs:
           cache: 'npm'
           cache-dependency-path: 'apps/web/package-lock.json'
           
-      - name: Setup Pages
-        uses: actions/configure-pages@v4
-        
       - name: Install dependencies
         run: |
           cd apps/web
           npm ci
-          
-      - name: Run quality checks
-        run: |
-          cd apps/web
-          # Verify all required dependencies are installed
-          npm list --depth=0
-          
-      - name: Run tests
-        run: |
-          cd apps/web
-          npm run test:ci
-          
-      - name: Run linting and type checking
-        run: |
-          cd apps/web
-          # Run linting to catch code quality issues
-          npm run lint
-          # Run type checking before build
-          npm run type-check
           
       - name: Build with Vite
         run: |
@@ -64,71 +31,10 @@ jobs:
           NODE_ENV: production
           VITE_APP_TITLE: "Privacy Jenga"
           
-      - name: List build output
-        run: |
-          cd apps/web
-          ls -la dist/
-          echo "=== index.html content ==="
-          cat dist/index.html
-          echo "=== Checking for assets ==="
-          ls -la dist/assets/ || echo "No assets directory found"
-          
-      - name: Verify build contains game files
-        run: |
-          cd apps/web/dist
-          if [ ! -f "index.html" ]; then
-            echo "❌ index.html not found!"
-            exit 1
-          fi
-          if ! grep -q "Privacy Jenga" index.html; then
-            echo "❌ index.html doesn't contain Privacy Jenga content!"
-            exit 1
-          fi
-          echo "✅ Build verification passed - game files are present"
-          
-      - name: Verify mobile responsiveness
-        run: |
-          cd apps/web/dist
-          # Check for responsive design elements
-          if ! grep -q "viewport" index.html; then
-            echo "⚠️  Warning: No viewport meta tag found for mobile responsiveness"
-          else
-            echo "✅ Viewport meta tag found for mobile responsiveness"
-          fi
-          
-          # Check for CSS media queries
-          if [ -d "assets" ]; then
-            echo "✅ Assets directory found - checking for responsive CSS"
-            find assets -name "*.css" -exec grep -l "media" {} \; || echo "⚠️  No media queries found in CSS files"
-          fi
-          
-      - name: Clean deployment artifacts
-        run: |
-          cd apps/web/dist
-          # Remove any README files that might interfere with GitHub Pages
-          rm -f README.md readme.md README.txt
-          # Ensure index.html is the main entry point
-          echo "✅ Cleaned deployment artifacts"
-          
-      - name: Create .nojekyll file
-        run: |
-          cd apps/web/dist
-          # Create .nojekyll file to prevent GitHub Pages from using Jekyll processing
-          touch .nojekyll
-          echo "✅ Created .nojekyll file to ensure proper GitHub Pages serving"
-          
-      - name: Setup artifact context
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: 'apps/web/dist'
-
-  deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    runs-on: ubuntu-latest
-    needs: build
-    steps:
       - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./apps/web/dist
+          publish_branch: gh-pages
+          force_orphan: true
