@@ -2,7 +2,7 @@
 
 > **Learn Bitcoin privacy and security through an engaging 3D tower-building experience!**
 
-![Privacy Jenga Game Interface](https://github.com/MWANGAZA-LAB/Privacy-Jenga/assets/your-username/privacy-jenga-screenshot.png)
+<img width="1917" height="967" alt="image" src="https://github.com/user-attachments/assets/e4f3df05-0045-4aa7-8464-f7916e59f768" />
 
 [![React](https://img.shields.io/badge/React-18-blue.svg)](https://reactjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue.svg)](https://www.typescriptlang.org/)
