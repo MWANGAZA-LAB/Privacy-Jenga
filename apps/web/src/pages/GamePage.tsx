@@ -95,7 +95,7 @@ const GamePage: React.FC = () => {
   const [soundEnabled] = useState(soundManager.getSettings().enabled);
   
   // Mobile responsiveness
-  const { isMobile, isSmallMobile } = useResponsiveDesign();
+  const { isMobile } = useResponsiveDesign();
 
   // Initialize game
   useEffect(() => {
@@ -280,151 +280,109 @@ const GamePage: React.FC = () => {
   return (
     <GameErrorBoundary>
       <div className="min-h-screen bg-gradient-to-br from-blue-900 via-purple-900 to-indigo-900">
-        {/* Header */}
-        <header className="relative z-30 bg-black/20 backdrop-blur-sm border-b border-white/10">
-          <div className="container mx-auto px-4 py-4">
+        {/* Mobile-First Header */}
+        <header className="relative z-30 bg-black/20 backdrop-blur-sm border-b border-white/10 sticky top-0">
+          <div className="px-4 py-3">
             <div className="flex items-center justify-between">
               {/* Back Button */}
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => window.history.back()}
-                className={`flex items-center gap-2 text-white hover:text-teal-300 transition-colors ${
-                  isSmallMobile ? 'text-sm' : ''
-                }`}
+                className="flex items-center gap-2 text-white hover:text-teal-300 transition-colors"
               >
-                <ArrowLeft className={isSmallMobile ? "w-4 h-4" : "w-5 h-5"} />
-                {!isSmallMobile && "Back to Menu"}
+                <ArrowLeft className="w-5 h-5" />
+                <span className="hidden sm:inline text-sm">Back</span>
               </motion.button>
 
               {/* Game Title */}
               <div className="text-center">
-                <h1 className={`font-bold text-white ${
-                  isSmallMobile ? 'text-lg' : 'text-2xl'
-                }`}>Privacy Jenga</h1>
-                <p className={`text-gray-300 ${
-                  isSmallMobile ? 'text-xs' : 'text-sm'
-                }`}>Learn Bitcoin Privacy Through Play</p>
+                <h1 className="font-bold text-white text-lg">Privacy Jenga</h1>
+                <p className="text-gray-300 text-xs">Learn Bitcoin Privacy Through Play</p>
               </div>
 
-              {/* Action Buttons */}
-              <div className={`flex items-center gap-2 ${
-                isSmallMobile ? 'gap-1' : ''
-              }`}>
+              {/* Mobile Action Buttons */}
+              <div className="flex items-center gap-1">
                 <motion.button
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   onClick={() => setShowStats(true)}
-                  className={`text-white hover:text-yellow-300 transition-colors ${
-                    isSmallMobile ? 'p-1' : 'p-2'
-                  }`}
+                  className="p-2 text-white hover:text-yellow-300 transition-colors"
                   title="Game Statistics"
                 >
-                  <BarChart3 className={isSmallMobile ? "w-4 h-4" : "w-5 h-5"} />
+                  <BarChart3 className="w-5 h-5" />
                 </motion.button>
                 
                 <motion.button
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   onClick={() => setShowHelp(true)}
-                  className={`text-white hover:text-blue-300 transition-colors ${
-                    isSmallMobile ? 'p-1' : 'p-2'
-                  }`}
+                  className="p-2 text-white hover:text-blue-300 transition-colors"
                   title="Game Help"
                 >
-                  <HelpCircle className={isSmallMobile ? "w-4 h-4" : "w-5 h-5"} />
+                  <HelpCircle className="w-5 h-5" />
                 </motion.button>
                 
-                                 <motion.button
-                   whileHover={{ scale: 1.05 }}
-                   whileTap={{ scale: 0.95 }}
-                   onClick={() => setShowTutorial(true)}
-                   className={`text-white hover:text-green-300 transition-colors ${
-                     isSmallMobile ? 'p-1' : 'p-2'
-                   }`}
-                   title="Game Tutorial"
-                 >
-                   <Brain className={isSmallMobile ? "w-4 h-4" : "w-5 h-5"} />
-                 </motion.button>
-                 
-                                                      <motion.button
-                     whileHover={{ scale: 1.05 }}
-                     whileTap={{ scale: 0.95 }}
-                     onClick={() => setShowSoundSettings(true)}
-                     className={`text-white hover:text-blue-300 transition-colors ${
-                       isSmallMobile ? 'p-1' : 'p-2'
-                     }`}
-                     title="Sound Settings"
-                   >
-                     {soundEnabled ? (
-                       <Volume2 className={isSmallMobile ? "w-4 h-4" : "w-5 h-5"} />
-                     ) : (
-                       <VolumeX className={isSmallMobile ? "w-4 h-4" : "w-5 h-5"} />
-                     )}
-                   </motion.button>
-                 
-
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => setShowTutorial(true)}
+                  className="p-2 text-white hover:text-green-300 transition-colors"
+                  title="Game Tutorial"
+                >
+                  <Brain className="w-5 h-5" />
+                </motion.button>
+                
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => setShowSoundSettings(true)}
+                  className="p-2 text-white hover:text-blue-300 transition-colors"
+                  title="Sound Settings"
+                >
+                  {soundEnabled ? (
+                    <Volume2 className="w-5 h-5" />
+                  ) : (
+                    <VolumeX className="w-5 h-5" />
+                  )}
+                </motion.button>
               </div>
             </div>
           </div>
         </header>
 
-        {/* Game Progress Bar */}
-        <div className="bg-black/20 backdrop-blur-sm border-b border-white/10 px-4 py-2">
-          <div className="container mx-auto">
-            <div className="flex items-center justify-between text-sm text-gray-300 mb-2">
-              <span>Learning Progress</span>
-              <span>{gameState.totalContentShown}/{gameState.totalContentAvailable} concepts</span>
-            </div>
-            <div className="w-full bg-gray-700 rounded-full h-2">
-              <div 
-                className="bg-gradient-to-r from-blue-500 to-purple-500 h-2 rounded-full transition-all duration-500"
-                style={{ width: `${(gameState.totalContentShown / gameState.totalContentAvailable) * 100}%` }}
-              />
-            </div>
+        {/* Mobile-First Progress Bar */}
+        <div className="bg-black/20 backdrop-blur-sm border-b border-white/10 px-4 py-3">
+          <div className="flex items-center justify-between text-sm text-gray-300 mb-2">
+            <span>Learning Progress</span>
+            <span>{gameState.totalContentShown}/{gameState.totalContentAvailable} concepts</span>
+          </div>
+          <div className="w-full bg-gray-700 rounded-full h-2">
+            <div 
+              className="bg-gradient-to-r from-blue-500 to-purple-500 h-2 rounded-full transition-all duration-500"
+              style={{ width: `${(gameState.totalContentShown / gameState.totalContentAvailable) * 100}%` }}
+            />
           </div>
         </div>
 
-        {/* Game Stats Bar */}
-        <div className="bg-black/10 backdrop-blur-sm px-4 py-3">
-          <div className="container mx-auto">
-            <div className={`grid gap-4 text-center ${
-              isSmallMobile ? 'grid-cols-2 gap-2' : 
-              isMobile ? 'grid-cols-2 gap-3' : 
-              'grid-cols-2 md:grid-cols-4 gap-4'
-            }`}>
-              <div>
-                <div className={`font-bold text-yellow-400 ${
-                  isSmallMobile ? 'text-base' : 'text-lg'
-                }`}>{gameState.currentScore}</div>
-                <div className={`text-gray-400 ${
-                  isSmallMobile ? 'text-xs' : 'text-xs'
-                }`}>Score</div>
-              </div>
-              <div>
-                <div className={`font-bold text-green-400 ${
-                  isSmallMobile ? 'text-base' : 'text-lg'
-                }`}>{gameState.towerStability}%</div>
-                <div className={`text-gray-400 ${
-                  isSmallMobile ? 'text-xs' : 'text-xs'
-                }`}>Stability</div>
-              </div>
-              {!isSmallMobile && (
-                <>
-                  <div>
-                    <div className={`font-bold text-blue-400 ${
-                      isMobile ? 'text-base' : 'text-lg'
-                    }`}>{gameState.currentDifficulty}</div>
-                    <div className="text-xs text-gray-400">Difficulty</div>
-                  </div>
-                  <div>
-                    <div className={`font-bold text-purple-400 ${
-                      isMobile ? 'text-base' : 'text-lg'
-                    }`}>{gameState.currentPlayer.totalAchievements}</div>
-                    <div className="text-xs text-gray-400">Achievements</div>
-                  </div>
-                </>
-              )}
+        {/* Mobile-First Game Stats */}
+        <div className="bg-black/10 backdrop-blur-sm px-4 py-4">
+          <div className="grid grid-cols-4 gap-2 text-center">
+            <div>
+              <div className="font-bold text-yellow-400 text-lg">{gameState.currentScore}</div>
+              <div className="text-gray-400 text-xs">Score</div>
+            </div>
+            <div>
+              <div className="font-bold text-green-400 text-lg">{gameState.towerStability}%</div>
+              <div className="text-gray-400 text-xs">Stability</div>
+            </div>
+            <div>
+              <div className="font-bold text-blue-400 text-lg">{gameState.currentDifficulty}</div>
+              <div className="text-gray-400 text-xs">Difficulty</div>
+            </div>
+            <div>
+              <div className="font-bold text-purple-400 text-lg">{gameState.currentPlayer.totalAchievements}</div>
+              <div className="text-gray-400 text-xs">Achievements</div>
             </div>
           </div>
         </div>
@@ -443,87 +401,79 @@ const GamePage: React.FC = () => {
            {/* Tower Collapse Button removed - now handled by popup */}
          </main>
 
-         {/* Game Footer */}
-         <footer className="relative z-20 bg-black/20 backdrop-blur-sm border-t border-white/10 px-4 py-3">
-           <div className="container mx-auto">
-             <div className={`flex items-center justify-between ${
-               isSmallMobile ? 'flex-col gap-3' : 'flex-row'
-             }`}>
-               {/* Help Button */}
-               <div className="relative">
-                 <button
-                   onClick={() => setShowQuickHelp(!showQuickHelp)}
-                   className="bg-black/60 backdrop-blur-sm rounded-lg p-2 border border-gray-600/50 hover:bg-gray-700/80 transition-colors"
-                   title="Quick Help"
-                 >
-                   <div className="text-center">
-                     <div className="text-gray-300 text-sm font-semibold">?</div>
-                     <div className="text-gray-400 text-xs">Help</div>
+         {/* Mobile-First Game Footer */}
+         <footer className="relative z-20 bg-black/20 backdrop-blur-sm border-t border-white/10 px-4 py-4">
+           <div className="flex items-center justify-between">
+             {/* Help Button */}
+             <div className="relative">
+               <button
+                 onClick={() => setShowQuickHelp(!showQuickHelp)}
+                 className="bg-black/60 backdrop-blur-sm rounded-lg p-3 border border-gray-600/50 hover:bg-gray-700/80 transition-colors"
+                 title="Quick Help"
+               >
+                 <div className="text-center">
+                   <div className="text-gray-300 text-sm font-semibold">?</div>
+                   <div className="text-gray-400 text-xs">Help</div>
+                 </div>
+               </button>
+               
+               {/* Quick help tooltip */}
+               {showQuickHelp && (
+                 <div className="absolute bottom-full left-0 mb-2 bg-black/90 backdrop-blur-sm rounded-lg p-3 border border-gray-600/50 max-w-xs z-30">
+                   <div className="text-gray-300 text-xs space-y-1">
+                     <div className="font-semibold text-white mb-2">Quick Tips:</div>
+                     <div>• Click on any block to reveal content</div>
+                     <div>• Answer questions correctly to maintain stability</div>
+                     <div>• Learn all 54 Bitcoin privacy concepts</div>
+                     <div>• Difficulty adapts to your performance</div>
+                     <div>• Green = Safe, Orange = Medium, Red = Risky</div>
                    </div>
-                 </button>
-                 
-                 {/* Quick help tooltip */}
-                 {showQuickHelp && (
-                   <div className={`absolute bg-black/90 backdrop-blur-sm rounded-lg p-3 border border-gray-600/50 max-w-xs z-30 ${
-                     isSmallMobile ? 'bottom-full left-0 mb-2' : 'bottom-full left-0 mb-2'
-                   }`}>
-                     <div className="text-gray-300 text-xs space-y-1">
-                       <div className="font-semibold text-white mb-2">Quick Tips:</div>
-                       <div>• Click on any block to reveal content</div>
-                       <div>• Answer questions correctly to maintain stability</div>
-                       <div>• Learn all 54 Bitcoin privacy concepts</div>
-                       <div>• Difficulty adapts to your performance</div>
-                       <div>• Green = Safe, Orange = Medium, Red = Risky</div>
-                     </div>
-                   </div>
-                 )}
-               </div>
+                 </div>
+               )}
+             </div>
 
-               {/* Footer Info */}
-               <div className={`text-center text-gray-400 text-xs ${
-                 isSmallMobile ? 'order-3 w-full' : ''
-               }`}>
-                 <div>Privacy Jenga - Learn Bitcoin Privacy Through Play</div>
-                 <div>Click blocks to learn, answer questions to progress</div>
-               </div>
+             {/* Footer Info */}
+             <div className="text-center text-gray-400 text-xs flex-1 mx-4">
+               <div>Privacy Jenga - Learn Bitcoin Privacy Through Play</div>
+               <div>Click blocks to learn, answer questions to progress</div>
+             </div>
 
-               {/* Audio Debug Button */}
-               <div className="relative">
-                 <button
-                   onClick={() => {
-                     console.log('🔊 Audio Debug Info:');
-                     console.log('Audio supported:', soundManager.isAudioSupported());
-                     console.log('Audio status:', soundManager.getAudioStatus());
-                     console.log('Sound settings:', soundManager.getSettings());
-                     console.log('Loaded sounds:', Array.from(soundManager['sounds'].keys()));
-                     soundManager.playSound('button-click');
-                   }}
-                   className="bg-black/60 backdrop-blur-sm rounded-lg p-2 border border-gray-600/50 hover:bg-gray-700/80 transition-colors"
-                   title="Audio Debug"
-                 >
-                   <div className="text-center">
-                     <div className="text-gray-300 text-sm">🔧</div>
-                     <div className="text-gray-400 text-xs">Debug</div>
-                   </div>
-                 </button>
-               </div>
+             {/* Audio Debug Button */}
+             <div className="relative">
+               <button
+                 onClick={() => {
+                   console.log('🔊 Audio Debug Info:');
+                   console.log('Audio supported:', soundManager.isAudioSupported());
+                   console.log('Audio status:', soundManager.getAudioStatus());
+                   console.log('Sound settings:', soundManager.getSettings());
+                   console.log('Loaded sounds:', Array.from(soundManager['sounds'].keys()));
+                   soundManager.playSound('button-click');
+                 }}
+                 className="bg-black/60 backdrop-blur-sm rounded-lg p-3 border border-gray-600/50 hover:bg-gray-700/80 transition-colors"
+                 title="Audio Debug"
+               >
+                 <div className="text-center">
+                   <div className="text-gray-300 text-sm">🔧</div>
+                   <div className="text-gray-400 text-xs">Debug</div>
+                 </div>
+               </button>
              </div>
            </div>
          </footer>
 
-        {/* Achievement Notification */}
+        {/* Mobile-First Achievement Notification */}
         {showAchievementNotification && lastAchievement && (
           <motion.div
             initial={{ opacity: 0, y: -50, scale: 0.9 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -50, scale: 0.9 }}
-            className="fixed top-4 right-4 z-50 bg-gradient-to-r from-yellow-500/90 to-orange-500/90 backdrop-blur-sm rounded-lg p-4 border border-yellow-400/50 shadow-lg"
+            className="fixed top-4 left-4 right-4 z-50 bg-gradient-to-r from-yellow-500/90 to-orange-500/90 backdrop-blur-sm rounded-lg p-4 border border-yellow-400/50 shadow-lg"
           >
             <div className="flex items-center gap-3">
-              <div className="text-3xl">{lastAchievement.icon}</div>
-              <div>
-                <div className="font-bold text-white">{lastAchievement.name}</div>
-                <div className="text-sm text-yellow-100">{lastAchievement.description}</div>
+              <div className="text-2xl">{lastAchievement.icon}</div>
+              <div className="flex-1">
+                <div className="font-bold text-white text-sm">{lastAchievement.name}</div>
+                <div className="text-xs text-yellow-100">{lastAchievement.description}</div>
                 <div className="text-xs text-yellow-200">+{lastAchievement.points} points</div>
               </div>
             </div>
