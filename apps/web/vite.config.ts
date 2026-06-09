@@ -118,7 +118,13 @@ export default defineConfig({
       },
     }),
   ],
-  base: process.env.NODE_ENV === 'production' ? '/Privacy-Jenga/' : '/',
+  // GitHub Pages serves from /Privacy-Jenga/, but Vercel (and dev) serve from root.
+  // Vercel sets VERCEL=1 during the build, so detect it and use '/'.
+  base: process.env.VERCEL
+    ? '/'
+    : process.env.NODE_ENV === 'production'
+      ? '/Privacy-Jenga/'
+      : '/',
   test: {
     globals: true,
     environment: 'jsdom',
