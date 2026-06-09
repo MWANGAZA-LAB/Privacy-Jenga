@@ -26,7 +26,7 @@ console.log('🏠 Base name will be:', (import.meta as any).env.PROD ? "/Privacy
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <QueryClientProvider client={queryClient}>
-      <BrowserRouter basename={(import.meta as any).env.PROD ? "/Privacy-Jenga" : "/"}>
+      <BrowserRouter basename={import.meta.env.BASE_URL.replace(/\/$/, '') || '/'}>
         <App />
         <Toaster 
           position="top-right"
